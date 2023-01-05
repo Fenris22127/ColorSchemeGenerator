@@ -11,8 +11,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.colorscheme.app.App.outputField;
-import static de.colorscheme.app.App.task;
+import static de.colorscheme.app.App.*;
 import static java.util.logging.Level.INFO;
 
 /**
@@ -74,6 +73,7 @@ public class ColorData {
     /**
      * Empty default constructor
      */
+    @SuppressWarnings("unused")
     protected ColorData() {
     }
 
@@ -93,7 +93,7 @@ public class ColorData {
      * a custom exception {@link PixelListSizeException PixelListSizeException} is thrown and the
      * {@link javax.swing.SwingWorker SwingWorker} in {@link de.colorscheme.app.StartProcess StartProcess} is
      * cancelled. The user is informed about
-     * the error via the {@link App#outputField textfield}.
+     * the error via the {@link App#getOutputField() textfield}.
      *
      * @param image A {@link BufferedImage}: The image to be read
      **/
@@ -121,11 +121,11 @@ public class ColorData {
         }
         //recorded pixels and total pixels in image differ
         catch (PixelListSizeException e) {
-            outputField.setForeground(Color.RED);
-            outputField.setText("An error occurred while getting the pixels in the image! " +
+            getOutputField().setForeground(Color.RED);
+            getOutputField().setText("An error occurred while getting the pixels in the image! " +
                     "Expected and actual amount of pixels differ!" + System.lineSeparator() + "Expected: " +
                     (int) pixelCount + System.lineSeparator() + "Actual: " + pixelColor.size());
-            task.cancel(true);
+            getTask().cancel(true);
 
             LOGGER.log(Level.SEVERE, String.format("%s: Expected and actual amount of pixels differ! Expected: %e%nActual: %d%n",
                     e.getClass().getSimpleName(), pixelCount, pixelColor.size()));
@@ -583,6 +583,7 @@ public class ColorData {
      *
      * @return A {@link Point3D} - The minimum
      */
+    @SuppressWarnings("unused")
     protected Point3D getMin() {
         return minimum;
     }
@@ -592,6 +593,7 @@ public class ColorData {
      *
      * @return A {@link Point3D} - The maximum
      */
+    @SuppressWarnings("unused")
     protected Point3D getMax() {
         return maximum;
     }

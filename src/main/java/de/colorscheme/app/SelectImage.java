@@ -109,7 +109,7 @@ public class SelectImage {
         //Create JFrame, set DefaultCloseOperation and set icon to be displayed in the top left corner
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setIconImage(new ImageIcon("src\\assets\\searchFile.png").getImage());
+        frame.setIconImage(new ImageIcon("src/main/resources/searchFile.png").getImage());
 
         //Create FileChooser, set its dimensions, font, display the control buttons and set dialog title
         JFileChooser fileChooser = new JFileChooser("user.home");
@@ -207,7 +207,9 @@ public class SelectImage {
 
                         // Set icon otherwise
                         img.setIcon(new ImageIcon(image));
-                    } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                    }
+                    catch (InterruptedException | ExecutionException | TimeoutException e) {
+                        Thread.currentThread().interrupt();
                         img.setText("Couldn't load image.");
                     }
                 }
@@ -280,7 +282,7 @@ public class SelectImage {
     private static void setFileChooserFont(Component[] comp) {
         Font font = new Font("Verdana",Font.PLAIN,14);
         for (Component component : comp) {
-            if (component instanceof Container) setFileChooserFont(((Container) component).getComponents());
+            if (component instanceof Container container) setFileChooserFont(container.getComponents());
             component.setFont(font);
         }
     }

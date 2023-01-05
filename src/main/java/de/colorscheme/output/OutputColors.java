@@ -1,14 +1,15 @@
 package de.colorscheme.output;
 
+import com.itextpdf.text.*;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import de.colorscheme.app.App;
 import de.colorscheme.clustering.ColorData;
+import de.customlogger.logger.ColorLogger;
 import javafx.geometry.Point3D;
 
 import java.awt.*;
@@ -16,7 +17,7 @@ import java.io.*;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 
-import static de.colorscheme.clustering.KMeans.centroids;
+import static de.colorscheme.clustering.KMeans.getCentroids;
 import static java.util.logging.Level.SEVERE;
 
 /**
@@ -30,14 +31,10 @@ import static java.util.logging.Level.SEVERE;
 public class OutputColors {
 
     /**
-     * Creates a {@link Logger} for this class
+     * Creates a {@link ColorLogger Logger} for this class
      */
-    private static final Logger LOGGER = Logger.getLogger(OutputColors.class.getName());
+    private static final Logger LOGGER = ColorLogger.newLogger(OutputColors.class.getName());
 
-    /**
-     * Private constructor to hide the public one
-     */
-    private OutputColors() {}
     /**
      * The {@link Font} used for the {@link Document} title
      */
@@ -52,6 +49,11 @@ public class OutputColors {
      * The {@link Font} used for the {@link Document}s small content
      */
     private static final Font small = FontFactory.getFont(FontFactory.HELVETICA, 10, Font.NORMAL);
+
+    /**
+     * Private constructor to hide the public one
+     */
+    private OutputColors() {}
 
     /**
      * Create a PDF with the resulting color scheme using the methods of the class {@link OutputColors OutputColors}.
@@ -81,7 +83,7 @@ public class OutputColors {
 
         String filename = "ColorScheme_" + imgName.substring(0, imgName.lastIndexOf(".")) + ".pdf";
 
-        String finalPath = fileDestinationBuilder.append(App.downloadPath).append("\\").append(filename).toString();
+        String finalPath = fileDestinationBuilder.append(App.getDownloadPath()).append("\\").append(filename).toString();
 
         //Try to create a new file "ColorScheme.pdf"
         try {
@@ -100,21 +102,22 @@ public class OutputColors {
                 outputWrite(c, fileDestinationBuilder.toString(), imagePath);
             }
             return colorScheme;
-        } catch (DocumentException e) {
-            App.outputField.setForeground(Color.RED);
-            App.outputField.setText("An error occurred while trying to write into the created file!");
-            App.task.cancel(true);
+        }
+        catch (DocumentException e) {
+            App.getOutputField().setForeground(Color.RED);
+            App.getOutputField().setText("An error occurred while trying to write into the created file!");
+            App.getTask().cancel(true);
 
-            LOGGER.log(SEVERE, "{0}: Couldn't instantiate PdfWriter!", e.getClass().getSimpleName());
+            LOGGER.log(SEVERE, "{0}: Could not instantiate PdfWriter!", e.getClass().getSimpleName());
             e.printStackTrace();
         }
         catch (FileNotFoundException e) {
-            App.outputField.setForeground(Color.RED);
-            App.outputField.setText("An error occurred while trying to create the file!" +
+            App.getOutputField().setForeground(Color.RED);
+            App.getOutputField().setText("An error occurred while trying to create the file!" +
                     "Destination may have been moved or deleted!");
-            App.task.cancel(true);
+            App.getTask().cancel(true);
 
-            LOGGER.log(SEVERE,"{0}: FileOutputStream couldn't create file!", e.getClass().getSimpleName());
+            LOGGER.log(SEVERE,"{0}: FileOutputStream could not create file!", e.getClass().getSimpleName());
             e.printStackTrace();
         }
 
@@ -171,21 +174,21 @@ public class OutputColors {
             doc.close();
         }
         catch (IOException e) {
-            App.outputField.setForeground(Color.RED);
-            App.outputField.setText("An error occurred while trying to access the created file! " +
+            App.getOutputField().setForeground(Color.RED);
+            App.getOutputField().setText("An error occurred while trying to access the created file! " +
                     "File may have been moved or access may be denied by a Security Manager!");
-            App.task.cancel(true);
+            App.getTask().cancel(true);
 
-            LOGGER.log(SEVERE,"{0}: FileOutputStream couldn't access created document!",
+            LOGGER.log(SEVERE,"{0}: FileOutputStream could not access created document!",
                     e.getClass().getSimpleName());
             e.printStackTrace();
         }
         catch (DocumentException e) {
-            App.outputField.setForeground(Color.RED);
-            App.outputField.setText("An error occurred while trying to write into the created file!");
-            App.task.cancel(true);
+            App.getOutputField().setForeground(Color.RED);
+            App.getOutputField().setText("An error occurred while trying to write into the created file!");
+            App.getTask().cancel(true);
 
-            LOGGER.log(SEVERE,"{0}: Couldn't instantiate PdfWriter!",
+            LOGGER.log(SEVERE,"{0}: Could not instantiate PdfWriter!",
                     e.getClass().getSimpleName());
             e.printStackTrace();
         }
@@ -281,14 +284,14 @@ public class OutputColors {
             addEmptyLine(space, 1);
             doc.add(space);
 
-            PdfPTable table = new PdfPTable(centroids);
-            for (int i = 0; i < centroids; i++) {
+            PdfPTable table = new PdfPTable(getCentroids());
+            for (int i = 0; i < getCentroids(); i++) {
                 PdfPCell cell = new PdfPCell();
                 cell.setFixedHeight(200);
                 cell.setBackgroundColor(colors.get(i));
                 table.addCell(cell);
             }
-            for (int i = 0; i < centroids; i++) {
+            for (int i = 0; i < getCentroids(); i++) {
                 int red = colors.get(i).getRed();
                 int green = colors.get(i).getGreen();
                 int blue = colors.get(i).getBlue();
@@ -307,21 +310,21 @@ public class OutputColors {
             doc.add(table);
         }
         catch (DocumentException e) {
-            App.outputField.setForeground(Color.RED);
-            App.outputField.setText("An error occurred while adding elements to the created file!");
-            App.task.cancel(true);
+            App.getOutputField().setForeground(Color.RED);
+            App.getOutputField().setText("An error occurred while adding elements to the created file!");
+            App.getTask().cancel(true);
 
-            Logger.getAnonymousLogger().log(SEVERE,"{}: Couldn't add element to created document!",
+            Logger.getAnonymousLogger().log(SEVERE,"{}: Could not add element to created document!",
                     e.getClass().getSimpleName());
             e.printStackTrace();
         }
         catch (IOException e) {
-        App.outputField.setForeground(Color.RED);
-        App.outputField.setText("An error occurred while getting the chosen image to display it in the created file! " +
+        App.getOutputField().setForeground(Color.RED);
+        App.getOutputField().setText("An error occurred while getting the chosen image to display it in the created file! " +
                 "Couldn't read image!");
-        App.task.cancel(true);
+        App.getTask().cancel(true);
 
-            Logger.getAnonymousLogger().log(SEVERE,"{}: Couldn't read image to display in created document!",
+            Logger.getAnonymousLogger().log(SEVERE,"{}: Could not read image to display in created document!",
                     e.getClass().getSimpleName());
         e.printStackTrace();
     }
@@ -352,7 +355,7 @@ public class OutputColors {
      * @param paragraph A {@link Paragraph}: The target {@link Paragraph} for the empty lines
      * @param number An {@link Integer}: The amount of empty lines to be added
      */
-    @SuppressWarnings("SameParameterValue")
+    //@SuppressWarnings("SameParameterValue")
     private static void addEmptyLine(Paragraph paragraph, int number) {
         for (int i = 0; i < number; i++) {
             paragraph.add(new Paragraph(" "));

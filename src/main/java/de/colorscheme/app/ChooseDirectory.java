@@ -1,7 +1,5 @@
 package de.colorscheme.app;
 
-import darrylbu.util.SwingUtils;
-
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
@@ -79,7 +77,7 @@ public class ChooseDirectory {
         //Create JFrame, set DefaultCloseOperation and set icon to be displayed in the top left corner
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setIconImage(new ImageIcon("src\\assets\\downloadIcon.png").getImage());
+        frame.setIconImage(new ImageIcon("src/main/resources/downloadIcon.png").getImage());
 
         //Create FileChooser, set its dimensions, font, display the control buttons and set dialog title
         JFileChooser fileChooser = new JFileChooser("user.home");
@@ -106,7 +104,7 @@ public class ChooseDirectory {
         details.actionPerformed(null);
 
         //Get files in listview as a table, set width of 'modified' and 'type' and remove 'size' tab
-        JTable table = SwingUtils.getDescendantsOfType(JTable.class, fileChooser).get(0);
+        JTable table = darrylbu.util.SwingUtils.getDescendantsOfType(JTable.class, fileChooser).get(0);
         TableColumnModel columnModel = table.getColumnModel();
         columnModel.getColumn(table.getColumnCount() - 1).setPreferredWidth(180);
         columnModel.getColumn(table.getColumnCount() - 2).setPreferredWidth(100);

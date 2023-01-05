@@ -41,13 +41,13 @@ public class StartProcess extends SwingWorker<Boolean, Integer> {
      * <ol>
      *    <li>
      *        Sets the progress of the {@link JProgressBar progress bar} to 10% and adds "File found" to the
-     *        {@link JTextArea} {@link App#outputField outputField}.
+     *        {@link JTextArea} {@link App#getOutputField() outputField}.
      *    </li>
      *    <li>
      *        Calls {@link #findImage()} to get the {@link BufferedImage image} either in its original size, if it's
      *        below the threshold or the resized image, if it exceeds a certain dimension. <br>
      *        Then sets the progress of the {@link JProgressBar progress bar} to 24% and adds "Reading colours in
-     *        image." to the {@link JTextArea} {@link App#outputField outputField}. <br>
+     *        image." to the {@link JTextArea} {@link App#getOutputField() outputField}. <br>
      *        To improve the conciseness, the Thread is put to {@link Thread#sleep(long) sleep} for one
      *        second (1000 ms) before starting to read the pixels of the image.
      *    </li>
@@ -57,7 +57,7 @@ public class StartProcess extends SwingWorker<Boolean, Integer> {
      *        will be inspected and its colour saved. <br>
      *        Then, an instance of ColorData is created, that will be used for all following processes and sets the
      *        progress of the {@link JProgressBar progress bar} to 68% and adds "Determining main colours." to the
-     *        {@link JTextArea} {@link App#outputField outputField}.
+     *        {@link JTextArea} {@link App#getOutputField() outputField}.
      *    </li>
      *    <li>
      *        Starts K-Means clustering by calling
@@ -67,13 +67,13 @@ public class StartProcess extends SwingWorker<Boolean, Integer> {
      *    </li>
      *    <li>
      *        Then sets the progress of the {@link JProgressBar progress bar} to 86%, adds "Creating the color
-     *        scheme." to the {@link JTextArea} {@link App#outputField outputField}, sets the progress to 99% and then
-     *        adds "Finishing up..." to the {@link App#outputField outputField}.
+     *        scheme." to the {@link JTextArea} {@link App#getOutputField() outputField}, sets the progress to 99% and then
+     *        adds "Finishing up..." to the {@link App#getOutputField() outputField}.
      *    </li>
      *    <li>
      *        Again, to improve the conciseness, the Thread is put to {@link Thread#sleep(long) sleep}
      *        for one second (1000 ms), before setting the progress of the {@link JProgressBar progress bar} to 100%
-     *        and adding "Done!" to the {@link App#outputField outputField}.
+     *        and adding "Done!" to the {@link App#getOutputField() outputField}.
      *    </li>
      *    <li>
      *        Finally, the {@link App#download download button} is enabled and if {@link App#autoDownload autodownload}
@@ -88,34 +88,34 @@ public class StartProcess extends SwingWorker<Boolean, Integer> {
     @Override
     protected Boolean doInBackground() throws Exception {
         newProgress(10);
-        outputField.append("Found file." + System.lineSeparator());
+        getOutputField().append("Found file." + System.lineSeparator());
 
         BufferedImage img = findImage();
         newProgress(24);
-        outputField.append("Reading colours in image." + System.lineSeparator());
+        getOutputField().append("Reading colours in image." + System.lineSeparator());
         TimeUnit.MILLISECONDS.sleep(1000);
 
         ColorData data = new ColorData(img);
         if (!isCancelled()){
             newProgress(68);
-            outputField.append("Determining main colors." + System.lineSeparator());
+            getOutputField().append("Determining main colors." + System.lineSeparator());
         }
 
         if (!isCancelled()) {
             kMeans(data, selectedCentroids);
             newProgress(86);
-            outputField.append("Creating the color scheme." + System.lineSeparator());
+            getOutputField().append("Creating the color scheme." + System.lineSeparator());
         }
 
         if (!isCancelled()) {
             newProgress(99);
-            outputField.append("Finishing up..." + System.lineSeparator());
+            getOutputField().append("Finishing up..." + System.lineSeparator());
         }
 
         if (!isCancelled()) {
             TimeUnit.MILLISECONDS.sleep(1000);
             newProgress(100);
-            outputField.append("Done!");
+            getOutputField().append("Done!");
             download.setEnabled(true);
             colorData = data;
         }

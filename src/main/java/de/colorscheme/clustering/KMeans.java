@@ -5,8 +5,8 @@ import javafx.geometry.Point3D;
 import java.awt.*;
 import java.util.AbstractCollection;
 
-import static de.colorscheme.app.App.outputField;
-import static de.colorscheme.app.App.task;
+import static de.colorscheme.app.App.getOutputField;
+import static de.colorscheme.app.App.getTask;
 
 /**
  * The class providing the methods for the KMeans clustering process used to determine the image's main colours. <br>
@@ -18,11 +18,6 @@ import static de.colorscheme.app.App.task;
 public class KMeans {
 
     /**
-     * Private constructor to hide the public one
-     */
-    private KMeans() {}
-
-    /**
      * The value, deciding when the amount of changes after recalculating the centroids is low enough to finish the
      * clustering process
      */
@@ -31,7 +26,22 @@ public class KMeans {
     /**
      * The amount of centroids to be generated for KMeans, determining how many colors will be generated from the image
      */
-    public static int centroids = 0;
+    private static int centroids = 0;
+
+    /**
+     * Private constructor to hide the public one
+     */
+    private KMeans() {
+    }
+
+    /**
+     * Returns amount of centroids to be generated for KMeans
+     *
+     * @return An {@link Integer}: The value of {@link #centroids}
+     */
+    public static int getCentroids() {
+        return centroids;
+    }
 
     /**
      * K-Means++ implementation: initializes centroids from data by selecting a
@@ -55,7 +65,8 @@ public class KMeans {
      *         {@link ColorData#getCentroids() list of centroids}.
      *     </li>
      * </ol>
-     * @param colorData An Instance of the class {@link ColorData}
+     *
+     * @param colorData      An Instance of the class {@link ColorData}
      * @param totalCentroids An {@link Integer} - The number of total centroids to be calculated
      */
     protected static void kMeansPlusPlus(ColorData colorData, int totalCentroids) {
@@ -65,7 +76,7 @@ public class KMeans {
         colorData.getIndicesOfCentroids().add(randomIndex);
         //Add pixel at previously chosen index to list with centroids
         colorData.getCentroids().add(colorData.pixelColor.get(randomIndex).pixel);
-        for(int i = 1; i < totalCentroids; i++) {
+        for (int i = 1; i < totalCentroids; i++) {
             colorData.getCentroids().add(colorData.calculateWeighedCentroid());
         }
     }
@@ -122,28 +133,29 @@ public class KMeans {
      *         Sum of Squared Errors and the loop repeats.
      *     </li>
      * </ol>
-     * @param colorData A {@link ColorData} object: The instance used for all processes for the currently inspected
-     *                  image
+     *
+     * @param colorData      A {@link ColorData} object: The instance used for all processes for the currently inspected
+     *                       image
      * @param totalCentroids An {@link Integer int}: The amount of centroids to be calculated
      **/
     public static void kMeans(ColorData colorData, int totalCentroids) {
         centroids = totalCentroids;
-        kMeansPlusPlus(colorData, totalCentroids);
+        kMeansPlusPlus(colorData, centroids);
         if (colorData.getCentroids().isEmpty()) {
-            outputField.setForeground(Color.RED);
-            outputField.setText("An error occurred while trying to initializing the color scheme generation process!" +
+            getOutputField().setForeground(Color.RED);
+            getOutputField().setText("An error occurred while trying to initializing the color scheme generation process!" +
                     "The list of initializing centroids is empty!");
-            task.cancel(true);
+            getTask().cancel(true);
         }
 
         Double sumSquaredErrors = Double.MAX_VALUE;
 
-        while(true) {
-            for(ColorData.Pixels pixel : colorData.getPixels()) {
+        while (true) {
+            for (ColorData.Pixels pixel : colorData.getPixels()) {
                 double minDist = Double.MAX_VALUE;
 
                 //Iterate through centroids ...
-                for(int i = 0; i < colorData.getCentroids().size(); i++) {
+                for (int i = 0; i < colorData.getCentroids().size(); i++) {
                     //...to find the centroid at a minimum distance from it
                     Double dist = ColorData.euclideanDistance(colorData.getCentroids().get(i), pixel.getPixel());
 
@@ -160,7 +172,7 @@ public class KMeans {
 
             // exit condition, SSE changed less than PRECISION parameter
             Double newSumSquaredErrors = colorData.calculateTotalSumSquaredDistances(colorData.getCentroids());
-            if(sumSquaredErrors - newSumSquaredErrors <= PRECISION) {
+            if (sumSquaredErrors - newSumSquaredErrors <= PRECISION) {
                 break;
             }
 

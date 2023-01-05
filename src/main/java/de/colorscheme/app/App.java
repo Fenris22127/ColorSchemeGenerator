@@ -26,11 +26,6 @@ import static de.colorscheme.output.OutputColors.createOutput;
 public class App {
 
     /**
-     * Private constructor to hide the public one
-     */
-    private App(){}
-
-    /**
      * The {@link JProgressBar progress bar} displaying the progress of the currently generating color scheme
      */
     protected static final JProgressBar progressBar = new JProgressBar();
@@ -39,6 +34,17 @@ public class App {
      * The main {@link JFrame frame} containing all components of the user interface
      */
     private static final JFrame frame = new JFrame("Color Scheme Generator");
+
+    /**
+     * The {@link JCheckBox} to enable/disable automatic downloading of the resulting color scheme file after
+     * finishing the generation of the color scheme
+     */
+    private static final JCheckBox checkbox = new JCheckBox();
+
+    /**
+     * An instance of the class extending a {@link SwingWorker} to update the GUI while executing methods
+     */
+    private static StartProcess task;
 
     /**
      * The upload {@link JButton button} to let the user choose an image
@@ -56,27 +62,10 @@ public class App {
     protected static String fileName = "";
 
     /**
-     * The {@link JTextArea} updating the user about the progress of the color scheme generation
-     */
-    public static JTextArea outputField = new JTextArea();
-
-    /**
-     * The {@link JCheckBox} to enable/disable automatic downloading of the resulting color scheme file after
-     * finishing the generation of the color scheme
-     */
-    private static final JCheckBox checkbox = new JCheckBox();
-
-    /**
      * The {@link Boolean} storing if auto-download is enabled
      * Default: false - Auto-Download is disabled
      */
     protected static boolean autoDownload = false;
-
-    /**
-     * The path, where the resulting color scheme file will be saved, depending on whether auto-download is enabled or
-     * disabled
-     */
-    public static String downloadPath;
 
     /**
      * The {@link ColorData} object used for all processes for the currently inspected image
@@ -90,9 +79,48 @@ public class App {
     protected static int selectedCentroids = 4;
 
     /**
-     * An instance of the class extending a {@link SwingWorker} to update the GUI while executing methods
+     * The {@link JTextArea} updating the user about the progress of the color scheme generation
      */
-    public static StartProcess task;
+    private static JTextArea outputField = new JTextArea();
+
+    /**
+     * The path, where the resulting color scheme file will be saved, depending on whether auto-download is enabled or
+     * disabled
+     */
+    private static String downloadPath;
+
+    /**
+     * Private constructor to hide the public one
+     */
+    private App() {
+    }
+
+    /**
+     * Returns the {@link JTextArea} updating the user about the progress of the color scheme generation
+     *
+     * @return A {@link JTextArea}: The {@link #outputField}
+     */
+    public static JTextArea getOutputField() {
+        return outputField;
+    }
+
+    /**
+     * Returns the path, where the resulting color scheme file will be saved
+     *
+     * @return A {@link String}: The {@link #downloadPath}
+     */
+    public static String getDownloadPath() {
+        return downloadPath;
+    }
+
+    /**
+     * Returns the instance of the class extending a {@link SwingWorker} to update the GUI while executing methods
+     *
+     * @return A {@link StartProcess} instance: The {@link #task}
+     */
+    public static StartProcess getTask() {
+        return task;
+    }
 
     /**
      * Sets up the user interface to let the user upload an image, select the amount of colors to be generated, if the
@@ -184,9 +212,9 @@ public class App {
      *     </li>
      * </ol>
      */
-    protected static void frame() {
-        final String font = "Tahoma";
-        frame.setIconImage(new ImageIcon("src\\assets\\searchFile.png").getImage());
+    public static void frame() {
+        final String FONT = "Tahoma";
+        frame.setIconImage(new ImageIcon("src/main/resources/searchFile.png").getImage());
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
@@ -194,7 +222,7 @@ public class App {
         panel.add(Box.createRigidArea(new Dimension(5, 10)));
 
         JLabel titel = new JLabel("GENERATE A COLOR SCHEME FROM AN IMAGE");
-        titel.setFont(new Font(font, Font.BOLD, 22));
+        titel.setFont(new Font(FONT, Font.BOLD, 22));
         titel.setPreferredSize(new Dimension(500, 50));
         titel.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(titel);
@@ -212,14 +240,14 @@ public class App {
         count.setMaximumSize(new Dimension(500, 50));
         JSpinner spinner = new JSpinner(new SpinnerNumberModel(1, 1, 8, 1));
         spinner.setValue(4);
-        spinner.setFont(new Font(font, Font.PLAIN, 18));
+        spinner.setFont(new Font(FONT, Font.PLAIN, 18));
         spinner.addChangeListener(e -> selectedCentroids = (int) spinner.getValue());
         spinner.setBounds(70, 70, 60, 50);
         count.add(spinner);
         panel.add(count);
 
         upload.setText("Upload");
-        upload.setFont(new Font(font, Font.PLAIN, 15));
+        upload.setFont(new Font(FONT, Font.PLAIN, 15));
         upload.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(upload);
 
@@ -244,7 +272,7 @@ public class App {
         panel.add(Box.createRigidArea(new Dimension(5, 30)));
 
         download.setText("Download");
-        download.setFont(new Font(font, Font.PLAIN, 15));
+        download.setFont(new Font(FONT, Font.PLAIN, 15));
         download.setAlignmentX(Component.CENTER_ALIGNMENT);
         download.setEnabled(false);
         panel.add(download);
@@ -313,8 +341,9 @@ public class App {
      *         the {@link ColorData} instance and {@link #fileName path} to the selected image.
      *     </li>
      * </ol>
-     * @param status    A {@link JPanel}: The passed {@link JPanel panel} that will hold the
-     *                  {@link JProgressBar progress bar} and the {@link JTextArea text fiel} for progress updates.
+     *
+     * @param status A {@link JPanel}: The passed {@link JPanel panel} that will hold the
+     *               {@link JProgressBar progress bar} and the {@link JTextArea text fiel} for progress updates.
      */
     private static void startProgressBar(JPanel status) {
         progressBar.setMinimum(0);
@@ -354,7 +383,8 @@ public class App {
                         });
 
                 task.execute();
-            }});
+            }
+        });
         download.addActionListener(e -> {
             if ((progressBar.getValue() == 100) && colorData != null) {
                 downloadPath = chooseDirectory();
