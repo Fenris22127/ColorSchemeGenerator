@@ -1,5 +1,7 @@
 package de.colorscheme.app;
 
+import darrylbu.util.SwingUtils;
+
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
@@ -104,7 +106,7 @@ public class ChooseDirectory {
         details.actionPerformed(null);
 
         //Get files in listview as a table, set width of 'modified' and 'type' and remove 'size' tab
-        JTable table = darrylbu.util.SwingUtils.getDescendantsOfType(JTable.class, fileChooser).get(0);
+        JTable table = SwingUtils.getDescendantsOfType(JTable.class, fileChooser).get(0);
         TableColumnModel columnModel = table.getColumnModel();
         columnModel.getColumn(table.getColumnCount() - 1).setPreferredWidth(180);
         columnModel.getColumn(table.getColumnCount() - 2).setPreferredWidth(100);

@@ -36,6 +36,7 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
     implementation group: 'com.itextpdf', name: 'itextpdf', version: '5.5.13.3'
     implementation files("src/main/resources/CustomLogger-1.0-SNAPSHOT.jar")
+    implementation files("src/main/resources/SwingUtils.jar")
 }
 
 test {
