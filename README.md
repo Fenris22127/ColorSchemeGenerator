@@ -307,7 +307,7 @@ Project Link: [https://github.com/Fenris22127/ColorSchemeGenerator](https://gith
 [Java-url]: https://www.java.com/
 [Java.de]: https://img.shields.io/badge/java-41492f?style=for-the-badge&logoColor=fafbfc
 [Close-x]: https://img.shields.io/badge/%E2%9C%95-red?style=flat&logoColor=green
-
+{
 <style>
   #center {
     text-align: center;
@@ -365,4 +365,4 @@ Project Link: [https://github.com/Fenris22127/ColorSchemeGenerator](https://gith
   h1 {
     margin: 1.25rem 0 0.313rem 0;
   }
-</style>
+</style>}
