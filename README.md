@@ -308,8 +308,8 @@ Project Link: [https://github.com/Fenris22127/ColorSchemeGenerator](https://gith
 [Java.de]: https://img.shields.io/badge/java-41492f?style=for-the-badge&logoColor=fafbfc
 [Close-x]: https://img.shields.io/badge/%E2%9C%95-red?style=flat&logoColor=green
 
-<p style="display: none">
-  #center {
+
+ ###### #center {
     text-align: center;
   }
   #right {
