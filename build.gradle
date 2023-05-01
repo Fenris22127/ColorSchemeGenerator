@@ -14,7 +14,7 @@ ext {
     junitVersion = '5.9.0'
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
