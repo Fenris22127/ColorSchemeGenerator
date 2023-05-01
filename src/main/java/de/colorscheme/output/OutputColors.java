@@ -308,6 +308,13 @@ public class OutputColors {
                 table.addCell(cell);
             }
             doc.add(table);
+
+            if (ColorWheel.createColorWheel(colors)) {
+                Image colorWheel = Image.getInstance("src/main/resources/SchemeWheel.png");
+                colorWheel.setAlignment(Element.ALIGN_CENTER);
+                colorWheel.scaleToFit(width40, height40);
+                doc.add(colorWheel);
+            }
         }
         catch (DocumentException e) {
             App.getOutputField().setForeground(Color.RED);
@@ -327,7 +334,7 @@ public class OutputColors {
             Logger.getAnonymousLogger().log(SEVERE,"{}: Could not read image to display in created document!",
                     e.getClass().getSimpleName());
         e.printStackTrace();
-    }
+        }
     }
 
     /**

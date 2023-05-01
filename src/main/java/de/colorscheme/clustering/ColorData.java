@@ -389,7 +389,9 @@ public class ColorData {
      */
     protected void recomputeCentroids(int totalCentroids) {
         for (int i = 0; i < totalCentroids; i++) {
-            getCentroids().add(calculateCentroid(i));
+            System.out.println("remove " + i);
+            getCentroids().remove(i);
+            getCentroids().add(i, calculateCentroid(i));
         }
     }
 

@@ -105,7 +105,7 @@ public class SelectImage {
      * </ol>
      * @return A {@link String} with the absolute filepath to the selected image
      */
-    protected static String chooseFile() {
+    public static String chooseFile() {
         //Create JFrame, set DefaultCloseOperation and set icon to be displayed in the top left corner
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

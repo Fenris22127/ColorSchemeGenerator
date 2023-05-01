@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'application'
-    id 'org.openjfx.javafxplugin' version '0.0.10'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
 }
 
 group 'de.colorscheme'
@@ -14,12 +14,12 @@ ext {
     junitVersion = '5.9.0'
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
 application {
-    mainClass = 'de.colorscheme.main.Main'
+    mainClass = 'de.colorscheme.app.FXApp'
 }
 
 repositories {
@@ -27,8 +27,8 @@ repositories {
 }
 
 javafx {
-    version = '17.0.1'
-    modules = ['javafx.controls', 'javafx.fxml']
+    version = '17.0.2'
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.web']
 }
 
 dependencies {

@@ -148,7 +148,7 @@ public class ChooseDirectory {
      * Finds the users default download directory.
      * @return A {@link String}: The path to the default download directory
      */
-    protected static String autoSave() {
+    public static String autoSave() {
         return System.getProperty("user.home").concat("/Downloads");
     }
 }

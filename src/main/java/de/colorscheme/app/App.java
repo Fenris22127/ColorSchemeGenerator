@@ -70,13 +70,13 @@ public class App {
     /**
      * The {@link ColorData} object used for all processes for the currently inspected image
      */
-    protected static ColorData colorData;
+    public static ColorData colorData;
 
     /**
      * The amount of Centroids and therefore the amount of colors to be generated from the image <br>
      * Default: 4 Centroids - The color scheme will contain 4 colors
      */
-    protected static int selectedCentroids = 4;
+    public static int selectedCentroids = 4;
 
     /**
      * The {@link JTextArea} updating the user about the progress of the color scheme generation
