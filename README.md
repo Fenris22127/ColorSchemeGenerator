@@ -221,28 +221,29 @@ See the [documentation](#) for specifics.
 
 - [ ] Finish README
   - [ ] Add Usage Examples
-  - [ ] Add License
-- [ ] Create Bug Template
+  - [x] Add License
+- [x] Create Bug Template
 - [ ] Add documentation
-- [ ] Add history
+- [x] Add history
 - [ ] Add Metadata to image
 - [ ] Better incorporate color wheel
 
-See the [open issues](https://github.com/Fenris22127/ColorSchemeGenerator/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/Fenris22127/ColorSchemeGenerator/issues) for a full list of proposed features (and known issues).<br>
+To report an issue, please use the [issue template](https://github.com/Fenris22127/ColorSchemeGenerator/blob/master/doc/ISSUE_TEMPLATE.md).
 
 
 <!-- LICENSE -->
-## 🚧 License 🚧
-
-Don't edit, distribute or use the code for anything other than private, non commercial use.
-
+## License
+By using the software, the user agrees to the 
+[End User License Agreement](https://github.com/Fenris22127/ColorSchemeGenerator/blob/master/doc/LICENSE.md) and accepts 
+the risks of use.
 
 <!-- CONTACT -->
 ## Contact
 
 Elisa Johanna Woelk<br><br>
 
-[![Email][email-shield]][twitter-url]<br>
+![Email][email-shield]<br>
 [![Twitter][twitter-shield]][twitter-url]<br>
 [![Instagram][instagram-shield]][instagram-url]<br>
 [![GitHub][github-shield]][github-url]
