@@ -11,7 +11,7 @@ So there I was, armed with only my phone, my tablet I used for drawing, OneNote 
 
 I remembered my professor's words, that we needed to know how to write code on paper as we wouldn't always have a computer and an IDE available and I cursed my arrogance as I had thought, that if I needed to code, I would use my PC or an online IDE and if I had neither available, I would just not code. So I had to fall back onto my very limited memory of my first programming classes. Lucky for me, due to my bad memory, I write everything down so I had at least some code snippets I could use as reference for my first lines of code.
 
-I spent my holiday reading up on K-Means Clustering, three dimensional spaces in Java and different forms of visualisations of color spaces. And if I am honest, those holidays were amazing. There is a difference between sitting at home and researching and sitting in the sun at the beach in a different city and researching.
+I spent my holiday reading up on K-Means Clustering, three dimensional spaces in Java and different forms of visualizations of color spaces. And if I am honest, those holidays were amazing. There is a difference between sitting at home and researching and sitting in the sun at the beach in a different city and researching.
 
 When I had come home, I transferred my code into my IDE and to my surprise and joy, I had only very few issues to fix until the version 1.0 of my Color Scheme Generator was working.
 
