@@ -307,8 +307,8 @@ Project Link: [https://github.com/Fenris22127/ColorSchemeGenerator](https://gith
 [Java-url]: https://www.java.com/
 [Java.de]: https://img.shields.io/badge/java-41492f?style=for-the-badge&logoColor=fafbfc
 [Close-x]: https://img.shields.io/badge/%E2%9C%95-red?style=flat&logoColor=green
-[Style]:
-<p style="color: red">
+
+<p style="display: none">
   #center {
     text-align: center;
   }
@@ -337,7 +337,6 @@ Project Link: [https://github.com/Fenris22127/ColorSchemeGenerator](https://gith
     font-size: 0.8rem;
     text-align: center;
   }
-
   button {
     background-color: #c2fbd7;
     border-radius: 6.25rem;
