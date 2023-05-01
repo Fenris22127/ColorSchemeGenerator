@@ -68,7 +68,13 @@
       <a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
+        <li>
+          <a href="#installation">Installation</a>
+          <ol>
+            <li><a href="#installing-java">Installing Java</a></li>
+            <li></li>
+          </ol>
+        </li>
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
@@ -115,7 +121,7 @@ I have also learned a ton about Java, gained a lot of experience with managing a
 
 <!-- Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description` -->
 
-<p align="right"><button><a href="#readme-top">Back to top</a></button></p>
+<p id="right"><button><a href="#readme-top">Back to top</a></button></p>
 
 
 
@@ -305,6 +311,9 @@ Project Link: [https://github.com/github_username/repo_name](https://github.com/
 <style>
   #center {
     text-align: center;
+  }
+  #right {
+    text-align: right;
   }
 
   button {

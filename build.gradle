@@ -17,14 +17,20 @@ ext {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
+tasks.withType(org.gradle.jvm.tasks.Jar).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
 
 application {
-    mainClass = 'de.colorscheme.main.Main'
+    mainClassName = 'de.colorscheme.main.Main'
 }
 
 jar {
     manifest {
-        attributes 'Main-Class': 'de.colorscheme.main.Main'
+        attributes 'Main-Class': application.mainClass
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 
