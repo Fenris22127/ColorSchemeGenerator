@@ -4,7 +4,7 @@
 <br />
 <div id="center">
   <a href="https://github.com/Fenris22127/ColorSchemeGenerator">
-    <img src="src/res/images/logo.png" alt="Logo" width="100" height="76">
+    <img src="src/res/images/logo.png" alt="Logo" width="100">
   </a>
   <a id="readme-top"></a>
 

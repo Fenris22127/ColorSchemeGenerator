@@ -11,7 +11,7 @@ f
 6src/main/java/de/colorscheme/clustering/ColorData.java,2\d\2df35201cbb019f565391b04dd3be0a3e60e5162
 e
 5src/main/java/de/colorscheme/output/OutputColors.java,f\a\fa5caa88eea9c6fbf5c82ad8ae01a99dd68f2e3c
-9
-	README.md,8\e\8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
 F
 src/res/icons/more.svg,6\e\6e8c2ec6f4bdebc0a28a40f756b188f0df0897c0
+E
+doc/ISSUE_TEMPLATE.md,e\b\eb19761d4de8074e8841c1d24c0e0040bf959520
