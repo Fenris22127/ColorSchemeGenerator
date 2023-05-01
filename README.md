@@ -1,31 +1,4 @@
-<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 <a name="readme-top"></a>
-<!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
-*** or simply open an issue with the tag "enhancement".
-*** Don't forget to give the project a star!
-*** Thanks again! Now go create something AMAZING! :D
--->
-
-
-
-<!-- PROJECT SHIELDS -->
-<!--
-*** I'm using markdown "reference style" links for readability.
-*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
-*** See the bottom of this document for the declaration of the reference variables
-*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
-*** https://www.markdownguide.org/basic-syntax/#reference-style-links
-
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]-->
-
-
 
 <!-- PROJECT LOGO -->
 <br />
@@ -116,9 +89,6 @@ Since then, I incorporated the iTextPDF library to be able to save the resulting
 I have also learned a ton about Java, gained a lot of experience with managing a project, Code Conventions and most importantly patience and determination and can finally say: I am incredibly proud of my project. It might not be a revolutionary tool that people are in dire need of but it is my first large project that I have kept up with and improved as I continued my studies and that is the result of my determination, patience with myself and my love for coding, which I discovered a few months into my first semester at the University of Applied Sciences in Wernigerode, Germany.
 </p>
 
-
-<!-- Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description` -->
-
 <p id="right"><button><a href="#readme-top">Back to top</a></button></p>
 
 
@@ -189,11 +159,11 @@ This program requires Java 18+ to run properly. How to install Java will be expl
 5. To verify the installation, open the Terminal (on Windows, press the Windows key and search for `Terminal`)
 
 6. Type `java -version` and hit enter. You should see this:
-  <div id="code">
-  PS C:\Users\<span>[YourName]</span>> java -version<br>
-  java version "<span>[Java Version]</span>" <span>[Release date]</span><br>
-  Java(TM) SE Runtime Environment (build <span>[Version+Build Nr]</span>)
-  </div>
+    <div id="code">
+    PS C:\Users\<span>[YourName]</span>> java -version<br>
+    java version "<span>[Java Version]</span>" <span>[Release date]</span><br>
+    Java(TM) SE Runtime Environment (build <span>[Version+Build Nr]</span>)
+    </div>
 
 7. If the version number matched the version you installed, you can skip the following steps. If not, here is how to proceed:<br>
     * Windows: 
@@ -236,7 +206,7 @@ This program requires Java 18+ to run properly. How to install Java will be expl
 
 See the [documentation](#) for specifics.
 
-<p id="warning">NEVER download or open unknown .exe, .jar or other executable files!</p>
+<p id="warning"><b>NEVER download or open unknown .exe, .jar or other executable files!</b></p>
 <p id="subwarning"><b>If you open this without knowing what it is, that is on you.</b></p>
 
 
@@ -309,13 +279,13 @@ Project Link: [https://github.com/Fenris22127/ColorSchemeGenerator](https://gith
 [Close-x]: https://img.shields.io/badge/%E2%9C%95-red?style=flat&logoColor=green
 
 
- ###### #center {
+ <!-- #center {
     text-align: center;
   }
-  #right {
+#right {
     text-align: right;
   }
-  #code {
+#code {
     color: #dddddd;
     background-color: #161616;
     padding: 1rem;
@@ -366,3 +336,4 @@ Project Link: [https://github.com/Fenris22127/ColorSchemeGenerator](https://gith
   }
 </style>
 </p>
+-->
