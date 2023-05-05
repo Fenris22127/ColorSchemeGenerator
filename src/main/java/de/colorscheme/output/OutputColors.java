@@ -9,16 +9,30 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import de.colorscheme.app.App;
 import de.colorscheme.clustering.ColorData;
-import de.customlogger.logger.ColorLogger;
+import de.fenris.logger.ColorLogger;
 import javafx.geometry.Point3D;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import static de.colorscheme.clustering.KMeans.getCentroids;
 import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
 
 /**
  * Writes the color scheme of the selected image into a pdf containing the image, image name, colours
@@ -34,6 +48,11 @@ public class OutputColors {
      * Creates a {@link ColorLogger Logger} for this class
      */
     private static final Logger LOGGER = ColorLogger.newLogger(OutputColors.class.getName());
+
+    /**
+     * The {@link Font} used for the {@link Document} bold text
+     */
+    private static final Font bold = FontFactory.getFont(FontFactory.HELVETICA, 11, Font.BOLD);
 
     /**
      * The {@link Font} used for the {@link Document} title
@@ -315,6 +334,29 @@ public class OutputColors {
                 colorWheel.scaleToFit(width40, height40);
                 doc.add(colorWheel);
             }
+            Paragraph empty = new Paragraph();
+            addEmptyLine(empty, 10);
+            doc.add(empty);
+
+            PdfPTable meta = new PdfPTable(2);
+            HashMap<String, String> metaData = getMeta(image);
+            List<String> keys = getMetaDetails();
+
+            for (int i = 0; i < metaData.size(); i++) {
+                String key = keys.get(i);
+                Paragraph p = new Paragraph();
+                p.setFont(bold);
+                p.add(key);
+                meta.addCell(new PdfPCell(p));
+                p = new Paragraph();
+                p.setFont(regular);
+                p.add(metaData.get(key));
+                PdfPCell cell = new PdfPCell(p);
+                cell.setPaddingBottom(5);
+                meta.addCell(cell);
+            }
+            doc.add(meta);
+
         }
         catch (DocumentException e) {
             App.getOutputField().setForeground(Color.RED);
@@ -335,6 +377,149 @@ public class OutputColors {
                     e.getClass().getSimpleName());
         e.printStackTrace();
         }
+    }
+
+    private static HashMap<String, String> getMeta(String path) {
+        HashMap<String, String> meta = new HashMap<>();
+        DateTimeFormatter dateTimeFormatter =
+                DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        String noAccess = "Could not access meta data!";
+
+        int lastDot = path.lastIndexOf('.');
+        String type = path.substring(lastDot + 1).toUpperCase();
+        meta.put("File type:", type);
+
+        File f = new File(path);
+        float bytes = f.length();
+        String size = String.format("%.2f bytes", bytes);
+        //bytes to KB
+        if (bytes > 1_000) {
+            size = String.format("%.2f KB", bytes / 1_000);
+        }
+        //bytes to MB
+        if (bytes > 1_000_000) {
+            size = String.format("%.2f MB", bytes / 1_000_000);
+        }
+        //bytes to GB
+        if (bytes > 1_000_000_000) {
+            size = String.format("%.2f GB", bytes / 1_000_000_000);
+        }
+        meta.put("File name:", f.getName().substring(0, f.getName().lastIndexOf('.')));
+        meta.put("Size:", size);
+
+        String modTime;
+        String accTime;
+        String creaTime;
+        try {
+            BasicFileAttributes attributes = Files.readAttributes(Paths.get(path), BasicFileAttributes.class);
+
+            FileTime creationTime = attributes.creationTime();
+            LocalDateTime time = creationTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            creaTime = time.format(dateTimeFormatter);
+
+            FileTime accessTime = attributes.lastAccessTime();
+            time = accessTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            accTime =  time.format(dateTimeFormatter);
+
+            FileTime modifiedTime = attributes.lastModifiedTime();
+            time = modifiedTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            modTime = time.format(dateTimeFormatter);
+        }
+        catch (IOException ioException) {
+            LOGGER.log(WARNING, "Could not access file attributes for file at path {0}", path);
+            modTime = noAccess;
+            accTime = noAccess;
+            creaTime = noAccess;
+        }
+        meta.put("Created:", creaTime);
+        meta.put("Last modified:", modTime);
+        meta.put("Last accessed:", accTime);
+
+        String bitDepth;
+        String height;
+        String width;
+        String colorSpace;
+        String colComponents;
+        String transparency;
+        String alpha;
+        String preAlpha;
+        try {
+            BufferedImage bufferedImage = ImageIO.read(f);
+            ColorModel model = bufferedImage.getColorModel();
+            bitDepth = String.valueOf(model.getPixelSize());
+            height = String.valueOf(bufferedImage.getHeight());
+            width = String.valueOf(bufferedImage.getWidth());
+            colorSpace = getColorSpace(bufferedImage.getType());
+            colComponents = String.valueOf(model.getNumComponents());
+            transparency = switch (model.getTransparency()) {
+                case 1 -> "Completely opaque";
+                case 2 -> "Either completely opaque or completely transparent";
+                case 3 -> "Supports transparency values between and including 0% and 100%";
+                default -> "Cannot be determined";
+            };
+            alpha = (model.hasAlpha() ? "Transparency supported by color model" : "Transparency not supported by color model");
+            preAlpha = (model.isAlphaPremultiplied() ? "Premultiplied alpha" : "Non-premultiplied alpha");
+
+        }
+        catch (IOException ioException) {
+            LOGGER.log(WARNING, "Could not access file attributes for file at path {0}", path);
+            bitDepth = noAccess;
+            height = noAccess;
+            width = noAccess;
+            colorSpace = noAccess;
+            colComponents = noAccess;
+            transparency = noAccess;
+            alpha = noAccess;
+            preAlpha = noAccess;
+        }
+        meta.put("Bit depth:", bitDepth);
+        meta.put("Height:", height.concat(" px"));
+        meta.put("Width:", width.concat(" px"));
+        meta.put("Color space:", colorSpace);
+        meta.put("Color components:", colComponents);
+        meta.put("Transparency:", transparency);
+        meta.put("Alpha:", alpha);
+        meta.put("Alpha type:", preAlpha);
+        return meta;
+    }
+
+    private static List<String> getMetaDetails() {
+        return List.of(
+                "File name:",
+                "File type:",
+                "Size:",
+                "Created:",
+                "Last modified:",
+                "Last accessed:",
+                "Height:",
+                "Width:",
+                "Color space:",
+                "Color components:",
+                "Bit depth:",
+                "Transparency:",
+                "Alpha:",
+                "Alpha type:");
+    }
+
+    private static String getColorSpace(int i) {
+        String model;
+        switch (i) {
+            case 1 -> model = "8-bit RGB integer pixels without alpha (TYPE_INT_RGB)";
+            case 2 -> model = "8-bit RGB integer pixels with alpha (TYPE_INT_ARGB)";
+            case 3 -> model = "Premultiplied 8-bit RGB integer pixels with alpha (TYPE_INT_ARGB_PRE)";
+            case 4 -> model = "8-bit RGB integer pixels in BGR color model without alpha (TYPE_INT_BGR)";
+            case 5 -> model = "8-bit RGB integer pixels in BGR color model without alpha (TYPE_3BYTE_BGR)";
+            case 6 -> model = "8-bit RGB pixels in BGRA color model with alpha, stored in four bytes (TYPE_4BYTE_ABGR)";
+            case 7 -> model = "Premultiplied 8-bit RGB pixels in BGRA color model with alpha, stored in four bytes (TYPE_4BYTE_ABGR_PRE)";
+            case 8 -> model = "Non-indexed, unsigned byte grayscale image (TYPE_BYTE_GRAY)";
+            case 9 -> model = "Opaque, byte-packed 1, 2, or 4 bit image without alpha, usually in sRGB (TYPE_BYTE_BINARY)";
+            case 10 -> model = "Indexed byte image, usually in sRGB (TYPE_BYTE_INDEXED)";
+            case 11 -> model = "Non-indexed, unsigned short grayscale image (TYPE_USHORT_GRAY)";
+            case 12 -> model = "5 bits red, 6 bits green and 5 bits blue RGB pixels without alpha (TYPE_USHORT_565_RGB)";
+            case 13 -> model = "5 bits red, 5 bits green and 5 bits blue RGB pixels without alpha (TYPE_USHORT_555_RGB)";
+            default -> model = "Custom/Not recognised";
+        }
+        return model;
     }
 
     /**

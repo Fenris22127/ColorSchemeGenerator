@@ -61,7 +61,7 @@
 
 <!-- ABOUT THE PROJECT -->
 <h1>About The Project</h1>
-<a name="about-the-project"></a>
+<a id="about-the-project"></a>
 <div id="center">
     <a id="center" href="https://github.com/Fenris22127/ColorSchemeGenerator">
         <img src="src/res/images/example.png" alt="Example" width="500">
@@ -213,7 +213,11 @@ See the [documentation](#) for specifics.
 <!-- USAGE EXAMPLES -->
 ## 🚧 Usage 🚧
 
-...to be added...
+<div id="center">
+<a>
+    <img src="src/res/images/How-to.png" alt="UI-Explanation" width="500">
+</a>
+</div>
 
 
 <!-- ROADMAP -->
@@ -224,6 +228,7 @@ See the [documentation](#) for specifics.
   - [x] Add License
 - [x] Create Bug Template
 - [ ] Add documentation
+- [ ] Create Commit message guidelines
 - [x] Add history
 - [ ] Add Metadata to image
 - [ ] Better incorporate color wheel

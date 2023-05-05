@@ -97,3 +97,7 @@ estimates based on timestamps on files and documents.</sub>
 > * `ISSUE_TEMPLATE.md`: Added a template for bug reports
 > * `HISTORY.md`: Added a changelog/project history
 
+### 03.05.2023 00:15
+> #### Version 2.0.11
+> * `ColorLogger-v2.jar`: Added the .jar for the improved ColorLogger
+> * `build.gradle`: Changed dependencies accordingly

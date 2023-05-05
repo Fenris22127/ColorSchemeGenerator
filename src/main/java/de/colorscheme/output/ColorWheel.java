@@ -1,7 +1,7 @@
 package de.colorscheme.output;
 
 import com.itextpdf.text.BaseColor;
-import de.customlogger.logger.ColorLogger;
+import de.fenris.logger.ColorLogger;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
