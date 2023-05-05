@@ -50,7 +50,13 @@
         </li>
       </ul>
     </li>
-    <li><a href="#-usage-">Usage</a></li>
+   <li>
+      <a href="#-usage-">Usage</a>
+      <ul>
+         <li><a href="#general-use">General Use</a></li>
+         <li><a href="#output-file-overview">Output File Overview</a></li>
+      </ul>
+   </li>
     <li><a href="#-roadmap-">Roadmap</a></li>
     <li><a href="#-license-">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -213,12 +219,38 @@ See the [documentation](#) for specifics.
 <!-- USAGE EXAMPLES -->
 ## 🚧 Usage 🚧
 
-<div id="center">
-<a>
-    <img src="src/res/images/How-to.png" alt="UI-Explanation" width="900">
-</a>
-</div>
+<img src="src/res/images/How-to.png" alt="UI-Explanation" width="900">
 
+### General use
+<img src="src/res/images/choose.png" alt="Choose the amount of colors" width="500">
+
+#### Choose the amount of colors you want to be extracted
+<br>
+<img src="src/res/images/auto-download.png" alt="Set auto-download" width="500">
+
+#### Choose, whether you want your file to be automatically downloaded when finished
+<br>
+<img src="src/res/images/upload.png" alt="Click upload" width="500">
+
+#### Click on "Upload"
+<br>
+<img src="src/res/images/choose.png" alt="Choose your image" width="500">
+
+#### Choose your image and click on "Open"
+<br>
+<img src="src/res/images/wait.png" alt="Wait until the program has finished" width="500">
+
+#### Wait until the program has finished and the text field show "Done!"
+<br>
+<img src="src/res/images/download.png" alt="Download your file" width="500">
+
+#### Click on download and select the location where the file will be saved to
+
+#### The file will be called "ColorScheme_[Filename].pdf"
+
+### Output File Overview
+
+🚧 ...to be added... 🚧
 
 <!-- ROADMAP -->
 ## 🚧 Roadmap 🚧
