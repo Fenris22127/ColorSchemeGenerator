@@ -215,7 +215,7 @@ See the [documentation](#) for specifics.
 
 <div id="center">
 <a>
-    <img src="src/res/images/How-to.png" alt="UI-Explanation" width="500">
+    <img src="src/res/images/How-to.png" alt="UI-Explanation" width="900">
 </a>
 </div>
 
