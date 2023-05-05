@@ -222,7 +222,7 @@ See the [documentation](#) for specifics.
 <img src="src/res/images/How-to.png" alt="UI-Explanation" width="900">
 
 ### General use
-<img src="src/res/images/choose.png" alt="Choose the amount of colors" width="500">
+<img src="src/res/images/color_choice.png" alt="Choose the amount of colors" width="500">
 
 #### Choose the amount of colors you want to be extracted
 <br>
