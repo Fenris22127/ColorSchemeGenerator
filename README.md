@@ -25,8 +25,6 @@
   </p>
 </div>
 
-
-
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary style="font-size: 18px; margin-top: 20px;">Table of Contents</summary>
@@ -63,8 +61,6 @@
   </ol>
 </details>
 
-
-
 <!-- ABOUT THE PROJECT -->
 <h1>About The Project</h1>
 <a id="about-the-project"></a>
@@ -96,7 +92,6 @@ I have also learned a ton about Java, gained a lot of experience with managing a
 </p>
 
 <p id="right"><button><a href="#readme-top">Back to top</a></button></p>
-
 
 
 ## Built With
