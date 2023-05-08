@@ -165,11 +165,11 @@ This program requires Java 18+ to run properly. How to install Java will be expl
 5. To verify the installation, open the Terminal (on Windows, press the Windows key and search for `Terminal`)
 
 6. Type `java -version` and hit enter. You should see this:
-    <div id="code">
-    PS C:\Users\<span>[YourName]</span>> java -version<br>
-    java version "<span>[Java Version]</span>" <span>[Release date]</span><br>
-    Java(TM) SE Runtime Environment (build <span>[Version+Build Nr]</span>)
-    </div>
+    
+    `PS C:\Users\[YourName]> java -version`<br>
+    `java version "[Java Version]" [Release date]`<br>
+    `Java(TM) SE Runtime Environment (build [Version+Build Nr])`
+    
 
 7. If the version number matched the version you installed, you can skip the following steps. If not, here is how to proceed:<br>
     * Windows: 
@@ -196,9 +196,7 @@ This program requires Java 18+ to run properly. How to install Java will be expl
       2. Find the path to the target file by typing `~/.bash-profile` and hitting enter
       3. Open the file at the provided location with a text editor of your choice (e.g. Notepad, programs like Microsoft Word will not work the same)
       4. Add the following to the file (the file path may vary but usually is at this location)
-          <div id="code">
-            export %JAVA_HOME%=C:\Program Files\Java\<span>[jdk-##]</span>
-          </div>
+          `export %JAVA_HOME%=C:\Program Files\Java\[jdk-##]`
       5. Save the file (the original file should now be modified)
       6. Execute the new file by reopening the Terminal
     * Linux:
@@ -212,8 +210,8 @@ This program requires Java 18+ to run properly. How to install Java will be expl
 
 See the [documentation](#) for specifics.
 
-<p id="warning"><b>NEVER download or open unknown .exe, .jar or other executable files!</b></p>
-<p id="subwarning"><b>If you open this without knowing what it is, that is on you.</b></p>
+<p id="warning" style="color: #d50000; font-size: 1.2rem"><b>NEVER download or open unknown .exe, .jar or other executable files!</b></p>
+<p id="subwarning" style="color: #d50000; font-size: 1rem"><b>If you open this without knowing what it is, that is on you.</b></p>
 
 
 <!-- USAGE EXAMPLES -->
