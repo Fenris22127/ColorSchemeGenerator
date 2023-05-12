@@ -58,7 +58,7 @@ public class ColorWheel {
         drawColorWheel(colWheel);
 
         colWheel = addCircle(colours);
-        File f = new File("src/main/resources/SchemeWheel.png");
+        File f = new File("src/main/resources/img/SchemeWheel.png");
         try {
             ImageIO.write(Objects.requireNonNull(colWheel), "png", f);
         }
@@ -173,10 +173,10 @@ public class ColorWheel {
         try {
             BufferedImage wheel = ImageIO.read(
                     Objects.requireNonNull(
-                            ClassLoader.getSystemClassLoader().getResource("wheel.png")));
+                            ClassLoader.getSystemClassLoader().getResource("img/wheel.png")));
             BufferedImage circle = ImageIO.read(
                     Objects.requireNonNull(
-                            ClassLoader.getSystemClassLoader().getResource("circle.png")));
+                            ClassLoader.getSystemClassLoader().getResource("img/circle.png")));
             int wheelRadius = wheel.getHeight() / 2;
             int circleRadius = 50;
             circle = resize(circle, circleRadius * 2, circleRadius * 2);
@@ -184,9 +184,9 @@ public class ColorWheel {
             g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0F));
 
             for (BaseColor col : colors) {
-                float[] hsbvals = Color.RGBtoHSB(col.getRed(), col.getGreen(), col.getBlue(), null);
-                float radius = (WHEEL_SIZE / 2F) * hsbvals[1];
-                double angle = Math.toRadians(360 * hsbvals[0] + 90);
+                float[] hsbValues = Color.RGBtoHSB(col.getRed(), col.getGreen(), col.getBlue(), null);
+                float radius = (WHEEL_SIZE / 2F) * hsbValues[1];
+                double angle = Math.toRadians(360 * hsbValues[0] + 90);
                 double xPos = radius * Math.cos(angle) + wheelRadius;
                 double yPos = radius * Math.sin(angle) + wheelRadius;
                 Color c = new Color(col.getRed(), col.getGreen(), col.getBlue());
@@ -202,8 +202,6 @@ public class ColorWheel {
                         (int) xPos - circleRadius,
                         (int) yPos - circleRadius,
                         null);
-
-
             }
             g.dispose();
             return wheel;

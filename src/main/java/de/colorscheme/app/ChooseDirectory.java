@@ -11,15 +11,24 @@ import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.ResourceBundle;
+
+import static de.colorscheme.app.App.getRessourceLanguage;
 
 /**
  * Lets the user choose a directory or finds the default download directory. <br>
  *
- * @author &copy; 2022 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
+ * @author &copy; 2023 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
  * @version 1.1
  * @since 17.0.1
  */
 public class ChooseDirectory {
+
+    /**
+     * {@link App#getRessourceLanguage() Gets} the language and sets the {@link ResourceBundle} used for the displayed
+     * text accordingly
+     */
+    private static final String RESSOURCE = getRessourceLanguage();
 
     /**
      * Private constructor to hide the public one
@@ -79,15 +88,15 @@ public class ChooseDirectory {
         //Create JFrame, set DefaultCloseOperation and set icon to be displayed in the top left corner
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setIconImage(new ImageIcon("src/main/resources/downloadIcon.png").getImage());
+        frame.setIconImage(new ImageIcon("src/main/resources/img/download_icon.png").getImage());
 
         //Create FileChooser, set its dimensions, font, display the control buttons and set dialog title
         JFileChooser fileChooser = new JFileChooser("user.home");
         fileChooser.setPreferredSize(new Dimension(800, 600));
         setFileChooserFont(fileChooser.getComponents());
         fileChooser.setControlButtonsAreShown(true);
-        fileChooser.setDialogTitle("Save in...");
-        fileChooser.setApproveButtonText("Select");
+        fileChooser.setDialogTitle(ResourceBundle.getBundle(RESSOURCE).getString("chooseDirSaveIn"));
+        fileChooser.setApproveButtonText(ResourceBundle.getBundle(RESSOURCE).getString("chooseDirSelect"));
 
         //Set icons of files to System default icons
         fileChooser.setFileView(new FileView() {

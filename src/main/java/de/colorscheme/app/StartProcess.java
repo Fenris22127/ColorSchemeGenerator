@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
 import static de.colorscheme.app.App.*;
@@ -18,22 +20,29 @@ import static de.colorscheme.output.OutputColors.createOutput;
  * Starts the process of generating a color scheme after an image has been selected in {@link SelectImage}
  * while simultaneously updating the GUI according to the current progress.
  *
- * @author &copy; 2022 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
+ * @author &copy; 2023 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
  * @version 1.2
  * @since 17.0.1
  */
 public class StartProcess extends SwingWorker<Boolean, Integer> {
+
+    /**
+     * {@link App#getRessourceLanguage() Gets} the language and sets the {@link ResourceBundle} used for the displayed
+     * text accordingly
+     */
+    private static final String RESSOURCE = getRessourceLanguage();
+
     /**
      * The name if the file, selected by the user
      */
-    String fileName;
+    Path filePath;
 
     /**
-    * Class constructor containing a setter for the {@link String} {@link #fileName}
-    * @param fileName A {@link String} - The name of the file chosen by the user
+    * Class constructor containing a setter for the {@link Path} {@link #filePath}
+    * @param filePath A {@link Path} - The name of the file chosen by the user
     */
-    protected StartProcess(String fileName) {
-        this.fileName = fileName;
+    protected StartProcess(Path filePath) {
+        this.filePath = filePath;
     }
 
     /**
@@ -63,7 +72,7 @@ public class StartProcess extends SwingWorker<Boolean, Integer> {
      *        Starts K-Means clustering by calling
      *        {@link de.colorscheme.clustering.KMeans#kMeans(ColorData, int) kMeans()} with the
      *        {@link de.colorscheme.clustering.ColorData ColorData} instance and the chosen
-     *        {@link App#selectedCentroids amount of centroids}.
+     *        {@link App#getSelectedCentroids() amount of centroids}.
      *    </li>
      *    <li>
      *        Then sets the progress of the {@link JProgressBar progress bar} to 86%, adds "Creating the color
@@ -77,7 +86,7 @@ public class StartProcess extends SwingWorker<Boolean, Integer> {
      *    </li>
      *    <li>
      *        Finally, the {@link App#download download button} is enabled and if {@link App#autoDownload autodownload}
-     *        is enabled, {@link de.colorscheme.output.OutputColors#createOutput(ColorData, String)} is called to save the
+     *        is enabled, {@link de.colorscheme.output.OutputColors#createOutput(ColorData, Path)} is called to save the
      *        color scheme.
      *    </li>
      * </ol>
@@ -88,39 +97,46 @@ public class StartProcess extends SwingWorker<Boolean, Integer> {
     @Override
     protected Boolean doInBackground() throws Exception {
         newProgress(10);
-        getOutputField().append("Found file." + System.lineSeparator());
+        getOutputField().append(
+                ResourceBundle.getBundle(RESSOURCE).getString("startFoundFile")
+                        + System.lineSeparator());
 
         BufferedImage img = findImage();
         newProgress(24);
-        getOutputField().append("Reading colours in image." + System.lineSeparator());
+        getOutputField().append(
+                ResourceBundle.getBundle(RESSOURCE).getString("startReadingColours")
+                        + System.lineSeparator());
         TimeUnit.MILLISECONDS.sleep(1000);
 
         ColorData data = new ColorData(img);
         if (!isCancelled()){
             newProgress(68);
-            getOutputField().append("Determining main colors." + System.lineSeparator());
+            getOutputField().append(ResourceBundle.getBundle(RESSOURCE).getString("startDeterminingColours")
+                    + System.lineSeparator());
         }
 
         if (!isCancelled()) {
-            kMeans(data, selectedCentroids);
+            kMeans(data, getSelectedCentroids());
             newProgress(86);
-            getOutputField().append("Creating the color scheme." + System.lineSeparator());
+            getOutputField().append(ResourceBundle.getBundle(RESSOURCE).getString("startCreatingScheme")
+                    + System.lineSeparator());
         }
 
         if (!isCancelled()) {
             newProgress(99);
-            getOutputField().append("Finishing up..." + System.lineSeparator());
+            getOutputField().append(ResourceBundle.getBundle(RESSOURCE).getString("startFinishing")
+                    + System.lineSeparator());
         }
 
         if (!isCancelled()) {
             TimeUnit.MILLISECONDS.sleep(1000);
             newProgress(100);
-            getOutputField().append("Done!");
+            getOutputField().append(ResourceBundle.getBundle(RESSOURCE).getString("startDone"));
             download.setEnabled(true);
-            colorData = data;
+            setColorData(data);
         }
         if (autoDownload && !isCancelled()) {
-            createOutput(colorData, fileName);
+            createOutput(getColorData(), fileName);
         }
         return true;
     }
@@ -133,8 +149,8 @@ public class StartProcess extends SwingWorker<Boolean, Integer> {
      *          exceeds a certain Dimension
      * @throws IOException An {@link IOException} - If the selected file cannot be read
      */
-    private BufferedImage findImage() throws IOException {
-        File file = new File(fileName);
+    private static BufferedImage findImage() throws IOException {
+        File file = fileName.toFile();
         BufferedImage image = ImageIO.read(file);
         double width = image.getWidth();
         double height = image.getHeight();

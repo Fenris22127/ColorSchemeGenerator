@@ -47,8 +47,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
     implementation group: 'com.itextpdf', name: 'itextpdf', version: '5.5.13.3'
-    implementation files("src/main/resources/ColorLogger-v2.jar")
-    implementation files("src/main/resources/SwingUtils.jar")
+    implementation files("src/main/resources/jar/ColorLogger-v2.jar")
+    implementation files("src/main/resources/jar/SwingUtils.jar")
 }
 
 test {

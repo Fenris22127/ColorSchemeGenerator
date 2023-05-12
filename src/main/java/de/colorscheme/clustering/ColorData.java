@@ -1,6 +1,7 @@
 package de.colorscheme.clustering;
 
 import de.colorscheme.app.App;
+import de.fenris.logger.ColorLogger;
 import javafx.geometry.Point3D;
 
 import javax.imageio.ImageIO;
@@ -18,16 +19,16 @@ import static java.util.logging.Level.INFO;
  * Reads an image and stores all pixels rgb-values <br>
  * Contains the methods required in {@link KMeans}
  *
- * @author &copy; 2022 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
+ * @author &copy; 2023 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
  * @version 1.2
  * @since 17.0.1
  */
 public class ColorData {
 
     /**
-     * Creates a {@link Logger} for this class
+     * Creates a {@link ColorLogger} for this class
      */
-    private static final Logger LOGGER = Logger.getLogger(ColorData.class.getName());
+    private static final Logger LOGGER = ColorLogger.newLogger(ColorData.class.getName());
 
     /**
      * An Instance of the '{@link Random} class used to generate random values

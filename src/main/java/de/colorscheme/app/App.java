@@ -8,7 +8,9 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.nio.file.Path;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 import static de.colorscheme.app.ChooseDirectory.autoSave;
 import static de.colorscheme.app.ChooseDirectory.chooseDirectory;
@@ -19,11 +21,22 @@ import static de.colorscheme.output.OutputColors.createOutput;
  * Creates the interface, where the user can select a file, the amount of colors and where the file will be
  * downloaded or if it will be downloaded automatically.
  *
- * @author &copy; 2022 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
+ * @author &copy; 2023 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
  * @version 1.2
  * @since 17.0.1
  */
 public class App {
+
+    static {
+        String language = System.getProperty("user.language");
+        if (language.equals("de")) {
+            ressourceLanguage = "messages_DE";
+        }
+        else {
+            ressourceLanguage = "messages_EN";
+        }
+    }
+    private static String ressourceLanguage;
 
     /**
      * The {@link JProgressBar progress bar} displaying the progress of the currently generating color scheme
@@ -57,9 +70,9 @@ public class App {
     protected static JButton download = new JButton();
 
     /**
-     * The {@link String} containing the path to the image chosen by the user
+     * The {@link Path} containing the path to the image chosen by the user
      */
-    protected static String fileName = "";
+    protected static Path fileName = Path.of("");
 
     /**
      * The {@link Boolean} storing if auto-download is enabled
@@ -70,13 +83,13 @@ public class App {
     /**
      * The {@link ColorData} object used for all processes for the currently inspected image
      */
-    public static ColorData colorData;
+    private static ColorData colorData;
 
     /**
      * The amount of Centroids and therefore the amount of colors to be generated from the image <br>
      * Default: 4 Centroids - The color scheme will contain 4 colors
      */
-    public static int selectedCentroids = 4;
+    private static int selectedCentroids = 4;
 
     /**
      * The {@link JTextArea} updating the user about the progress of the color scheme generation
@@ -93,6 +106,30 @@ public class App {
      * Private constructor to hide the public one
      */
     private App() {
+    }
+
+    /**
+     * A Getter for {@link #colorData}
+     * @return A {@link ColorData} object: The {@link #colorData}
+     */
+    public static ColorData getColorData() {
+        return colorData;
+    }
+
+    /**
+     * A Setter for {@link #colorData}
+     * @param colorData A {@link ColorData} object: The new value for {@link #colorData}
+     */
+    public static void setColorData(ColorData colorData) {
+        App.colorData = colorData;
+    }
+
+    /**
+     * A Getter for {@link #selectedCentroids}
+     * @return An {@link Integer}: The amount of selected centroids
+     */
+    public static int getSelectedCentroids() {
+        return selectedCentroids;
     }
 
     /**
@@ -120,6 +157,10 @@ public class App {
      */
     public static StartProcess getTask() {
         return task;
+    }
+
+    public static String getRessourceLanguage() {
+        return ressourceLanguage;
     }
 
     /**
@@ -214,14 +255,16 @@ public class App {
      */
     public static void frame() {
         final String FONT = "Tahoma";
-        frame.setIconImage(new ImageIcon("src/main/resources/searchFile.png").getImage());
+        frame.setIconImage(new ImageIcon("src/main/resources/img/logo.png")
+                .getImage()
+                .getScaledInstance(100, 100, Image.SCALE_SMOOTH));
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
         panel.add(Box.createRigidArea(new Dimension(5, 10)));
 
-        JLabel titel = new JLabel("GENERATE A COLOR SCHEME FROM AN IMAGE");
+        JLabel titel = new JLabel(ResourceBundle.getBundle(ressourceLanguage).getString("appTitle"));
         titel.setFont(new Font(FONT, Font.BOLD, 22));
         titel.setPreferredSize(new Dimension(500, 50));
         titel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -231,9 +274,9 @@ public class App {
 
         JPanel countTitle = new JPanel();
         countTitle.setMaximumSize(new Dimension(500, 30));
-        JLabel l1 = new JLabel("Choose the amount of colors to be picked:");
-        l1.setHorizontalAlignment(SwingConstants.CENTER);
-        countTitle.add(l1);
+        JLabel colorAmount = new JLabel(ResourceBundle.getBundle(ressourceLanguage).getString("appColorAmount"));
+        colorAmount.setHorizontalAlignment(SwingConstants.CENTER);
+        countTitle.add(colorAmount);
         panel.add(countTitle);
 
         JPanel count = new JPanel();
@@ -246,7 +289,7 @@ public class App {
         count.add(spinner);
         panel.add(count);
 
-        upload.setText("Upload");
+        upload.setText(ResourceBundle.getBundle(ressourceLanguage).getString("appUpload"));
         upload.setFont(new Font(FONT, Font.PLAIN, 15));
         upload.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(upload);
@@ -255,7 +298,7 @@ public class App {
 
         JPanel check = new JPanel();
         check.setMaximumSize(new Dimension(500, 30));
-        checkbox.setText("Automatically download color scheme when finished");
+        checkbox.setText(ResourceBundle.getBundle(ressourceLanguage).getString("appAutoDownload"));
         checkbox.setHorizontalAlignment(SwingConstants.LEFT);
         check.add(checkbox);
         panel.add(check);
@@ -271,17 +314,58 @@ public class App {
 
         panel.add(Box.createRigidArea(new Dimension(5, 30)));
 
-        download.setText("Download");
+        download.setText(ResourceBundle.getBundle(ressourceLanguage).getString("appDownload"));
         download.setFont(new Font(FONT, Font.PLAIN, 15));
         download.setAlignmentX(Component.CENTER_ALIGNMENT);
         download.setEnabled(false);
         panel.add(download);
+
+        panel.add(Box.createRigidArea(new Dimension(5, 30)));
+
+        JPanel language = new JPanel();
+        language.setMinimumSize(new Dimension(550, 70));
+        language.setSize(new Dimension(550, 70));
+        String[] comboBoxList = {"English", "German"};
+        JComboBox<String> languageChoice = new JComboBox<>(comboBoxList);
+        languageChoice.setMaximumSize(new Dimension(80, 20));
+        language.add(languageChoice);
+        languageChoice.addActionListener(e -> {
+            if (Objects.equals(languageChoice.getSelectedItem(), "English")) {
+                ressourceLanguage = "messages_EN";
+                updateText(titel, colorAmount);
+            }
+            else {
+                ressourceLanguage = "messages_DE";
+                updateText(titel, colorAmount);
+            }
+            frame.repaint();
+        });
+
+        panel.add(languageChoice);
 
         frame.add(panel);
         frame.setSize(600, 600);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setVisible(true);
+    }
+
+    private static void updateText(JLabel titel, JLabel colorAmount) {
+        titel.setText(
+                ResourceBundle.getBundle(ressourceLanguage).getString("appTitle")
+        );
+        colorAmount.setText(
+                ResourceBundle.getBundle(ressourceLanguage).getString("appColorAmount")
+        );
+        upload.setText(
+                ResourceBundle.getBundle(ressourceLanguage).getString("appUpload")
+        );
+        checkbox.setText(
+                ResourceBundle.getBundle(ressourceLanguage).getString("appAutoDownload")
+        );
+        download.setText(
+                ResourceBundle.getBundle(ressourceLanguage).getString("appDownload")
+        );
     }
 
     /**
@@ -320,7 +404,7 @@ public class App {
      *         will be testet and if it has been {@link JCheckBox#isSelected() checked}, {@link #autoDownload} will be
      *         set to <code>true</code> and the {@link #downloadPath} will be set, using
      *         {@link ChooseDirectory#autoSave() autoSave()}. <br>
-     *         Afterwards, the process is started by instantiating {@link StartProcess#StartProcess(String) StartProcess}
+     *         Afterwards, the process is started by instantiating {@link StartProcess#StartProcess(Path) StartProcess}
      *         and passing the {@link #fileName} to it. <br>
      *         A {@link PropertyChangeListener PropertyChangeListener} is
      *         {@link StartProcess#addPropertyChangeListener(PropertyChangeListener) added} to that instance and if the
@@ -337,7 +421,7 @@ public class App {
      *         <code>null</code>, the {@link #downloadPath} is set by the
      *         {@link ChooseDirectory#chooseDirectory() chooseDirectory()} method and the file containing the color
      *         scheme is created, using
-     *         {@link de.colorscheme.output.OutputColors#createOutput(ColorData, String) createOutput()} and passing
+     *         {@link de.colorscheme.output.OutputColors#createOutput(ColorData, Path) createOutput()} and passing
      *         the {@link ColorData} instance and {@link #fileName path} to the selected image.
      *     </li>
      * </ol>
@@ -364,9 +448,11 @@ public class App {
         status.add(scrollPane, BorderLayout.CENTER);
 
         upload.addActionListener(e -> {
+            progressBar.setValue(0);
+            download.setEnabled(false);
             outputField.setText("");
-            fileName = chooseFile();
-            if (Objects.equals(fileName, "cancel")) {
+            fileName = Path.of(chooseFile());
+            if (Objects.equals(fileName.toString(), "cancel")) {
                 frame.repaint();
             }
             else {

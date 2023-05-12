@@ -16,17 +16,27 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static de.colorscheme.app.App.getRessourceLanguage;
+
 /**
  * Opens the file directory and lets the user open an image file to generate a color scheme from
- * @author &copy; 2022 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
+ * @author &copy; 2023 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
  * @version 1.1
  * @since 17.0.1
  */
 public class SelectImage {
+
+    /**
+     * {@link App#getRessourceLanguage() Gets} the language and sets the {@link ResourceBundle} used for the displayed
+     * text accordingly
+     */
+    private static final String RESSOURCE = getRessourceLanguage();
 
     /**
      * Private constructor to hide the public one
@@ -42,7 +52,7 @@ public class SelectImage {
      *         the icon being displayed in the top left corner
      *     </li>
      *     <li>
-     *         Creates a {@link JFileChooser} and customises it by setting the dimensions, font, control elements
+     *         Creates a {@link JFileChooser} and customises it by setting the language, dimensions, font, control elements
      *         and dialog title
      *         </li>
      *     <li>
@@ -109,14 +119,18 @@ public class SelectImage {
         //Create JFrame, set DefaultCloseOperation and set icon to be displayed in the top left corner
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setIconImage(new ImageIcon("src/main/resources/searchFile.png").getImage());
+        frame.setIconImage(new ImageIcon("src/main/resources/img/search_file.png").getImage());
 
         //Create FileChooser, set its dimensions, font, display the control buttons and set dialog title
         JFileChooser fileChooser = new JFileChooser("user.home");
+        fileChooser.setLocale(
+                Locale.forLanguageTag(
+                        ResourceBundle.getBundle(RESSOURCE).getString("locale")));
+        fileChooser.updateUI();
         fileChooser.setPreferredSize(new Dimension(800, 600));
         setFileChooserFont(fileChooser.getComponents());
         fileChooser.setControlButtonsAreShown(true);
-        fileChooser.setDialogTitle("Upload file");
+        fileChooser.setDialogTitle(ResourceBundle.getBundle(RESSOURCE).getString("selectImgUpload"));
 
         //Set icons of files to System default icons
         fileChooser.setFileView(new FileView() {
@@ -128,7 +142,9 @@ public class SelectImage {
 
         //Set filter to display image files only and add as available filter
         fileChooser.setAcceptAllFileFilterUsed(false);
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("Image file", "jpg", "jpeg", "png");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                ResourceBundle.getBundle(RESSOURCE).getString("selectImgFileType"),
+                "jpg", "jpeg", "png");
         fileChooser.addChoosableFileFilter(filter);
         fileChooser.setFileFilter(filter);
 
@@ -186,7 +202,7 @@ public class SelectImage {
                         }
                         catch (NullPointerException e) {
                             // If there is a problem reading image (invalid image or unable to read)
-                            img.setText("Not valid image/Unable to read");
+                            img.setText(ResourceBundle.getBundle(RESSOURCE).getString("selectImgInvalid"));
                         }
                         catch (Exception e) {
                             img.setText("");
@@ -210,7 +226,7 @@ public class SelectImage {
                     }
                     catch (InterruptedException | ExecutionException | TimeoutException e) {
                         Thread.currentThread().interrupt();
-                        img.setText("Couldn't load image.");
+                        img.setText(ResourceBundle.getBundle(RESSOURCE).getString("selectImgNotLoad"));
                     }
                 }
             };

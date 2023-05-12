@@ -15,34 +15,39 @@ import javafx.geometry.Point3D;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
 import java.io.*;
+import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
+import static de.colorscheme.app.App.getRessourceLanguage;
 import static de.colorscheme.clustering.KMeans.getCentroids;
-import static java.util.logging.Level.SEVERE;
-import static java.util.logging.Level.WARNING;
+import static java.util.logging.Level.*;
 
 /**
  * Writes the color scheme of the selected image into a pdf containing the image, image name, colours
  * and their rgb- and hex-code
  *
- * @author &copy; 2022 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
- * @version 1.1
+ * @author &copy; 2023 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
+ * @version 2.2
  * @since 17.0.1
  */
 public class OutputColors {
+
+    /**
+     * {@link App#getRessourceLanguage() Gets} the language and sets the {@link ResourceBundle} used for the displayed
+     * text accordingly
+     */
+    private static final String RESSOURCE = getRessourceLanguage();
 
     /**
      * Creates a {@link ColorLogger Logger} for this class
@@ -85,46 +90,47 @@ public class OutputColors {
      *     <li>
      *         If a file of the name doesn't exist yet, a new {@link PdfWriter PdfWriter} is
      *         created which generates a new {@link FileOutputStream} at the download path and the method
-     *         {@link #outputWrite(ColorData, String, String)}  outputWrite()} is called.
+     *         {@link #outputWrite(ColorData, Path, Path)}  outputWrite()} is called.
      *     </li>
      *     <li>
      *         If a file of that name exists already, a new name is determined by
-     *         {@link #getFileName(String) getFileName()}, then the method
-     *         {@link #outputWrite(ColorData, String, String) outputWrite()} is called.
+     *         {@link #getFileName(Path) getFileName()}, then the method
+     *         {@link #outputWrite(ColorData, Path, Path) outputWrite()} is called.
      *     </li>
      * </ul>
      * @return a {@link Document}: The PDF file containing the image and its color scheme, or null, if the document
      * couldn't be created
      */
-    public static Document createOutput(ColorData c, String imagePath) {
+    public static Document createOutput(ColorData c, Path imagePath) {
         StringBuilder fileDestinationBuilder = new StringBuilder();
-        String imgName = fileName(imagePath);
+        String imgName = fileName(imagePath.toString());
 
         String filename = "ColorScheme_" + imgName.substring(0, imgName.lastIndexOf(".")) + ".pdf";
 
-        String finalPath = fileDestinationBuilder.append(App.getDownloadPath()).append("\\").append(filename).toString();
+        Path finalPath = Paths.get(fileDestinationBuilder.append(App.getDownloadPath()).append("\\").append(filename).toString());
 
         //Try to create a new file "ColorScheme.pdf"
         try {
             Document colorScheme = new Document();
-            File f = new File(finalPath);
 
             //If a file of the same name exists, find number of files with the same name and set filename accordingly
-            if (f.exists()) {
-                String newNamePath = getFileName(finalPath);
+            if (Files.exists(finalPath)) {
+                Path newNamePath = getFileName(finalPath);
                 outputWrite(c, newNamePath, imagePath);
             }
             //If file object was created successfully and file at destination doesn't exist yet, create new file
-            if (!f.exists()) {
+            if (!Files.exists(finalPath)) {
                 PdfWriter.getInstance(colorScheme, new FileOutputStream(fileDestinationBuilder.toString()));
 
-                outputWrite(c, fileDestinationBuilder.toString(), imagePath);
+                outputWrite(c, Paths.get(fileDestinationBuilder.toString()), imagePath);
             }
             return colorScheme;
         }
         catch (DocumentException e) {
             App.getOutputField().setForeground(Color.RED);
-            App.getOutputField().setText("An error occurred while trying to write into the created file!");
+            App.getOutputField().setText(
+                    ResourceBundle.getBundle(RESSOURCE).getString("docWriteInFileError")
+            );
             App.getTask().cancel(true);
 
             LOGGER.log(SEVERE, "{0}: Could not instantiate PdfWriter!", e.getClass().getSimpleName());
@@ -132,14 +138,14 @@ public class OutputColors {
         }
         catch (FileNotFoundException e) {
             App.getOutputField().setForeground(Color.RED);
-            App.getOutputField().setText("An error occurred while trying to create the file!" +
-                    "Destination may have been moved or deleted!");
+            App.getOutputField().setText(
+                    ResourceBundle.getBundle(RESSOURCE).getString("docFindFileError")
+            );
             App.getTask().cancel(true);
 
-            LOGGER.log(SEVERE,"{0}: FileOutputStream could not create file!", e.getClass().getSimpleName());
+            LOGGER.log(SEVERE,"FileNotFoundException: FileOutputStream could not find file!");
             e.printStackTrace();
         }
-
         return null;
     }
 
@@ -150,16 +156,16 @@ public class OutputColors {
      * @param path a {@link String}: The path at which the file will be saved
      * @return a {@link String}: The path with the updated filename at which the file will now be saved
      */
-    private static String getFileName(String path) {
+    private static Path getFileName(Path path) {
         int fileNumber = 1;
-        String filePath = path;
-        String name = fileName(path).substring(0, fileName(path).lastIndexOf("."));
+        Path filePath =path;
+        String name = fileName(path.toString()).substring(0, fileName(path.toString()).lastIndexOf("."));
         String newName = name;
         String oldName;
-        while (new File(filePath).exists()) {
+        while (Files.exists(filePath)) {
             oldName = newName;
             newName = String.format("%s (%d)", name, fileNumber);
-            filePath = filePath.replace(oldName, newName);
+            filePath = Paths.get(filePath.toString().replace(oldName, newName));
             fileNumber++;
         }
         return filePath;
@@ -176,26 +182,27 @@ public class OutputColors {
      *         {@link Document} at the specified path by using a {@link FileOutputStream}
      *     </li>
      *     <li>
-     *         {@link Document#open() Opens} the document and {@link #addContent(ColorData, Document, String) adds} the
+     *         {@link Document#open() Opens} the document and {@link #addContent(ColorData, Document, Path) adds} the
      *         content before {@link Document#close() closing} it again.
      *     </li>
      * </ol>
      * @param c A {@link ColorData} object: The instance used for all processes for the currently inspected image
      * @param path A {@link String}: The path to the location, where the color scheme file will be saved
-     * @param image A {@link String}: The path to the selected image
+     * @param imagePath A {@link String}: The path to the selected image
      */
-    private static void outputWrite(ColorData c, String path, String image) {
+    private static void outputWrite(ColorData c, Path path, Path imagePath) {
         try {
             Document doc = new Document(PageSize.A4, 0, 0, 0, 0);
-            PdfWriter.getInstance(doc, new FileOutputStream(path));
+            PdfWriter.getInstance(doc, new FileOutputStream(path.toString()));
             doc.open();
-            addContent(c, doc, image);
+            addContent(c, doc, imagePath);
             doc.close();
         }
         catch (IOException e) {
             App.getOutputField().setForeground(Color.RED);
-            App.getOutputField().setText("An error occurred while trying to access the created file! " +
-                    "File may have been moved or access may be denied by a Security Manager!");
+            App.getOutputField().setText(
+                    ResourceBundle.getBundle(RESSOURCE).getString("docAccessFileError")
+            );
             App.getTask().cancel(true);
 
             LOGGER.log(SEVERE,"{0}: FileOutputStream could not access created document!",
@@ -204,7 +211,8 @@ public class OutputColors {
         }
         catch (DocumentException e) {
             App.getOutputField().setForeground(Color.RED);
-            App.getOutputField().setText("An error occurred while trying to write into the created file!");
+            App.getOutputField().setText(
+                    ResourceBundle.getBundle(RESSOURCE).getString("docWriteInFileError"));
             App.getTask().cancel(true);
 
             LOGGER.log(SEVERE,"{0}: Could not instantiate PdfWriter!",
@@ -271,9 +279,9 @@ public class OutputColors {
      * </ol>
      * @param c A {@link ColorData} object: The instance used for all processes for the currently inspected image
      * @param doc A {@link Document}: The {@link Document} to be written in
-     * @param image A {@link String}: The path to the selected image
+     * @param imagePath A {@link String}: The path to the selected image
      */
-    private static void addContent(ColorData c, Document doc, String image) {
+    private static void addContent(ColorData c, Document doc, Path imagePath) {
         try {
             doc.newPage();
             doc.setMargins(0, 0, 0, 0);
@@ -284,7 +292,7 @@ public class OutputColors {
             addEmptyLine(title, 1);
             doc.add(title);
 
-            Paragraph docImg = new Paragraph(fileName(image), small);
+            Paragraph docImg = new Paragraph(fileName(imagePath.toString()), small);
             docImg.setAlignment(Element.ALIGN_CENTER);
             addEmptyLine(docImg, 1);
             doc.add(docImg);
@@ -294,63 +302,57 @@ public class OutputColors {
             float height = pageSize.getHeight();
             float width40 = width / 10 * 4;
             float height40 = height / 10 * 4;
-            Image img = Image.getInstance(image);
+            Image img = Image.getInstance(imagePath.toString());
             img.setAlignment(Element.ALIGN_CENTER);
             img.scaleToFit(width40, height40);
             doc.add(img);
 
             Paragraph space = new Paragraph();
-            addEmptyLine(space, 1);
+            addEmptyLine(space, 2);
             doc.add(space);
 
-            PdfPTable table = new PdfPTable(getCentroids());
-            for (int i = 0; i < getCentroids(); i++) {
-                PdfPCell cell = new PdfPCell();
-                cell.setFixedHeight(200);
-                cell.setBackgroundColor(colors.get(i));
-                table.addCell(cell);
-            }
-            for (int i = 0; i < getCentroids(); i++) {
-                int red = colors.get(i).getRed();
-                int green = colors.get(i).getGreen();
-                int blue = colors.get(i).getBlue();
-                String rgb = "rgb: " + red + ", " + green + ", " + blue;
-                String hex = String.format("#%02X%02X%02X", red, green, blue);
-                Paragraph p = new Paragraph();
-                p.setFont(regular);
-                p.add(rgb);
-                p.add(new Chunk(System.lineSeparator().concat(System.lineSeparator())));
-                p.add(hex);
-                p.setAlignment(Element.ALIGN_CENTER);
-                PdfPCell cell = new PdfPCell(p);
-                cell.setFixedHeight(50);
-                table.addCell(cell);
-            }
-            doc.add(table);
+            float[] hsbColors = new float[3];
+            addMainColors(doc, colors, hsbColors);
 
-            if (ColorWheel.createColorWheel(colors)) {
-                Image colorWheel = Image.getInstance("src/main/resources/SchemeWheel.png");
-                colorWheel.setAlignment(Element.ALIGN_CENTER);
-                colorWheel.scaleToFit(width40, height40);
-                doc.add(colorWheel);
-            }
             Paragraph empty = new Paragraph();
-            addEmptyLine(empty, 10);
+            addEmptyLine(empty, 20);
             doc.add(empty);
 
+            if (ColorWheel.createColorWheel(colors)) {
+                Image colorWheel = Image.getInstance("src/main/resources/img/SchemeWheel.png");
+                colorWheel.setAlignment(Element.ALIGN_CENTER);
+                colorWheel.scaleToFit(width40, height40);
+                Paragraph imgParagraph = new Paragraph();
+                Chunk imgChunk = new Chunk(colorWheel, 0, 0);
+                imgParagraph.add(imgChunk);
+                imgParagraph.setAlignment(Element.ALIGN_CENTER);
+                doc.add(imgParagraph);
+            }
+
+            Paragraph clrWheelSpacing = new Paragraph();
+            addEmptyLine(clrWheelSpacing, 2);
+            doc.add(clrWheelSpacing);
+
+            addAverage(doc, hsbColors);
+
+            Paragraph spacing = new Paragraph();
+            addEmptyLine(spacing, 2);
+            doc.add(spacing);
+
             PdfPTable meta = new PdfPTable(2);
-            HashMap<String, String> metaData = getMeta(image);
-            List<String> keys = getMetaDetails();
+            Set<MetaData> metaData = OutputColors.readMetaData(imagePath);
+            List<MetaData> metaList = new LinkedList<>(metaData);
+            Collections.reverse(metaList);
 
             for (int i = 0; i < metaData.size(); i++) {
-                String key = keys.get(i);
+                String key = metaList.get(i).getDescriptor();
                 Paragraph p = new Paragraph();
                 p.setFont(bold);
                 p.add(key);
                 meta.addCell(new PdfPCell(p));
                 p = new Paragraph();
                 p.setFont(regular);
-                p.add(metaData.get(key));
+                p.add(metaList.get(i).getData());
                 PdfPCell cell = new PdfPCell(p);
                 cell.setPaddingBottom(5);
                 meta.addCell(cell);
@@ -360,7 +362,8 @@ public class OutputColors {
         }
         catch (DocumentException e) {
             App.getOutputField().setForeground(Color.RED);
-            App.getOutputField().setText("An error occurred while adding elements to the created file!");
+            App.getOutputField().setText(
+                    ResourceBundle.getBundle(RESSOURCE).getString("docAddElementsError"));
             App.getTask().cancel(true);
 
             Logger.getAnonymousLogger().log(SEVERE,"{}: Could not add element to created document!",
@@ -368,158 +371,227 @@ public class OutputColors {
             e.printStackTrace();
         }
         catch (IOException e) {
-        App.getOutputField().setForeground(Color.RED);
-        App.getOutputField().setText("An error occurred while getting the chosen image to display it in the created file! " +
-                "Couldn't read image!");
-        App.getTask().cancel(true);
+            App.getOutputField().setForeground(Color.RED);
+            App.getOutputField().setText(
+                    ResourceBundle.getBundle(RESSOURCE).getString("docAddImageReadError")
+            );
+            App.getTask().cancel(true);
 
             Logger.getAnonymousLogger().log(SEVERE,"{}: Could not read image to display in created document!",
                     e.getClass().getSimpleName());
-        e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
-    private static HashMap<String, String> getMeta(String path) {
-        HashMap<String, String> meta = new HashMap<>();
-        DateTimeFormatter dateTimeFormatter =
-                DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-        String noAccess = "Could not access meta data!";
-
-        int lastDot = path.lastIndexOf('.');
-        String type = path.substring(lastDot + 1).toUpperCase();
-        meta.put("File type:", type);
-
-        File f = new File(path);
-        float bytes = f.length();
-        String size = String.format("%.2f bytes", bytes);
-        //bytes to KB
-        if (bytes > 1_000) {
-            size = String.format("%.2f KB", bytes / 1_000);
+    /**
+     * Adds the main colors of the image with their HEX and RGB values to the {@link Document}.
+     * @param doc A {@link Document}: The document to be written in
+     * @param colors A {@link LinkedList} with {@link BaseColor}s: The main colors of the image
+     * @param hsbColors A {@link Float} array: The average HSB values of the main colors
+     * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
+     */
+    private static void addMainColors(Document doc, LinkedList<BaseColor> colors, float[] hsbColors) throws DocumentException {
+        PdfPTable table = new PdfPTable(getCentroids());
+        for (int i = 0; i < getCentroids(); i++) {
+            PdfPCell cell = new PdfPCell();
+            cell.setFixedHeight(200);
+            cell.setBackgroundColor(colors.get(i));
+            table.addCell(cell);
         }
-        //bytes to MB
-        if (bytes > 1_000_000) {
-            size = String.format("%.2f MB", bytes / 1_000_000);
+        for (int i = 0; i < getCentroids(); i++) {
+            int red = colors.get(i).getRed();
+            int green = colors.get(i).getGreen();
+            int blue = colors.get(i).getBlue();
+            float[] hsb = new float[3];
+            Color.RGBtoHSB(red, green, blue, hsb);
+            hsbColors[0] += hsb[0];
+            hsbColors[1] += hsb[1];
+            hsbColors[2] += hsb[2];
+            String rgb = "rgb: " + red + ", " + green + ", " + blue;
+            String hex = String.format("#%02X%02X%02X", red, green, blue);
+            Paragraph p = new Paragraph();
+            p.setFont(regular);
+            p.add(rgb);
+            p.add(new Chunk(System.lineSeparator().concat(System.lineSeparator())));
+            p.add(hex);
+            p.setAlignment(Element.ALIGN_CENTER);
+            PdfPCell cell = new PdfPCell(p);
+            cell.setFixedHeight(50);
+            table.addCell(cell);
         }
-        //bytes to GB
-        if (bytes > 1_000_000_000) {
-            size = String.format("%.2f GB", bytes / 1_000_000_000);
-        }
-        meta.put("File name:", f.getName().substring(0, f.getName().lastIndexOf('.')));
-        meta.put("Size:", size);
-
-        String modTime;
-        String accTime;
-        String creaTime;
-        try {
-            BasicFileAttributes attributes = Files.readAttributes(Paths.get(path), BasicFileAttributes.class);
-
-            FileTime creationTime = attributes.creationTime();
-            LocalDateTime time = creationTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            creaTime = time.format(dateTimeFormatter);
-
-            FileTime accessTime = attributes.lastAccessTime();
-            time = accessTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            accTime =  time.format(dateTimeFormatter);
-
-            FileTime modifiedTime = attributes.lastModifiedTime();
-            time = modifiedTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            modTime = time.format(dateTimeFormatter);
-        }
-        catch (IOException ioException) {
-            LOGGER.log(WARNING, "Could not access file attributes for file at path {0}", path);
-            modTime = noAccess;
-            accTime = noAccess;
-            creaTime = noAccess;
-        }
-        meta.put("Created:", creaTime);
-        meta.put("Last modified:", modTime);
-        meta.put("Last accessed:", accTime);
-
-        String bitDepth;
-        String height;
-        String width;
-        String colorSpace;
-        String colComponents;
-        String transparency;
-        String alpha;
-        String preAlpha;
-        try {
-            BufferedImage bufferedImage = ImageIO.read(f);
-            ColorModel model = bufferedImage.getColorModel();
-            bitDepth = String.valueOf(model.getPixelSize());
-            height = String.valueOf(bufferedImage.getHeight());
-            width = String.valueOf(bufferedImage.getWidth());
-            colorSpace = getColorSpace(bufferedImage.getType());
-            colComponents = String.valueOf(model.getNumComponents());
-            transparency = switch (model.getTransparency()) {
-                case 1 -> "Completely opaque";
-                case 2 -> "Either completely opaque or completely transparent";
-                case 3 -> "Supports transparency values between and including 0% and 100%";
-                default -> "Cannot be determined";
-            };
-            alpha = (model.hasAlpha() ? "Transparency supported by color model" : "Transparency not supported by color model");
-            preAlpha = (model.isAlphaPremultiplied() ? "Premultiplied alpha" : "Non-premultiplied alpha");
-
-        }
-        catch (IOException ioException) {
-            LOGGER.log(WARNING, "Could not access file attributes for file at path {0}", path);
-            bitDepth = noAccess;
-            height = noAccess;
-            width = noAccess;
-            colorSpace = noAccess;
-            colComponents = noAccess;
-            transparency = noAccess;
-            alpha = noAccess;
-            preAlpha = noAccess;
-        }
-        meta.put("Bit depth:", bitDepth);
-        meta.put("Height:", height.concat(" px"));
-        meta.put("Width:", width.concat(" px"));
-        meta.put("Color space:", colorSpace);
-        meta.put("Color components:", colComponents);
-        meta.put("Transparency:", transparency);
-        meta.put("Alpha:", alpha);
-        meta.put("Alpha type:", preAlpha);
-        return meta;
+        doc.add(table);
     }
 
-    private static List<String> getMetaDetails() {
-        return List.of(
-                "File name:",
-                "File type:",
-                "Size:",
-                "Created:",
-                "Last modified:",
-                "Last accessed:",
-                "Height:",
-                "Width:",
-                "Color space:",
-                "Color components:",
-                "Bit depth:",
-                "Transparency:",
-                "Alpha:",
-                "Alpha type:");
+    /**
+     * Adds the description of the average HSB values of the main colors to the {@link Document}.
+     * @param doc A {@link Document}: The document to be written in
+     * @param hsbColors A {@link Float} array: The average HSB values of the main colors
+     * @throws DocumentException If the {@link Paragraph} could not be added to the document
+     */
+    private static void addAverage(Document doc, float[] hsbColors) throws DocumentException {
+        hsbColors[0] /= getCentroids();
+        hsbColors[1] /= getCentroids();
+        hsbColors[2] /= getCentroids();
+
+        Paragraph colorDetails = new Paragraph();
+        Phrase colorDetailsTitle = new Phrase(ResourceBundle.getBundle(RESSOURCE).getString("avgTitle"), bold);
+        colorDetails.add(colorDetailsTitle);
+        colorDetails.setAlignment(Element.ALIGN_CENTER);
+        doc.add(colorDetails);
+
+        Paragraph avg = new Paragraph();
+        Phrase avgColor = new Phrase("• " +
+                ResourceBundle.getBundle(RESSOURCE).getString("avgColorPre") +
+                determineHue(hsbColors[0]), regular);
+        avgColor.add(Chunk.NEWLINE);
+
+        avgColor.add(((hsbColors[1] < 0.5 ? "• " +
+                ResourceBundle.getBundle(RESSOURCE).getString("avgSaturationUnSat")
+                : "• " + ResourceBundle.getBundle(RESSOURCE).getString("avgSaturationSat"))
+                .concat(String.format(" (%s %.2f %%)",
+                        ResourceBundle.getBundle(RESSOURCE).getString("avgSaturation"),
+                        hsbColors[1] * 100))));
+        avgColor.add(Chunk.NEWLINE);
+
+        avgColor.add((hsbColors[2] < 0.5 ? "• " +
+                ResourceBundle.getBundle(RESSOURCE).getString("avgBrightnessDark")
+                : "• " + ResourceBundle.getBundle(RESSOURCE).getString("avgBrightnessLight"))
+                .concat(String.format(" (%s: %.2f %%)",
+                        ResourceBundle.getBundle(RESSOURCE).getString("avgBrightness"),
+                        hsbColors[2] * 100)));
+        avgColor.add(Chunk.NEWLINE);
+
+        avg.setIndentationLeft(220);
+        avg.add(avgColor);
+        doc.add(avg);
     }
 
-    private static String getColorSpace(int i) {
+    /**
+     * Determines the color for the passed hue value.
+     * @param hue A {@link Float}: The hue value to determine the color of.
+     * @return A {@link String}: The color for the passed hue value.
+     */
+    private static String determineHue(float hue) {
+        int newHue = (int) (hue * 360);
+        int h = (newHue - 29) / 60;
+        String color;
+        if (newHue < 30) {
+            color = ResourceBundle.getBundle(RESSOURCE).getString("avgRed");
+        }
+        else {
+            switch (h) {
+                case 0 -> color = ResourceBundle.getBundle(RESSOURCE).getString("avgYellow");
+                case 1 -> color = ResourceBundle.getBundle(RESSOURCE).getString("avgGreen");
+                case 2 -> color = ResourceBundle.getBundle(RESSOURCE).getString("avgCyan");
+                case 3 -> color = ResourceBundle.getBundle(RESSOURCE).getString("avgBlue");
+                case 4 -> color = ResourceBundle.getBundle(RESSOURCE).getString("avgPurple");
+                case 5 -> color = ResourceBundle.getBundle(RESSOURCE).getString("avgRed");
+                default -> color = ResourceBundle.getBundle(RESSOURCE).getString("avgIndeterminate");
+            }
+        }
+        return color;
+    }
+
+    /**
+     * Returns the description of the color space indicated by the passed integer.
+     * @param index A {@link Integer}: The index of the color space
+     * @return A {@link String}: The description of the color space
+     */
+    private static String getColorSpace(int index) {
         String model;
-        switch (i) {
-            case 1 -> model = "8-bit RGB integer pixels without alpha (TYPE_INT_RGB)";
-            case 2 -> model = "8-bit RGB integer pixels with alpha (TYPE_INT_ARGB)";
-            case 3 -> model = "Premultiplied 8-bit RGB integer pixels with alpha (TYPE_INT_ARGB_PRE)";
-            case 4 -> model = "8-bit RGB integer pixels in BGR color model without alpha (TYPE_INT_BGR)";
-            case 5 -> model = "8-bit RGB integer pixels in BGR color model without alpha (TYPE_3BYTE_BGR)";
-            case 6 -> model = "8-bit RGB pixels in BGRA color model with alpha, stored in four bytes (TYPE_4BYTE_ABGR)";
-            case 7 -> model = "Premultiplied 8-bit RGB pixels in BGRA color model with alpha, stored in four bytes (TYPE_4BYTE_ABGR_PRE)";
-            case 8 -> model = "Non-indexed, unsigned byte grayscale image (TYPE_BYTE_GRAY)";
-            case 9 -> model = "Opaque, byte-packed 1, 2, or 4 bit image without alpha, usually in sRGB (TYPE_BYTE_BINARY)";
-            case 10 -> model = "Indexed byte image, usually in sRGB (TYPE_BYTE_INDEXED)";
-            case 11 -> model = "Non-indexed, unsigned short grayscale image (TYPE_USHORT_GRAY)";
-            case 12 -> model = "5 bits red, 6 bits green and 5 bits blue RGB pixels without alpha (TYPE_USHORT_565_RGB)";
-            case 13 -> model = "5 bits red, 5 bits green and 5 bits blue RGB pixels without alpha (TYPE_USHORT_555_RGB)";
-            default -> model = "Custom/Not recognised";
+        switch (index) {
+            case 1 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel1");
+            case 2 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel2");
+            case 3 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel3");
+            case 4 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel4");
+            case 5 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel5");
+            case 6 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel6");
+            case 7 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel7");
+            case 8 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel8");
+            case 9 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel9");
+            case 10 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel10");
+            case 11 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel11");
+            case 12 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel12");
+            case 13 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel13");
+            default -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModelDefault");
         }
         return model;
+    }
+
+    /**
+     * Reads the metadata of the image the passed {@link Path} points to and returns it as a {@link Set} of
+     * {@link MetaData}.
+     * @param imgPath A {@link Path}: The path to the image to read the metadata from
+     * @return A {@link Set} of {@link MetaData}: The metadata of the image
+     */
+    public static Set<MetaData> readMetaData(Path imgPath) {
+        BufferedImage img;
+        BasicFileAttributes attr;
+        DateTimeFormatter dateTimeFormatter =
+                DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+        try {
+            img = ImageIO.read(imgPath.toFile());
+            attr = Files.readAttributes(imgPath, BasicFileAttributes.class);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            LOGGER.log(WARNING, "Could not read image to get meta data!");
+            return MetaData.createNoAccessMetaData();
+        }
+
+        return MetaData.createMetaData(type ->
+                switch (type) {
+                    case FILE_NAME -> imgPath.getFileName().toString().split("\\.")[0];
+                    case FILE_TYPE -> imgPath.getFileName().toString().split("\\.")[1].toUpperCase();
+                    case FILE_SIZE -> formatSize(attr.size());
+                    case FILE_CREATION_DATE -> formatTime(attr.creationTime(), dateTimeFormatter);
+                    case FILE_LAST_MODIFIED_DATE -> formatTime(attr.lastModifiedTime(), dateTimeFormatter);
+                    case FILE_LAST_ACCESSED_DATE -> formatTime(attr.lastAccessTime(), dateTimeFormatter);
+                    case FILE_HEIGHT -> img.getHeight() + " px";
+                    case FILE_WIDTH -> img.getWidth() + " px";
+                    case FILE_IMAGE_TYPE -> getColorSpace(img.getType());
+                    case FILE_COLOR_COMPONENTS -> String.valueOf(img.getColorModel().getNumComponents());
+                    case FILE_BIT_DEPTH -> String.valueOf(img.getColorModel().getPixelSize());
+                    case FILE_TRANSPARENCY -> switch (img.getColorModel().getTransparency()) {
+                        case 1 -> ResourceBundle.getBundle(RESSOURCE).getString("metaTransparency1");
+                        case 2 -> ResourceBundle.getBundle(RESSOURCE).getString("metaTransparency2");
+                        case 3 -> ResourceBundle.getBundle(RESSOURCE).getString("metaTransparency3");
+                        default -> ResourceBundle.getBundle(RESSOURCE).getString("metaTransparencyDefault");
+                    };
+                    case FILE_ALPHA -> (img.getColorModel().hasAlpha() ?
+                            ResourceBundle.getBundle(RESSOURCE).getString("metaAlphaYes") :
+                            ResourceBundle.getBundle(RESSOURCE).getString("metaAlphaNo"));
+                    case FILE_ALPHA_TYPE -> (img.getColorModel().isAlphaPremultiplied() ?
+                            ResourceBundle.getBundle(RESSOURCE).getString("metaAlphaPremultiplied") :
+                            ResourceBundle.getBundle(RESSOURCE).getString("metaAlphaNotPremultiplied"));
+                });
+    }
+
+    /**
+     * Formats the passed {@link FileTime} to a {@link String} using the passed {@link DateTimeFormatter}.
+     * @param time - A {@link FileTime}: The time to format
+     * @param dateTimeFormatter - A {@link DateTimeFormatter}: The formatter to use
+     * @return A {@link String}: The time, formatted to fit the pattern "dd/MM/yyyy HH:mm:ss"
+     */
+    private static String formatTime(FileTime time, DateTimeFormatter dateTimeFormatter) {
+        LocalDateTime ldt = time.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        return ldt.format(dateTimeFormatter);
+    }
+
+    /**
+     * Formats the passed {@link Long} to a {@link String} containing the size of the file in a better readable format.
+     * @param bytes - A {@link Long}: The size of the file in bytes
+     * @return A {@link String}: The size of the file in a better readable format
+     */
+    private static String formatSize(long bytes) {
+        long factor = 1_000L;
+        int power = 0;
+        while (bytes >= factor) {
+            power++;
+            bytes /= factor;
+        }
+        return String.format("%.2f %sB", (double) bytes, power == 0 ? "" : "kMGT".charAt(power - 1));
     }
 
     /**

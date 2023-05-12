@@ -1,21 +1,30 @@
 package de.colorscheme.clustering;
 
+import de.colorscheme.app.App;
 import javafx.geometry.Point3D;
 
 import java.awt.*;
 import java.util.AbstractCollection;
+import java.util.ResourceBundle;
 
 import static de.colorscheme.app.App.getOutputField;
+import static de.colorscheme.app.App.getRessourceLanguage;
 import static de.colorscheme.app.App.getTask;
 
 /**
  * The class providing the methods for the KMeans clustering process used to determine the image's main colours. <br>
  *
- * @author &copy; 2022 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
+ * @author &copy; 2023 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
  * @version 1.2
  * @since 17.0.1
  */
 public class KMeans {
+
+    /**
+     * {@link App#getRessourceLanguage() Gets} the language and sets the {@link ResourceBundle} used for the displayed
+     * text accordingly
+     */
+    private static final String RESSOURCE = getRessourceLanguage();
 
     /**
      * The value, deciding when the amount of changes after recalculating the centroids is low enough to finish the
@@ -143,8 +152,7 @@ public class KMeans {
         kMeansPlusPlus(colorData, centroids);
         if (colorData.getCentroids().isEmpty()) {
             getOutputField().setForeground(Color.RED);
-            getOutputField().setText("An error occurred while trying to initializing the color scheme generation process!" +
-                    "The list of initializing centroids is empty!");
+            getOutputField().setText(ResourceBundle.getBundle(RESSOURCE).getString("emptyCentroidList"));
             getTask().cancel(true);
         }
 
