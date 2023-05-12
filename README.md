@@ -256,7 +256,7 @@ See the [documentation](#) for specifics.
 - [ ] Create Commit message guidelines
 - [x] Add history
 - [x] Add Metadata to image
-- [ ] Better incorporate color wheel
+- [x] Better incorporate color wheel
 - [ ] Implement multiple languages (maybe)
 
 See the [open issues](https://github.com/Fenris22127/ColorSchemeGenerator/issues) for a full list of proposed features (and known issues).<br>
