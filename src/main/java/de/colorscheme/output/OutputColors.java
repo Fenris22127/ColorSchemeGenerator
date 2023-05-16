@@ -407,16 +407,19 @@ public class OutputColors {
             hsbColors[0] += hsb[0];
             hsbColors[1] += hsb[1];
             hsbColors[2] += hsb[2];
-            String rgb = "rgb: " + red + ", " + green + ", " + blue;
-            String hex = String.format("#%02X%02X%02X", red, green, blue);
+            String rgb = "RGB: " + red + ", " + green + ", " + blue;
+            String hex = String.format("HEX: #%02X%02X%02X", red, green, blue);
+            String hsbString = "HSB: " + Math.round(hsb[0] * 360) + ", " + Math.round(hsb[1] * 100) + "%, " + Math.round(hsb[2] * 100) + "%";
             Paragraph p = new Paragraph();
             p.setFont(regular);
             p.add(rgb);
             p.add(new Chunk(System.lineSeparator().concat(System.lineSeparator())));
             p.add(hex);
+            p.add(new Chunk(System.lineSeparator().concat(System.lineSeparator())));
+            p.add(hsbString);
             p.setAlignment(Element.ALIGN_CENTER);
             PdfPCell cell = new PdfPCell(p);
-            cell.setFixedHeight(50);
+            cell.setFixedHeight(70);
             table.addCell(cell);
         }
         doc.add(table);
@@ -456,7 +459,7 @@ public class OutputColors {
         avgColor.add((hsbColors[2] < 0.5 ? "• " +
                 ResourceBundle.getBundle(RESSOURCE).getString("avgBrightnessDark")
                 : "• " + ResourceBundle.getBundle(RESSOURCE).getString("avgBrightnessLight"))
-                .concat(String.format(" (%s: %.2f %%)",
+                .concat(String.format(" (%s %.2f %%)",
                         ResourceBundle.getBundle(RESSOURCE).getString("avgBrightness"),
                         hsbColors[2] * 100)));
         avgColor.add(Chunk.NEWLINE);

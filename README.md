@@ -243,13 +243,108 @@ See the [documentation](#) for specifics.
 
 ### Output File Overview
 
-🚧 ...to be added... 🚧
+<img src="src/res/images/page1.png" alt="Overview over page 1" width="500">
+
+<br>
+
+<img src="src/res/images/page2.png" alt="Overview over page 1" width="500">
+
+#### 1 - File name
+The file name and extension of the chosen image as displayed in the file explorer.
+
+#### 2 - Image
+The image chosen by the user that is used to generate the color scheme.
+
+#### 3 - Color Scheme
+The color scheme generated from the image along with the color codes in HEX, RGB and HSB.
+
+#### 4 - Color Wheel
+Shows the main colors of the color scheme in a color wheel.
+
+#### 5 - Averages of color scheme
+Shows the average color, whether the colors are saturated or unsaturated on average along the average saturation and 
+whether the colors are bright or dark on average along the average brightness.
+
+#### 6 - Metadata of image
+Shows the metadata of the image, if available.
+
+##### 6.1 - File name
+The display name of the file, which is also displayed in the file explorer. The file title set in the details tab of 
+the file properties may differ.
+
+##### 6.2 - File type
+Shows you the file type of your file. This is either a "JPG"/"JPEG" (no difference) or a "PNG" since the program only 
+accepts files of that type.
+
+##### 6.3 - File size
+Shows the file size in the appropriate unit, meaning it is within the 1 - 999.99 range of the unit, except for MB, 
+which is in the 0 - 999.99 range.
+
+##### 6.4 - Creation date
+Shows the date and time of the creation of the file according to the time zone of the user.
+
+##### 6.5 - Last modified
+Shows the date and time of the last modification of the file according to the time zone of the user. This includes 
+modifications that change the files' metadata, such as editing the name, owner or permissions.
+
+##### 6.6 - Last accessed
+Shows the date and time of the last time the file has been accessed, meaning it has been opened. This can mean the file 
+was opened by the user or a program.
+
+##### 6.7 - Height
+Shows the height of the image in pixels. This value might change according to the rotation of the image.
+
+##### 6.8 - Width
+Shows the width of the image in pixels. This value might change according to the rotation of the image.
+
+##### 6.9 - Color Space
+A color space is a range of colors on a spectrum that can be displayed visually.
+
+<img src="src/res/images/rgb_light.png" alt="The RGB color space visualised" width="300"> <br>
+<i>Example of the visualisation of the RGB color space</i> <br>
+R stands for red, G stands for green and B stands for blue. When the image supports transparency, the A stands for 
+alpha (transparency value). <br>
+These colors have to be stored in a format readable for a computer. Usually, color spaces 
+are 8-bit large, which can be imagined as 8 boxes that can hold a single color value. <br><br>
+<img src="src/res/images/boxes.png" alt="An image of 8 boxes" width="600"> <br><br>
+3 bits store red, 3 bits store green and 2 bits store blue, since the human eye is less sensitive to blue light. <br><br>
+<img src="src/res/images/boxes_colored.png" alt="An image of 8 boxes, 3 are red, 3 are green and 2 are blue" width="600"> <br><br>
+If the image supports transparency, each color only gets two bits and the alpha value is stored in the 7th and 8th box. 
+Usually, the color space name will contain an A somewhere, like in RGBA.<br>
+The boxes holding the colors can be moved around to create different color spaces like the BGR color space. This only 
+means that the order of the boxes holding the colors is reversed. <br>
+
+#### 6.10 - Color components
+Shows the amount of color components of the image. This includes the red, green and blue, making for three color 
+components. If the image supports transparency, the alpha channel is counted as the fourth color component.
+
+#### 6.11 - Bit depth
+This shows the amount of bits used to indicate the color of a pixel. The higher the bit depth, the more bits (boxes) 
+are used to store the color. With more bits, gradual changes in color can be displayed more accurately. 
+Bit depth is most notable when working with gradients as gradients will start showing clear steps in color as the bit 
+depth goes down. <br>
+
+#### 6.12 - Transparency
+Shows, how the image supports transparency. If the image does not support transparency, this will be displayed 
+as "completely opaque". If transparency is supported, the image is either completely transparent or allows gradual 
+steps in transparency (value between 0 and 1). <br>
+
+#### 6.13 - Alpha
+Shows, whether the image supports transparency. If the image does not support transparency, this will be displayed as 
+"Transparency not supported by color model". If transparency is supported, this will be displayed as 
+"Transparency supported by color model". <br>
+
+#### 6.14 - Alpha type
+Shows, whether the alpha is premultiplied. If not, the alpha value simply specifies how solid a color is, meaning the 
+alpha value can be decreased without changing the RGB channels and still result in a transparent pixel. <br>
+If the alpha channel is premultiplied however, the RGB channels and the alpha channel are linked. To create a completely 
+transparent pixel, the RGB channels and the alpha channel have to be set to 0. <br>
 
 <!-- ROADMAP -->
 ## 🚧 Roadmap 🚧
 
-- [ ] Finish README
-  - [ ] Add Usage Examples
+- [x] Finish README
+  - [x] Add Usage Examples
   - [x] Add License
 - [x] Create Bug Template
 - [ ] Add documentation
@@ -257,7 +352,7 @@ See the [documentation](#) for specifics.
 - [x] Add history
 - [x] Add Metadata to image
 - [x] Better incorporate color wheel
-- [ ] Implement multiple languages (maybe)
+- [x] Implement multiple languages (maybe)
 
 See the [open issues](https://github.com/Fenris22127/ColorSchemeGenerator/issues) for a full list of proposed features (and known issues).<br>
 To report an issue, please use the [issue template](https://github.com/Fenris22127/ColorSchemeGenerator/blob/master/doc/ISSUE_TEMPLATE.md).
