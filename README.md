@@ -210,7 +210,7 @@ See the [documentation](#) for specifics.
 
 
 <!-- USAGE EXAMPLES -->
-## 🚧 Usage 🚧
+## Usage
 
 <img src="src/res/images/How-to.png" alt="UI-Explanation" width="900">
 
@@ -353,6 +353,11 @@ transparent pixel, the RGB channels and the alpha channel have to be set to 0. <
 - [x] Add Metadata to image
 - [x] Better incorporate color wheel
 - [x] Implement multiple languages (maybe)
+- [ ] Create an interface using JavaFX
+- [ ] Implement possibility to see result in interface already
+- [ ] Write file explaining mathematical structures used
+- [ ] Write file explaining mathematical structures used in simple terms
+- [ ] Explain code (maybe, JavaDocs exist)
 
 See the [open issues](https://github.com/Fenris22127/ColorSchemeGenerator/issues) for a full list of proposed features (and known issues).<br>
 To report an issue, please use the [issue template](https://github.com/Fenris22127/ColorSchemeGenerator/blob/master/doc/ISSUE_TEMPLATE.md).
