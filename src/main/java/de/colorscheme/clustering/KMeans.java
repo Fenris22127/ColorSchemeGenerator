@@ -1,15 +1,10 @@
 package de.colorscheme.clustering;
 
-import de.colorscheme.app.App;
 import javafx.geometry.Point3D;
 
-import java.awt.*;
 import java.util.AbstractCollection;
-import java.util.ResourceBundle;
 
-import static de.colorscheme.app.App.getOutputField;
-import static de.colorscheme.app.App.getRessourceLanguage;
-import static de.colorscheme.app.App.getTask;
+import static de.colorscheme.app.AppController.*;
 
 /**
  * The class providing the methods for the KMeans clustering process used to determine the image's main colours. <br>
@@ -19,12 +14,6 @@ import static de.colorscheme.app.App.getTask;
  * @since 17.0.1
  */
 public class KMeans {
-
-    /**
-     * {@link App#getRessourceLanguage() Gets} the language and sets the {@link ResourceBundle} used for the displayed
-     * text accordingly
-     */
-    private static final String RESSOURCE = getRessourceLanguage();
 
     /**
      * The value, deciding when the amount of changes after recalculating the centroids is low enough to finish the
@@ -151,9 +140,8 @@ public class KMeans {
         centroids = totalCentroids;
         kMeansPlusPlus(colorData, centroids);
         if (colorData.getCentroids().isEmpty()) {
-            getOutputField().setForeground(Color.RED);
-            getOutputField().setText(ResourceBundle.getBundle(RESSOURCE).getString("emptyCentroidList"));
-            getTask().cancel(true);
+            addToOutputField(getResBundle().getString("emptyCentroidList"), true);
+            setCancelled(true);
         }
 
         Double sumSquaredErrors = Double.MAX_VALUE;

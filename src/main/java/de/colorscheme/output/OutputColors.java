@@ -1,13 +1,13 @@
 package de.colorscheme.output;
 
-import com.itextpdf.text.*;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import de.colorscheme.app.App;
+import de.colorscheme.app.AppController;
 import de.colorscheme.clustering.ColorData;
 import de.fenris.logger.ColorLogger;
 import javafx.geometry.Point3D;
@@ -16,7 +16,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,13 +24,16 @@ import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
-import static de.colorscheme.app.App.getRessourceLanguage;
+import static de.colorscheme.app.AppController.getResBundle;
 import static de.colorscheme.clustering.KMeans.getCentroids;
-import static java.util.logging.Level.*;
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
 
 /**
  * Writes the color scheme of the selected image into a pdf containing the image, image name, colours
@@ -42,12 +44,6 @@ import static java.util.logging.Level.*;
  * @since 17.0.1
  */
 public class OutputColors {
-
-    /**
-     * {@link App#getRessourceLanguage() Gets} the language and sets the {@link ResourceBundle} used for the displayed
-     * text accordingly
-     */
-    private static final String RESSOURCE = getRessourceLanguage();
 
     /**
      * Creates a {@link ColorLogger Logger} for this class
@@ -74,10 +70,22 @@ public class OutputColors {
      */
     private static final Font small = FontFactory.getFont(FontFactory.HELVETICA, 10, Font.NORMAL);
 
+    private static final Path schemeWheelPath = Path.of("src/main/resources/img/SchemeWheel.png");
+
+    /**
+     * The {@link String} containing the path where the file will be downloaded to
+     */
+    private static String downloadPath;
+
     /**
      * Private constructor to hide the public one
      */
-    private OutputColors() {}
+    private OutputColors() {
+    }
+
+    public static void setDownloadPath(String path) {
+        downloadPath = path;
+    }
 
     /**
      * Create a PDF with the resulting color scheme using the methods of the class {@link OutputColors OutputColors}.
@@ -98,6 +106,7 @@ public class OutputColors {
      *         {@link #outputWrite(ColorData, Path, Path) outputWrite()} is called.
      *     </li>
      * </ul>
+     *
      * @return a {@link Document}: The PDF file containing the image and its color scheme, or null, if the document
      * couldn't be created
      */
@@ -107,7 +116,7 @@ public class OutputColors {
 
         String filename = "ColorScheme_" + imgName.substring(0, imgName.lastIndexOf(".")) + ".pdf";
 
-        Path finalPath = Paths.get(fileDestinationBuilder.append(App.getDownloadPath()).append("\\").append(filename).toString());
+        Path finalPath = Paths.get(fileDestinationBuilder.append(downloadPath).append("\\").append(filename).toString());
 
         //Try to create a new file "ColorScheme.pdf"
         try {
@@ -125,25 +134,17 @@ public class OutputColors {
                 outputWrite(c, Paths.get(fileDestinationBuilder.toString()), imagePath);
             }
             return colorScheme;
-        }
-        catch (DocumentException e) {
-            App.getOutputField().setForeground(Color.RED);
-            App.getOutputField().setText(
-                    ResourceBundle.getBundle(RESSOURCE).getString("docWriteInFileError")
-            );
-            App.getTask().cancel(true);
+        } catch (DocumentException e) {
+            AppController.addToOutputField(getResBundle().getString("docWriteInFileError"), true);
+            AppController.setCancelled(true);
 
             LOGGER.log(SEVERE, "{0}: Could not instantiate PdfWriter!", e.getClass().getSimpleName());
             e.printStackTrace();
-        }
-        catch (FileNotFoundException e) {
-            App.getOutputField().setForeground(Color.RED);
-            App.getOutputField().setText(
-                    ResourceBundle.getBundle(RESSOURCE).getString("docFindFileError")
-            );
-            App.getTask().cancel(true);
+        } catch (FileNotFoundException e) {
+            AppController.addToOutputField(getResBundle().getString("docFindFileError"), true);
+            AppController.setCancelled(true);
 
-            LOGGER.log(SEVERE,"FileNotFoundException: FileOutputStream could not find file!");
+            LOGGER.log(SEVERE, "FileNotFoundException: FileOutputStream could not find file!");
             e.printStackTrace();
         }
         return null;
@@ -151,15 +152,16 @@ public class OutputColors {
 
     /**
      * Determines the file name of a file of the original name exists already. <br>
-     *
+     * <p>
      * Sets the filename as: Filename (x + 1).pdf with x being the number of files with the same name.
+     *
      * @param path a {@link String}: The path at which the file will be saved
      * @return a {@link String}: The path with the updated filename at which the file will now be saved
      */
     private static Path getFileName(Path path) {
         int fileNumber = 1;
-        Path filePath =path;
-        String name = fileName(path.toString()).substring(0, fileName(path.toString()).lastIndexOf("."));
+        Path filePath = path;
+        String name = String.valueOf(path.getFileName()).substring(0, String.valueOf(path.getFileName()).lastIndexOf("."));
         String newName = name;
         String oldName;
         while (Files.exists(filePath)) {
@@ -186,8 +188,9 @@ public class OutputColors {
      *         content before {@link Document#close() closing} it again.
      *     </li>
      * </ol>
-     * @param c A {@link ColorData} object: The instance used for all processes for the currently inspected image
-     * @param path A {@link String}: The path to the location, where the color scheme file will be saved
+     *
+     * @param c         A {@link ColorData} object: The instance used for all processes for the currently inspected image
+     * @param path      A {@link String}: The path to the location, where the color scheme file will be saved
      * @param imagePath A {@link String}: The path to the selected image
      */
     private static void outputWrite(ColorData c, Path path, Path imagePath) {
@@ -197,25 +200,19 @@ public class OutputColors {
             doc.open();
             addContent(c, doc, imagePath);
             doc.close();
-        }
-        catch (IOException e) {
-            App.getOutputField().setForeground(Color.RED);
-            App.getOutputField().setText(
-                    ResourceBundle.getBundle(RESSOURCE).getString("docAccessFileError")
-            );
-            App.getTask().cancel(true);
+            Files.deleteIfExists(schemeWheelPath);
+        } catch (IOException e) {
+            AppController.addToOutputField(getResBundle().getString("docAccessFileError"), true);
+            AppController.setCancelled(true);
 
-            LOGGER.log(SEVERE,"{0}: FileOutputStream could not access created document!",
+            LOGGER.log(SEVERE, "{0}: FileOutputStream could not access created document!",
                     e.getClass().getSimpleName());
             e.printStackTrace();
-        }
-        catch (DocumentException e) {
-            App.getOutputField().setForeground(Color.RED);
-            App.getOutputField().setText(
-                    ResourceBundle.getBundle(RESSOURCE).getString("docWriteInFileError"));
-            App.getTask().cancel(true);
+        } catch (DocumentException e) {
+            AppController.addToOutputField(getResBundle().getString("docWriteInFileError"), true);
+            AppController.setCancelled(true);
 
-            LOGGER.log(SEVERE,"{0}: Could not instantiate PdfWriter!",
+            LOGGER.log(SEVERE, "{0}: Could not instantiate PdfWriter!",
                     e.getClass().getSimpleName());
             e.printStackTrace();
         }
@@ -277,8 +274,9 @@ public class OutputColors {
      *         Finally the {@link PdfPTable} is added to the {@link Document}.
      *     </li>
      * </ol>
-     * @param c A {@link ColorData} object: The instance used for all processes for the currently inspected image
-     * @param doc A {@link Document}: The {@link Document} to be written in
+     *
+     * @param c         A {@link ColorData} object: The instance used for all processes for the currently inspected image
+     * @param doc       A {@link Document}: The {@link Document} to be written in
      * @param imagePath A {@link String}: The path to the selected image
      */
     private static void addContent(ColorData c, Document doc, Path imagePath) {
@@ -319,7 +317,7 @@ public class OutputColors {
             doc.add(empty);
 
             if (ColorWheel.createColorWheel(colors)) {
-                Image colorWheel = Image.getInstance("src/main/resources/img/SchemeWheel.png");
+                Image colorWheel = Image.getInstance(schemeWheelPath.toString());
                 colorWheel.setAlignment(Element.ALIGN_CENTER);
                 colorWheel.scaleToFit(width40, height40);
                 Paragraph imgParagraph = new Paragraph();
@@ -359,25 +357,17 @@ public class OutputColors {
             }
             doc.add(meta);
 
-        }
-        catch (DocumentException e) {
-            App.getOutputField().setForeground(Color.RED);
-            App.getOutputField().setText(
-                    ResourceBundle.getBundle(RESSOURCE).getString("docAddElementsError"));
-            App.getTask().cancel(true);
+        } catch (DocumentException e) {
+            AppController.addToOutputField(getResBundle().getString("docAddElementsError"), true);
+            AppController.setCancelled(true);
 
-            Logger.getAnonymousLogger().log(SEVERE,"{}: Could not add element to created document!",
+            Logger.getAnonymousLogger().log(SEVERE, "{}: Could not add element to created document!",
                     e.getClass().getSimpleName());
             e.printStackTrace();
-        }
-        catch (IOException e) {
-            App.getOutputField().setForeground(Color.RED);
-            App.getOutputField().setText(
-                    ResourceBundle.getBundle(RESSOURCE).getString("docAddImageReadError")
-            );
-            App.getTask().cancel(true);
-
-            Logger.getAnonymousLogger().log(SEVERE,"{}: Could not read image to display in created document!",
+        } catch (IOException e) {
+            AppController.addToOutputField(getResBundle().getString("docAddImageReadError"), true);
+            AppController.setCancelled(true);
+            Logger.getAnonymousLogger().log(SEVERE, "{}: Could not read image to display in created document!",
                     e.getClass().getSimpleName());
             e.printStackTrace();
         }
@@ -385,8 +375,9 @@ public class OutputColors {
 
     /**
      * Adds the main colors of the image with their HEX and RGB values to the {@link Document}.
-     * @param doc A {@link Document}: The document to be written in
-     * @param colors A {@link LinkedList} with {@link BaseColor}s: The main colors of the image
+     *
+     * @param doc       A {@link Document}: The document to be written in
+     * @param colors    A {@link LinkedList} with {@link BaseColor}s: The main colors of the image
      * @param hsbColors A {@link Float} array: The average HSB values of the main colors
      * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
      */
@@ -427,7 +418,8 @@ public class OutputColors {
 
     /**
      * Adds the description of the average HSB values of the main colors to the {@link Document}.
-     * @param doc A {@link Document}: The document to be written in
+     *
+     * @param doc       A {@link Document}: The document to be written in
      * @param hsbColors A {@link Float} array: The average HSB values of the main colors
      * @throws DocumentException If the {@link Paragraph} could not be added to the document
      */
@@ -437,30 +429,30 @@ public class OutputColors {
         hsbColors[2] /= getCentroids();
 
         Paragraph colorDetails = new Paragraph();
-        Phrase colorDetailsTitle = new Phrase(ResourceBundle.getBundle(RESSOURCE).getString("avgTitle"), bold);
+        Phrase colorDetailsTitle = new Phrase(AppController.getResBundle().getString("avgTitle"), bold);
         colorDetails.add(colorDetailsTitle);
         colorDetails.setAlignment(Element.ALIGN_CENTER);
         doc.add(colorDetails);
 
         Paragraph avg = new Paragraph();
         Phrase avgColor = new Phrase("• " +
-                ResourceBundle.getBundle(RESSOURCE).getString("avgColorPre") +
+                AppController.getResBundle().getString("avgColorPre") +
                 determineHue(hsbColors[0]), regular);
         avgColor.add(Chunk.NEWLINE);
 
         avgColor.add(((hsbColors[1] < 0.5 ? "• " +
-                ResourceBundle.getBundle(RESSOURCE).getString("avgSaturationUnSat")
-                : "• " + ResourceBundle.getBundle(RESSOURCE).getString("avgSaturationSat"))
+                AppController.getResBundle().getString("avgSaturationUnSat")
+                : "• " + AppController.getResBundle().getString("avgSaturationSat"))
                 .concat(String.format(" (%s %.2f %%)",
-                        ResourceBundle.getBundle(RESSOURCE).getString("avgSaturation"),
+                        AppController.getResBundle().getString("avgSaturation"),
                         hsbColors[1] * 100))));
         avgColor.add(Chunk.NEWLINE);
 
         avgColor.add((hsbColors[2] < 0.5 ? "• " +
-                ResourceBundle.getBundle(RESSOURCE).getString("avgBrightnessDark")
-                : "• " + ResourceBundle.getBundle(RESSOURCE).getString("avgBrightnessLight"))
+                AppController.getResBundle().getString("avgBrightnessDark")
+                : "• " + AppController.getResBundle().getString("avgBrightnessLight"))
                 .concat(String.format(" (%s %.2f %%)",
-                        ResourceBundle.getBundle(RESSOURCE).getString("avgBrightness"),
+                        AppController.getResBundle().getString("avgBrightness"),
                         hsbColors[2] * 100)));
         avgColor.add(Chunk.NEWLINE);
 
@@ -471,6 +463,7 @@ public class OutputColors {
 
     /**
      * Determines the color for the passed hue value.
+     *
      * @param hue A {@link Float}: The hue value to determine the color of.
      * @return A {@link String}: The color for the passed hue value.
      */
@@ -479,17 +472,16 @@ public class OutputColors {
         int h = (newHue - 29) / 60;
         String color;
         if (newHue < 30) {
-            color = ResourceBundle.getBundle(RESSOURCE).getString("avgRed");
-        }
-        else {
+            color = AppController.getResBundle().getString("avgRed");
+        } else {
             switch (h) {
-                case 0 -> color = ResourceBundle.getBundle(RESSOURCE).getString("avgYellow");
-                case 1 -> color = ResourceBundle.getBundle(RESSOURCE).getString("avgGreen");
-                case 2 -> color = ResourceBundle.getBundle(RESSOURCE).getString("avgCyan");
-                case 3 -> color = ResourceBundle.getBundle(RESSOURCE).getString("avgBlue");
-                case 4 -> color = ResourceBundle.getBundle(RESSOURCE).getString("avgPurple");
-                case 5 -> color = ResourceBundle.getBundle(RESSOURCE).getString("avgRed");
-                default -> color = ResourceBundle.getBundle(RESSOURCE).getString("avgIndeterminate");
+                case 0 -> color = AppController.getResBundle().getString("avgYellow");
+                case 1 -> color = AppController.getResBundle().getString("avgGreen");
+                case 2 -> color = AppController.getResBundle().getString("avgCyan");
+                case 3 -> color = AppController.getResBundle().getString("avgBlue");
+                case 4 -> color = AppController.getResBundle().getString("avgPurple");
+                case 5 -> color = AppController.getResBundle().getString("avgRed");
+                default -> color = AppController.getResBundle().getString("avgIndeterminate");
             }
         }
         return color;
@@ -497,26 +489,27 @@ public class OutputColors {
 
     /**
      * Returns the description of the color space indicated by the passed integer.
+     *
      * @param index A {@link Integer}: The index of the color space
      * @return A {@link String}: The description of the color space
      */
     private static String getColorSpace(int index) {
         String model;
         switch (index) {
-            case 1 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel1");
-            case 2 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel2");
-            case 3 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel3");
-            case 4 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel4");
-            case 5 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel5");
-            case 6 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel6");
-            case 7 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel7");
-            case 8 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel8");
-            case 9 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel9");
-            case 10 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel10");
-            case 11 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel11");
-            case 12 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel12");
-            case 13 -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModel13");
-            default -> model = ResourceBundle.getBundle(RESSOURCE).getString("metaColorModelDefault");
+            case 1 -> model = AppController.getResBundle().getString("metaColorModel1");
+            case 2 -> model = AppController.getResBundle().getString("metaColorModel2");
+            case 3 -> model = AppController.getResBundle().getString("metaColorModel3");
+            case 4 -> model = AppController.getResBundle().getString("metaColorModel4");
+            case 5 -> model = AppController.getResBundle().getString("metaColorModel5");
+            case 6 -> model = AppController.getResBundle().getString("metaColorModel6");
+            case 7 -> model = AppController.getResBundle().getString("metaColorModel7");
+            case 8 -> model = AppController.getResBundle().getString("metaColorModel8");
+            case 9 -> model = AppController.getResBundle().getString("metaColorModel9");
+            case 10 -> model = AppController.getResBundle().getString("metaColorModel10");
+            case 11 -> model = AppController.getResBundle().getString("metaColorModel11");
+            case 12 -> model = AppController.getResBundle().getString("metaColorModel12");
+            case 13 -> model = AppController.getResBundle().getString("metaColorModel13");
+            default -> model = AppController.getResBundle().getString("metaColorModelDefault");
         }
         return model;
     }
@@ -524,6 +517,7 @@ public class OutputColors {
     /**
      * Reads the metadata of the image the passed {@link Path} points to and returns it as a {@link Set} of
      * {@link MetaData}.
+     *
      * @param imgPath A {@link Path}: The path to the image to read the metadata from
      * @return A {@link Set} of {@link MetaData}: The metadata of the image
      */
@@ -536,8 +530,7 @@ public class OutputColors {
         try {
             img = ImageIO.read(imgPath.toFile());
             attr = Files.readAttributes(imgPath, BasicFileAttributes.class);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             LOGGER.log(WARNING, "Could not read image to get meta data!");
             return MetaData.createNoAccessMetaData();
@@ -557,23 +550,24 @@ public class OutputColors {
                     case FILE_COLOR_COMPONENTS -> String.valueOf(img.getColorModel().getNumComponents());
                     case FILE_BIT_DEPTH -> String.valueOf(img.getColorModel().getPixelSize());
                     case FILE_TRANSPARENCY -> switch (img.getColorModel().getTransparency()) {
-                        case 1 -> ResourceBundle.getBundle(RESSOURCE).getString("metaTransparency1");
-                        case 2 -> ResourceBundle.getBundle(RESSOURCE).getString("metaTransparency2");
-                        case 3 -> ResourceBundle.getBundle(RESSOURCE).getString("metaTransparency3");
-                        default -> ResourceBundle.getBundle(RESSOURCE).getString("metaTransparencyDefault");
+                        case 1 -> AppController.getResBundle().getString("metaTransparency1");
+                        case 2 -> AppController.getResBundle().getString("metaTransparency2");
+                        case 3 -> AppController.getResBundle().getString("metaTransparency3");
+                        default -> AppController.getResBundle().getString("metaTransparencyDefault");
                     };
                     case FILE_ALPHA -> (img.getColorModel().hasAlpha() ?
-                            ResourceBundle.getBundle(RESSOURCE).getString("metaAlphaYes") :
-                            ResourceBundle.getBundle(RESSOURCE).getString("metaAlphaNo"));
+                            AppController.getResBundle().getString("metaAlphaYes") :
+                            AppController.getResBundle().getString("metaAlphaNo"));
                     case FILE_ALPHA_TYPE -> (img.getColorModel().isAlphaPremultiplied() ?
-                            ResourceBundle.getBundle(RESSOURCE).getString("metaAlphaPremultiplied") :
-                            ResourceBundle.getBundle(RESSOURCE).getString("metaAlphaNotPremultiplied"));
+                            AppController.getResBundle().getString("metaAlphaPremultiplied") :
+                            AppController.getResBundle().getString("metaAlphaNotPremultiplied"));
                 });
     }
 
     /**
      * Formats the passed {@link FileTime} to a {@link String} using the passed {@link DateTimeFormatter}.
-     * @param time - A {@link FileTime}: The time to format
+     *
+     * @param time              - A {@link FileTime}: The time to format
      * @param dateTimeFormatter - A {@link DateTimeFormatter}: The formatter to use
      * @return A {@link String}: The time, formatted to fit the pattern "dd/MM/yyyy HH:mm:ss"
      */
@@ -584,6 +578,7 @@ public class OutputColors {
 
     /**
      * Formats the passed {@link Long} to a {@link String} containing the size of the file in a better readable format.
+     *
      * @param bytes - A {@link Long}: The size of the file in bytes
      * @return A {@link String}: The size of the file in a better readable format
      */
@@ -600,9 +595,10 @@ public class OutputColors {
     /**
      * Creates and returns a {@link LinkedList} containing the main {@link BaseColor colors} of the selected image
      * determined in {@link ColorData} and {@link de.colorscheme.clustering.KMeans KMeans}
+     *
      * @param c A {@link ColorData} object: The instance used for all processes for the currently inspected image
-     * @return  A {@link LinkedList} of {@link BaseColor}s: A {@link LinkedList} containing the main
-     *          {@link BaseColor colors} of the selected image
+     * @return A {@link LinkedList} of {@link BaseColor}s: A {@link LinkedList} containing the main
+     * {@link BaseColor colors} of the selected image
      */
     private static LinkedList<BaseColor> getColors(ColorData c) {
         LinkedList<BaseColor> schemeColors = new LinkedList<>();
@@ -619,10 +615,10 @@ public class OutputColors {
 
     /**
      * Adds a specified number of empty lines.
+     *
      * @param paragraph A {@link Paragraph}: The target {@link Paragraph} for the empty lines
-     * @param number An {@link Integer}: The amount of empty lines to be added
+     * @param number    An {@link Integer}: The amount of empty lines to be added
      */
-    //@SuppressWarnings("SameParameterValue")
     private static void addEmptyLine(Paragraph paragraph, int number) {
         for (int i = 0; i < number; i++) {
             paragraph.add(new Paragraph(" "));
@@ -631,6 +627,7 @@ public class OutputColors {
 
     /**
      * Gets the name of the file at the specified path.
+     *
      * @param path A {@link String}: The path of the target file
      * @return A {@link String}: The name of the file at the specified path
      */

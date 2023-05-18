@@ -1,6 +1,6 @@
 package de.colorscheme.clustering;
 
-import de.colorscheme.app.App;
+import de.colorscheme.app.AppController;
 import de.fenris.logger.ColorLogger;
 import javafx.geometry.Point3D;
 
@@ -12,7 +12,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.colorscheme.app.App.*;
+import static de.colorscheme.app.AppController.getResBundle;
 import static java.util.logging.Level.INFO;
 
 /**
@@ -34,27 +34,22 @@ public class ColorData {
      * An Instance of the '{@link Random} class used to generate random values
      */
     private static final Random random = new Random();
-
-    /**
-     * Used to store the amount of pixels in the image to test for possible errors while recording pixels to list
-     */
-    private double pixelCount = 0;
-
     /**
      * {@link LinkedList} storing {@link Pixels Pixels} objects, created from each pixel's {@link Color#getRGB() color}
      */
     protected final LinkedList<Pixels> pixelColor = new LinkedList<>();
-
     /**
      * {@link LinkedList} storing {@link Integer Integers} with the indices of Centroids
      */
     private final LinkedList<Integer> indicesOfCentroids = new LinkedList<>();
-
     /**
      * The {@link LinkedList List} containing the calculated centroids
      */
     private final LinkedList<Point3D> centroids = new LinkedList<>();
-
+    /**
+     * Used to store the amount of pixels in the image to test for possible errors while recording pixels to list
+     */
+    private double pixelCount = 0;
     /**
      * A {@link Point3D} object storing the minimums for each coordinate <br>
      * If the minimum is set to <code color="#B5B5B5">(x: -1, y: -1, z: -1)</code>,
@@ -92,9 +87,8 @@ public class ColorData {
      * <span color="#6897BB">width * height</span> match the number of elements stored in {@link #pixelColor}. <br>
      * If the {@link #pixelCount total amount of pixels} and the amount of pixels stored in {@link #pixelColor} differ,
      * a custom exception {@link PixelListSizeException PixelListSizeException} is thrown and the
-     * {@link javax.swing.SwingWorker SwingWorker} in {@link de.colorscheme.app.StartProcess StartProcess} is
-     * cancelled. The user is informed about
-     * the error via the {@link App#getOutputField() textfield}.
+     * {@link javafx.concurrent.Task task} in {@link AppController} is cancelled. The user is informed about
+     * the error via the textfield.
      *
      * @param image A {@link BufferedImage}: The image to be read
      **/
@@ -116,17 +110,16 @@ public class ColorData {
             }
             pixelCount = width * height;
             //compare recorded pixels and total pixels
-            if (pixelCount != pixelColor.size()) {
+            if ((int) pixelCount != pixelColor.size()) {
                 throw new PixelListSizeException("");
             }
         }
         //recorded pixels and total pixels in image differ
         catch (PixelListSizeException e) {
-            getOutputField().setForeground(Color.RED);
-            getOutputField().setText("An error occurred while getting the pixels in the image! " +
-                    "Expected and actual amount of pixels differ!" + System.lineSeparator() + "Expected: " +
-                    (int) pixelCount + System.lineSeparator() + "Actual: " + pixelColor.size());
-            getTask().cancel(true);
+            AppController.addToOutputField(getResBundle().getString("pixelError") + System.lineSeparator() +
+                    getResBundle().getString("pixelErrorExpected") + (int) pixelCount + System.lineSeparator() +
+                    getResBundle().getString("pixelErrorActual") + pixelColor.size(), true);
+            AppController.setCancelled(true);
 
             LOGGER.log(Level.SEVERE, String.format("%s: Expected and actual amount of pixels differ! Expected: %e%nActual: %d%n",
                     e.getClass().getSimpleName(), pixelCount, pixelColor.size()));
@@ -634,7 +627,7 @@ public class ColorData {
             green = pt.getY();
             blue = pt.getZ();
             pixelNr++;
-           LOGGER.log(INFO,"Pixel #{0}: R:{1}, G:{2}, B:{3}", new Object[]{pixelNr, red, green, blue});
+            LOGGER.log(INFO, "Pixel #{0}: R:{1}, G:{2}, B:{3}", new Object[]{pixelNr, red, green, blue});
         }
     }
 
