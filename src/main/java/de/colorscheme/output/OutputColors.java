@@ -1,9 +1,9 @@
 package de.colorscheme.output;
 
-import com.itextpdf.text.*;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -16,7 +16,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,13 +24,14 @@ import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 import static de.colorscheme.app.App.getRessourceLanguage;
 import static de.colorscheme.clustering.KMeans.getCentroids;
-import static java.util.logging.Level.*;
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
 
 /**
  * Writes the color scheme of the selected image into a pdf containing the image, image name, colours
@@ -77,7 +77,8 @@ public class OutputColors {
     /**
      * Private constructor to hide the public one
      */
-    private OutputColors() {}
+    private OutputColors() {
+    }
 
     /**
      * Create a PDF with the resulting color scheme using the methods of the class {@link OutputColors OutputColors}.
@@ -98,6 +99,7 @@ public class OutputColors {
      *         {@link #outputWrite(ColorData, Path, Path) outputWrite()} is called.
      *     </li>
      * </ul>
+     *
      * @return a {@link Document}: The PDF file containing the image and its color scheme, or null, if the document
      * couldn't be created
      */
@@ -125,8 +127,7 @@ public class OutputColors {
                 outputWrite(c, Paths.get(fileDestinationBuilder.toString()), imagePath);
             }
             return colorScheme;
-        }
-        catch (DocumentException e) {
+        } catch (DocumentException e) {
             App.getOutputField().setForeground(Color.RED);
             App.getOutputField().setText(
                     ResourceBundle.getBundle(RESSOURCE).getString("docWriteInFileError")
@@ -135,15 +136,14 @@ public class OutputColors {
 
             LOGGER.log(SEVERE, "{0}: Could not instantiate PdfWriter!", e.getClass().getSimpleName());
             e.printStackTrace();
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             App.getOutputField().setForeground(Color.RED);
             App.getOutputField().setText(
                     ResourceBundle.getBundle(RESSOURCE).getString("docFindFileError")
             );
             App.getTask().cancel(true);
 
-            LOGGER.log(SEVERE,"FileNotFoundException: FileOutputStream could not find file!");
+            LOGGER.log(SEVERE, "FileNotFoundException: FileOutputStream could not find file!");
             e.printStackTrace();
         }
         return null;
@@ -151,14 +151,15 @@ public class OutputColors {
 
     /**
      * Determines the file name of a file of the original name exists already. <br>
-     *
+     * <p>
      * Sets the filename as: Filename (x + 1).pdf with x being the number of files with the same name.
+     *
      * @param path a {@link String}: The path at which the file will be saved
      * @return a {@link String}: The path with the updated filename at which the file will now be saved
      */
     private static Path getFileName(Path path) {
         int fileNumber = 1;
-        Path filePath =path;
+        Path filePath = path;
         String name = fileName(path.toString()).substring(0, fileName(path.toString()).lastIndexOf("."));
         String newName = name;
         String oldName;
@@ -186,8 +187,9 @@ public class OutputColors {
      *         content before {@link Document#close() closing} it again.
      *     </li>
      * </ol>
-     * @param c A {@link ColorData} object: The instance used for all processes for the currently inspected image
-     * @param path A {@link String}: The path to the location, where the color scheme file will be saved
+     *
+     * @param c         A {@link ColorData} object: The instance used for all processes for the currently inspected image
+     * @param path      A {@link String}: The path to the location, where the color scheme file will be saved
      * @param imagePath A {@link String}: The path to the selected image
      */
     private static void outputWrite(ColorData c, Path path, Path imagePath) {
@@ -197,25 +199,24 @@ public class OutputColors {
             doc.open();
             addContent(c, doc, imagePath);
             doc.close();
-        }
-        catch (IOException e) {
+            Files.deleteIfExists(Path.of("src/main/resources/img/SchemeWheel.png"));
+        } catch (IOException e) {
             App.getOutputField().setForeground(Color.RED);
             App.getOutputField().setText(
                     ResourceBundle.getBundle(RESSOURCE).getString("docAccessFileError")
             );
             App.getTask().cancel(true);
 
-            LOGGER.log(SEVERE,"{0}: FileOutputStream could not access created document!",
+            LOGGER.log(SEVERE, "{0}: FileOutputStream could not access created document!",
                     e.getClass().getSimpleName());
             e.printStackTrace();
-        }
-        catch (DocumentException e) {
+        } catch (DocumentException e) {
             App.getOutputField().setForeground(Color.RED);
             App.getOutputField().setText(
                     ResourceBundle.getBundle(RESSOURCE).getString("docWriteInFileError"));
             App.getTask().cancel(true);
 
-            LOGGER.log(SEVERE,"{0}: Could not instantiate PdfWriter!",
+            LOGGER.log(SEVERE, "{0}: Could not instantiate PdfWriter!",
                     e.getClass().getSimpleName());
             e.printStackTrace();
         }
@@ -277,8 +278,9 @@ public class OutputColors {
      *         Finally the {@link PdfPTable} is added to the {@link Document}.
      *     </li>
      * </ol>
-     * @param c A {@link ColorData} object: The instance used for all processes for the currently inspected image
-     * @param doc A {@link Document}: The {@link Document} to be written in
+     *
+     * @param c         A {@link ColorData} object: The instance used for all processes for the currently inspected image
+     * @param doc       A {@link Document}: The {@link Document} to be written in
      * @param imagePath A {@link String}: The path to the selected image
      */
     private static void addContent(ColorData c, Document doc, Path imagePath) {
@@ -359,25 +361,23 @@ public class OutputColors {
             }
             doc.add(meta);
 
-        }
-        catch (DocumentException e) {
+        } catch (DocumentException e) {
             App.getOutputField().setForeground(Color.RED);
             App.getOutputField().setText(
                     ResourceBundle.getBundle(RESSOURCE).getString("docAddElementsError"));
             App.getTask().cancel(true);
 
-            Logger.getAnonymousLogger().log(SEVERE,"{}: Could not add element to created document!",
+            Logger.getAnonymousLogger().log(SEVERE, "{}: Could not add element to created document!",
                     e.getClass().getSimpleName());
             e.printStackTrace();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             App.getOutputField().setForeground(Color.RED);
             App.getOutputField().setText(
                     ResourceBundle.getBundle(RESSOURCE).getString("docAddImageReadError")
             );
             App.getTask().cancel(true);
 
-            Logger.getAnonymousLogger().log(SEVERE,"{}: Could not read image to display in created document!",
+            Logger.getAnonymousLogger().log(SEVERE, "{}: Could not read image to display in created document!",
                     e.getClass().getSimpleName());
             e.printStackTrace();
         }
@@ -385,8 +385,9 @@ public class OutputColors {
 
     /**
      * Adds the main colors of the image with their HEX and RGB values to the {@link Document}.
-     * @param doc A {@link Document}: The document to be written in
-     * @param colors A {@link LinkedList} with {@link BaseColor}s: The main colors of the image
+     *
+     * @param doc       A {@link Document}: The document to be written in
+     * @param colors    A {@link LinkedList} with {@link BaseColor}s: The main colors of the image
      * @param hsbColors A {@link Float} array: The average HSB values of the main colors
      * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
      */
@@ -427,7 +428,8 @@ public class OutputColors {
 
     /**
      * Adds the description of the average HSB values of the main colors to the {@link Document}.
-     * @param doc A {@link Document}: The document to be written in
+     *
+     * @param doc       A {@link Document}: The document to be written in
      * @param hsbColors A {@link Float} array: The average HSB values of the main colors
      * @throws DocumentException If the {@link Paragraph} could not be added to the document
      */
@@ -471,6 +473,7 @@ public class OutputColors {
 
     /**
      * Determines the color for the passed hue value.
+     *
      * @param hue A {@link Float}: The hue value to determine the color of.
      * @return A {@link String}: The color for the passed hue value.
      */
@@ -480,8 +483,7 @@ public class OutputColors {
         String color;
         if (newHue < 30) {
             color = ResourceBundle.getBundle(RESSOURCE).getString("avgRed");
-        }
-        else {
+        } else {
             switch (h) {
                 case 0 -> color = ResourceBundle.getBundle(RESSOURCE).getString("avgYellow");
                 case 1 -> color = ResourceBundle.getBundle(RESSOURCE).getString("avgGreen");
@@ -497,6 +499,7 @@ public class OutputColors {
 
     /**
      * Returns the description of the color space indicated by the passed integer.
+     *
      * @param index A {@link Integer}: The index of the color space
      * @return A {@link String}: The description of the color space
      */
@@ -524,6 +527,7 @@ public class OutputColors {
     /**
      * Reads the metadata of the image the passed {@link Path} points to and returns it as a {@link Set} of
      * {@link MetaData}.
+     *
      * @param imgPath A {@link Path}: The path to the image to read the metadata from
      * @return A {@link Set} of {@link MetaData}: The metadata of the image
      */
@@ -536,8 +540,7 @@ public class OutputColors {
         try {
             img = ImageIO.read(imgPath.toFile());
             attr = Files.readAttributes(imgPath, BasicFileAttributes.class);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             LOGGER.log(WARNING, "Could not read image to get meta data!");
             return MetaData.createNoAccessMetaData();
@@ -573,7 +576,8 @@ public class OutputColors {
 
     /**
      * Formats the passed {@link FileTime} to a {@link String} using the passed {@link DateTimeFormatter}.
-     * @param time - A {@link FileTime}: The time to format
+     *
+     * @param time              - A {@link FileTime}: The time to format
      * @param dateTimeFormatter - A {@link DateTimeFormatter}: The formatter to use
      * @return A {@link String}: The time, formatted to fit the pattern "dd/MM/yyyy HH:mm:ss"
      */
@@ -584,6 +588,7 @@ public class OutputColors {
 
     /**
      * Formats the passed {@link Long} to a {@link String} containing the size of the file in a better readable format.
+     *
      * @param bytes - A {@link Long}: The size of the file in bytes
      * @return A {@link String}: The size of the file in a better readable format
      */
@@ -600,9 +605,10 @@ public class OutputColors {
     /**
      * Creates and returns a {@link LinkedList} containing the main {@link BaseColor colors} of the selected image
      * determined in {@link ColorData} and {@link de.colorscheme.clustering.KMeans KMeans}
+     *
      * @param c A {@link ColorData} object: The instance used for all processes for the currently inspected image
-     * @return  A {@link LinkedList} of {@link BaseColor}s: A {@link LinkedList} containing the main
-     *          {@link BaseColor colors} of the selected image
+     * @return A {@link LinkedList} of {@link BaseColor}s: A {@link LinkedList} containing the main
+     * {@link BaseColor colors} of the selected image
      */
     private static LinkedList<BaseColor> getColors(ColorData c) {
         LinkedList<BaseColor> schemeColors = new LinkedList<>();
@@ -619,8 +625,9 @@ public class OutputColors {
 
     /**
      * Adds a specified number of empty lines.
+     *
      * @param paragraph A {@link Paragraph}: The target {@link Paragraph} for the empty lines
-     * @param number An {@link Integer}: The amount of empty lines to be added
+     * @param number    An {@link Integer}: The amount of empty lines to be added
      */
     //@SuppressWarnings("SameParameterValue")
     private static void addEmptyLine(Paragraph paragraph, int number) {
@@ -631,6 +638,7 @@ public class OutputColors {
 
     /**
      * Gets the name of the file at the specified path.
+     *
      * @param path A {@link String}: The path of the target file
      * @return A {@link String}: The name of the file at the specified path
      */

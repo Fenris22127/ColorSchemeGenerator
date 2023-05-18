@@ -353,7 +353,7 @@ transparent pixel, the RGB channels and the alpha channel have to be set to 0. <
 - [x] Add Metadata to image
 - [x] Better incorporate color wheel
 - [x] Implement multiple languages (maybe)
-- [ ] Create an interface using JavaFX
+- [x] Create an interface using JavaFX
 - [ ] Implement possibility to see result in interface already
 - [ ] Write file explaining mathematical structures used
 - [ ] Write file explaining mathematical structures used in simple terms
