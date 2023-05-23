@@ -26,6 +26,7 @@ import static de.colorscheme.app.App.getRessourceLanguage;
 
 /**
  * Opens the file directory and lets the user open an image file to generate a color scheme from
+ *
  * @author &copy; 2023 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
  * @version 1.1
  * @since 17.0.1
@@ -41,7 +42,8 @@ public class SelectImage {
     /**
      * Private constructor to hide the public one
      */
-    private SelectImage() {}
+    private SelectImage() {
+    }
 
     /**
      * Opens the users default directory in a customized {@link JFileChooser} to select an image to generate
@@ -113,6 +115,7 @@ public class SelectImage {
      *         If "Cancel" was clicked, exits program
      *     </li>
      * </ol>
+     *
      * @return A {@link String} with the absolute filepath to the selected image
      */
     public static String chooseFile() {
@@ -163,7 +166,7 @@ public class SelectImage {
 
         //Add new JLabel to display previews of images, set its size and add it as an accessory to the FileChooser
         JLabel img = new JLabel();
-        Dimension boundary = new Dimension(300,400);
+        Dimension boundary = new Dimension(300, 400);
         img.setPreferredSize(boundary);
         fileChooser.setAccessory(img);
 
@@ -179,7 +182,7 @@ public class SelectImage {
                 tableColumnModel.getColumn(jtable.getColumnCount() - 3).setPreferredWidth(220);
             }
             // Create SwingWorker for smooth experience when handling heavy tasks
-            SwingWorker<Image,Void> worker = new SwingWorker<>() {
+            SwingWorker<Image, Void> worker = new SwingWorker<>() {
 
                 protected Image doInBackground() {
                     //If selected file changes
@@ -199,12 +202,10 @@ public class SelectImage {
                                     imageDimension.height,
                                     Image.SCALE_SMOOTH);
 
-                        }
-                        catch (NullPointerException e) {
+                        } catch (NullPointerException e) {
                             // If there is a problem reading image (invalid image or unable to read)
                             img.setText(ResourceBundle.getBundle(RESSOURCE).getString("selectImgInvalid"));
-                        }
-                        catch (Exception e) {
+                        } catch (Exception e) {
                             img.setText("");
 
                         }
@@ -223,8 +224,7 @@ public class SelectImage {
 
                         // Set icon otherwise
                         img.setIcon(new ImageIcon(image));
-                    }
-                    catch (InterruptedException | ExecutionException | TimeoutException e) {
+                    } catch (InterruptedException | ExecutionException | TimeoutException e) {
                         Thread.currentThread().interrupt();
                         img.setText(ResourceBundle.getBundle(RESSOURCE).getString("selectImgNotLoad"));
                     }
@@ -259,7 +259,8 @@ public class SelectImage {
 
     /**
      * Scales the passed image to fit the given boundary without losing its aspect ratio
-     * @param img The image to be scaled
+     *
+     * @param img      The image to be scaled
      * @param boundary A two-dimensional Object specifying the maximum width and height for the image
      * @return A {@link Dimension} Object, containing the new dimensions of the image
      */
@@ -293,10 +294,11 @@ public class SelectImage {
 
     /**
      * Sets the font used for the File Explorer
+     *
      * @param comp An {@link java.util.Arrays Array} with all components of the File Explorer
      */
     private static void setFileChooserFont(Component[] comp) {
-        Font font = new Font("Verdana",Font.PLAIN,14);
+        Font font = new Font("Verdana", Font.PLAIN, 14);
         for (Component component : comp) {
             if (component instanceof Container container) setFileChooserFont(container.getComponents());
             component.setFont(font);

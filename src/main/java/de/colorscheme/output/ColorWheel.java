@@ -61,8 +61,7 @@ public class ColorWheel {
         File f = new File("src/main/resources/img/SchemeWheel.png");
         try {
             ImageIO.write(Objects.requireNonNull(colWheel), "png", f);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return f.exists();
@@ -106,6 +105,7 @@ public class ColorWheel {
 
     /**
      * Uses a {@link Ellipse2D} as a mask for the color wheel gradient to create the clean color wheel.
+     *
      * @param img A {@link BufferedImage}: The gradient to be masked to create the clean color wheel
      */
     private static void drawColorWheel(BufferedImage img) {
@@ -134,6 +134,7 @@ public class ColorWheel {
 
     /**
      * Creates the color wheel gradient for the color wheel
+     *
      * @return A {@link BufferedImage}: The gradient for the clean color wheel
      */
     private static BufferedImage makeColorWheelImage() {
@@ -165,8 +166,9 @@ public class ColorWheel {
 
     /**
      * Adds the main colors determined by the algorithm in circles onto the color wheel.
+     *
      * @param colors A {@link List} of {@link BaseColor}s: The list containing the main colors determined by the
-     * algorithm
+     *               algorithm
      * @return @return A {@link BufferedImage}: The color wheel with the added circles for the main colors
      */
     private static BufferedImage addCircle(List<BaseColor> colors) {
@@ -205,8 +207,7 @@ public class ColorWheel {
             }
             g.dispose();
             return wheel;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             LOGGER.log(SEVERE, "{0}: BufferedImage could not be read!", e.getClass().getSimpleName());
         }
         return null;
@@ -214,6 +215,7 @@ public class ColorWheel {
 
     /**
      * Resizes an image to a new width and height.
+     *
      * @param img       A {@link BufferedImage}: The image to be resized
      * @param newWidth  An {@link Integer}: The new width for the image
      * @param newHeight An {@link Integer}: The new height for the image

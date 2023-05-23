@@ -49,7 +49,7 @@
       </ul>
     </li>
    <li>
-      <a href="#-usage-">Usage</a>
+      <a href="#usage">Usage</a>
       <ul>
          <li><a href="#general-use">General Use</a></li>
          <li><a href="#output-file-overview">Output File Overview</a></li>
