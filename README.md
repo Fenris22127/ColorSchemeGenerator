@@ -200,8 +200,8 @@ This program requires Java 18+ to run properly. How to install Java will be expl
 <p id="right"><button><a href="#readme-top">Back to top</a></button></p>
 
 ### Using the Color Scheme Generator
-1. Download the `.jar` file from the [jar folder](https://github.com/Fenris22127/ColorSchemeGenerator/tree/master/jar)
-2. Open the file
+1. Download the latest release file from the [releases page](https://github.com/Fenris22127/ColorSchemeGenerator/releases)
+2. Open the file by double clicking it
 
 See the [documentation](#) for specifics.
 
