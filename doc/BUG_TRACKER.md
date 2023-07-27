@@ -33,14 +33,14 @@ This caused the list to grow far beyond its supposed size.
 ### Fix
 ### Previous
 `protected void recomputeCentroids(int totalCentroids) {`<br>
-    `&nbsp;&nbsp;&nbsp;&nbsp;for (int i = 0; i < totalCentroids; i++) {`<br>
-        `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;getCentroids().add(i, calculateCentroid(i));`<br>
-    `&nbsp;&nbsp;&nbsp;&nbsp;}`<br>
+    `for (int i = 0; i < totalCentroids; i++) {`<br>
+        `getCentroids().add(i, calculateCentroid(i));`<br>
+    `}`<br>
 `}`<br>
 ### Fixed
 `protected void recomputeCentroids(int totalCentroids) {`<br>
-    `&nbsp;&nbsp;&nbsp;&nbsp;for (int i = 0; i < totalCentroids; i++) {`<br>
-        `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;getCentroids().remove(i);`💡<br>
-        `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;getCentroids().add(i, calculateCentroid(i));`<br>
-    `&nbsp;&nbsp;&nbsp;&nbsp;}`<br>
+    `for (int i = 0; i < totalCentroids; i++) {`<br>
+        `getCentroids().remove(i);`💡<br>
+        `getCentroids().add(i, calculateCentroid(i));`<br>
+    `}`<br>
 `}`<br>
