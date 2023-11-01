@@ -107,10 +107,9 @@ public class OutputColors {
      *     </li>
      * </ul>
      *
-     * @return a {@link Document}: The PDF file containing the image and its color scheme, or null, if the document
      * couldn't be created
      */
-    public static Document createOutput(ColorData c, Path imagePath) {
+    public static void createOutput(ColorData c, Path imagePath) {
         StringBuilder fileDestinationBuilder = new StringBuilder();
         String imgName = fileName(imagePath.toString());
 
@@ -118,36 +117,15 @@ public class OutputColors {
 
         Path finalPath = Paths.get(fileDestinationBuilder.append(downloadPath).append("\\").append(filename).toString());
 
-        //Try to create a new file "ColorScheme.pdf"
-        try {
-            Document colorScheme = new Document();
-
-            //If a file of the same name exists, find number of files with the same name and set filename accordingly
-            if (Files.exists(finalPath)) {
-                Path newNamePath = getFileName(finalPath);
-                outputWrite(c, newNamePath, imagePath);
-            }
-            //If file object was created successfully and file at destination doesn't exist yet, create new file
-            if (!Files.exists(finalPath)) {
-                PdfWriter.getInstance(colorScheme, new FileOutputStream(fileDestinationBuilder.toString()));
-
-                outputWrite(c, Paths.get(fileDestinationBuilder.toString()), imagePath);
-            }
-            return colorScheme;
-        } catch (DocumentException e) {
-            AppController.addToOutputField(getResBundle().getString("docWriteInFileError"), true);
-            AppController.setCancelled(true);
-
-            LOGGER.log(SEVERE, "{0}: Could not instantiate PdfWriter!", e.getClass().getSimpleName());
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            AppController.addToOutputField(getResBundle().getString("docFindFileError"), true);
-            AppController.setCancelled(true);
-
-            LOGGER.log(SEVERE, "FileNotFoundException: FileOutputStream could not find file!");
-            e.printStackTrace();
+        //If a file of the same name exists, find number of files with the same name and set filename accordingly
+        if (Files.exists(finalPath)) {
+            Path newNamePath = getFileName(finalPath);
+            outputWrite(c, newNamePath, imagePath);
         }
-        return null;
+        //If file object was created successfully and file at destination doesn't exist yet, create new file
+        if (!Files.exists(finalPath)) {
+            outputWrite(c, Paths.get(fileDestinationBuilder.toString()), imagePath);
+        }
     }
 
     /**

@@ -9,7 +9,7 @@
     -fx-white: #D3D6D7;
 }
 
-#base_pane {
+#basePane {
     -fx-background-color: linear-gradient(to top, rgba(220,222,223,1) 0%, rgba(255,255,255,1) 35%);
 }
 
@@ -125,4 +125,13 @@
 
 .choice-box .menu-item:focused > .label {
     -fx-text-fill: white;
+}
+
+.harmonicsPane {
+    -fx-background-color: white;
+}
+
+.toggle-button:focused {
+    -fx-faint-focus-color: -fx-light-green-glow;
+    -fx-focus-color: -fx-light-green;
 }

@@ -61,8 +61,7 @@ public class ColorWheel {
         File f = new File("src/main/resources/img/SchemeWheel.png");
         try {
             ImageIO.write(Objects.requireNonNull(colWheel), "png", f);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return f.exists();
@@ -205,8 +204,7 @@ public class ColorWheel {
             }
             g.dispose();
             return wheel;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             LOGGER.log(SEVERE, "{0}: BufferedImage could not be read!", e.getClass().getSimpleName());
         }
         return null;

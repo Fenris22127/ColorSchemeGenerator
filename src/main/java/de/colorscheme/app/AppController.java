@@ -1,21 +1,29 @@
 package de.colorscheme.app;
 
 import de.colorscheme.clustering.ColorData;
+import de.colorscheme.output.ColorHarmony;
 import de.colorscheme.output.OutputColors;
 import de.fenris.logger.ColorLogger;
+import javafx.animation.AnimationTimer;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.util.converter.NumberStringConverter;
@@ -42,7 +50,7 @@ import static de.colorscheme.output.OutputColors.createOutput;
  * The controller for the FXML file which is the main window of the program.
  *
  * @author &copy; 2023 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
- * @version 1.1
+ * @version 1.2
  * @since 18.0.1
  */
 public class AppController implements Initializable {
@@ -77,6 +85,19 @@ public class AppController implements Initializable {
      */
     private static StringProperty textProp;
     private static Scene currentScene;
+    private static ColorHarmony harmony = ColorHarmony.COMPLEMENTARY;
+    @FXML
+    private static ToggleButton complementary;
+    @FXML
+    private static ToggleButton splitComplementary;
+    @FXML
+    private static ToggleButton analogous;
+    @FXML
+    private static ToggleButton triadic;
+    @FXML
+    private static ToggleButton tetradic;
+    @FXML
+    private static ToggleButton monochromatic;
 
     static {
         String language = System.getProperty("user.language");
@@ -87,10 +108,17 @@ public class AppController implements Initializable {
         }
     }
 
+    public HBox colorsBox;
     /**
      * The {@link Path} containing the path to the image chosen by the user
      */
     protected Path fileName;
+    @FXML
+    private VBox basePane;
+    @FXML
+    private Pane harmonicPane;
+    @FXML
+    private CheckBox includeHarmonics;
     /**
      * The {@link TextArea} displaying the progress of the process in text form
      */
@@ -166,6 +194,9 @@ public class AppController implements Initializable {
      */
     @FXML
     private Label noImageLabel;
+    private HBox hbox;
+    private double height = 0;
+    private double opacity = 1;
 
     /**
      * Returns the {@link TextField} displaying the progress of the process
@@ -244,8 +275,76 @@ public class AppController implements Initializable {
         Bindings.bindBidirectional(textProp, progressProp, new NumberStringConverter("#'%'"));
         done.setPreserveRatio(true);
         done.setFitHeight(32);
+
         languageChoice.setItems(FXCollections.observableList(List.of("English", "Deutsch")));
         languageChoice.setValue("Language");
+
+        Image compIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icons/complementary_icon.png")), 30, 30, true, true);
+        complementary = new ToggleButton();
+        complementary.setId("complementary");
+        complementary.setGraphic(new ImageView(compIcon));
+        complementary.setStyle("-fx-background-radius: 50px; -fx-padding: 0;");
+
+        Image monoIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icons/monochromatic_icon.png")), 30, 30, true, true);
+        monochromatic = new ToggleButton();
+        monochromatic.setId("monochromatic");
+        monochromatic.setGraphic(new ImageView(monoIcon));
+        monochromatic.setStyle("-fx-background-radius: 50px; -fx-padding: 0;");
+
+        Image analogIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icons/analogous_icon.png")), 30, 30, true, true);
+        analogous = new ToggleButton();
+        analogous.setId("analogous");
+        analogous.setGraphic(new ImageView(analogIcon));
+        analogous.setStyle("-fx-background-radius: 50px; -fx-padding: 0;");
+
+        Image splitCompIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icons/split-complementary_icon.png")), 30, 30, true, true);
+        splitComplementary = new ToggleButton();
+        splitComplementary.setId("split_complementary");
+        splitComplementary.setGraphic(new ImageView(splitCompIcon));
+        splitComplementary.setStyle("-fx-background-radius: 50px; -fx-padding: 0;");
+
+        Image triIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icons/triadic_icon.png")), 30, 30, true, true);
+        triadic = new ToggleButton();
+        triadic.setId("triadic");
+        triadic.setGraphic(new ImageView(triIcon));
+        triadic.setStyle("-fx-background-radius: 50px; -fx-padding: 0 1px 0 0;");
+
+        Image tetIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icons/tetradic_icon.png")), 30, 30, true, true);
+        tetradic = new ToggleButton();
+        tetradic.setId("tetradic");
+        tetradic.setGraphic(new ImageView(tetIcon));
+        tetradic.setStyle("-fx-background-radius: 50px; -fx-padding: 0 1px 0 0;");
+
+        hbox = new HBox();
+        hbox.setSpacing(10);
+        hbox.setPadding(new Insets(5, 0, 0, 5));
+
+        List<ToggleButton> buttons = List.of(complementary, splitComplementary, analogous, triadic, tetradic, monochromatic);
+        for (ToggleButton button : buttons) {
+            button.getGraphic().setOpacity(0);
+            button.setPrefSize(40, 40);
+            button.setMaxSize(40, 40);
+            button.setMinSize(40, 40);
+            button.setOnAction(this::toggleButton);
+
+            button.setClip(new Rectangle(42, 42));
+        }
+        AnimationTimer collapse = new CollapsePane();
+        AnimationTimer expand = new ExpandPane();
+        includeHarmonics.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, event -> {
+            if (includeHarmonics.isSelected()) {
+                collapse.stop();
+                expand.start();
+            } else {
+                expand.stop();
+                collapse.start();
+            }
+        });
+        hbox.setPrefSize(400, 0);
+        hbox.setMaxHeight(0);
+        hbox.setMinHeight(0);
+        harmonicPane.getChildren().add(hbox);
+
 
         languageChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             bundle = switch (newValue.intValue()) {
@@ -256,6 +355,7 @@ public class AppController implements Initializable {
             title.setText(bundle.getString("appTitle"));
             colorAmountLabel.setText(bundle.getString("appColorAmount"));
             checkbox.setText(bundle.getString("appAutoDownload"));
+            includeHarmonics.setText(bundle.getString("appIncludeHarmonics"));
             download.setText(bundle.getString("appDownload"));
             upload.setText(bundle.getString("appUpload"));
             generateTab.setText(bundle.getString("appGenerate"));
@@ -265,6 +365,27 @@ public class AppController implements Initializable {
 
         if (IS_DEBUG) {
             LOGGER.log(Level.INFO, "Spinner Default Value: {0}", numberColors.getValue());
+        }
+    }
+
+    private void toggleButton(ActionEvent actionEvent) {
+        ToggleButton tBtn = (ToggleButton) actionEvent.getSource();
+        List<ToggleButton> buttons = List.of(complementary, splitComplementary, analogous, triadic, tetradic, monochromatic);
+        for (ToggleButton button : buttons) {
+            if (button != tBtn) {
+                button.setSelected(false);
+            } else {
+                button.setSelected(true);
+                switch (button.getId()) {
+                    case "complementary" -> harmony = ColorHarmony.COMPLEMENTARY;
+                    case "split_complementary" -> harmony = ColorHarmony.SPLIT_COMPLEMENTARY;
+                    case "analogous" -> harmony = ColorHarmony.ANALOGOUS;
+                    case "triadic" -> harmony = ColorHarmony.TRIADIC;
+                    case "tetradic" -> harmony = ColorHarmony.TETRADIC;
+                    case "monochromatic" -> harmony = ColorHarmony.MONOCHROMATIC;
+                    default -> throw new IllegalStateException("Unexpected value: " + button.getId());
+                }
+            }
         }
     }
 
@@ -336,6 +457,60 @@ public class AppController implements Initializable {
         }
     }
 
+    private class CollapsePane extends AnimationTimer {
+        @Override
+        public void handle(long now) {
+            collapse();
+        }
+
+        private void collapse() {
+            height -= 7;
+            opacity -= 0.1;
+
+            basePane.setMinHeight(basePane.getMinHeight() - 7);
+            hbox.setPrefHeight(height);
+            hbox.setMaxHeight(height);
+            hbox.setMinHeight(height);
+            List<ToggleButton> harmonics = List.of(complementary, monochromatic, analogous, splitComplementary, triadic, tetradic);
+            for (ToggleButton harmonic : harmonics) {
+                harmonic.getGraphic().setOpacity(0);
+                harmonic.clipProperty().setValue(new Rectangle(42, height));
+            }
+            hbox.getChildren().clear();
+            if (height <= 0) {
+                stop();
+            }
+        }
+    }
+
+    private class ExpandPane extends AnimationTimer {
+        @Override
+        public void handle(long now) {
+            expand();
+        }
+
+        private void expand() {
+            height += 7;
+            opacity += 0.1;
+            basePane.setMinHeight(basePane.getMinHeight() + 7);
+            hbox.setMaxHeight(height);
+            hbox.setPrefHeight(height);
+            hbox.setMinHeight(height);
+            List<ToggleButton> harmonics = List.of(complementary, monochromatic, analogous, splitComplementary, triadic, tetradic);
+            if (hbox.getChildren().isEmpty()) {
+                hbox.getChildren().addAll(harmonics);
+            } else {
+                for (ToggleButton harmonic : harmonics) {
+                    harmonic.getGraphic().setOpacity(1);
+                    harmonic.clipProperty().setValue(new Rectangle(42, height));
+                }
+            }
+            if (height >= 44) {
+                stop();
+            }
+        }
+    }
+
     /**
      * An inner class that extends {@link Task} and is used to read the image and generate the color scheme
      */
@@ -400,7 +575,6 @@ public class AppController implements Initializable {
             if (checkbox.isSelected() && !cancelled) {
                 downloadFile();
             }
-
             return null;
         }
 
