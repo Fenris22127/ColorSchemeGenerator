@@ -1,38 +1,67 @@
 package de.colorscheme.output;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Function;
 
-import static de.colorscheme.app.App.getRessourceLanguage;
+import static de.colorscheme.app.AppController.getResBundle;
 
 /**
  * Represents the metadata of an image file and allows values to be assigned to the metadata types.
  *
  * @author &copy; 2023 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
- * @version 1.2
+ * @version 1.3
  * @since 18.0.1
  */
 public interface MetaData extends Comparable<MetaData> {
 
     /**
-     * The {@link String} determining the language of the resource bundle used for the displayed text
+     * Creates a {@link Set} of {@link MetaData} with the given {@link Function} to assign the values to a
+     * {@link MetaData.Type metadata type}
+     *
+     * @param metaDataCreator A {@link Function}: The function used to assign the values to a metadata type
+     * @return A {@link Set} of {@link MetaData}: The metadata with the assigned values
      */
-    String RESOURCE = getRessourceLanguage();
+    static Set<MetaData> createMetaData(Function<MetaData.Type, String> metaDataCreator) {
+        Set<MetaData> metaData = new TreeSet<>();
+        for (MetaData.Type type : MetaData.Type.values()) {
+            metaData.add(type.create(metaDataCreator.apply(type)));
+        }
+        return metaData;
+    }
+
+    /**
+     * Creates a {@link Set} of {@link MetaData} with the given {@link Function} to assign the value representing no
+     * access to the image
+     *
+     * @return A {@link Set} of {@link MetaData}: The metadata with the assigned no-access values
+     */
+    static Set<MetaData> createNoAccessMetaData() {
+        Set<MetaData> metaData = new TreeSet<>();
+        for (MetaData.Type type : MetaData.Type.values()) {
+            metaData.add(type.create(getResBundle().getString("noAccess")));
+        }
+        return metaData;
+    }
 
     /**
      * Gets the data of a {@link MetaData.Type metadata type}
+     *
      * @return A {@link String}: The value of the metadata type
      */
     String getData();
 
     /**
      * Gets the {@link MetaData.Type metadata type} as a {@link String}
+     *
      * @return A {@link String}: The metadata type
      */
     String getDescriptor();
 
     /**
      * Gets the {@link MetaData.Type metadata type}
+     *
      * @return A {@link MetaData.Type}: The metadata type
      */
     Type getType();
@@ -45,59 +74,59 @@ public interface MetaData extends Comparable<MetaData> {
         /**
          * The name of the file
          */
-        FILE_NAME(ResourceBundle.getBundle(RESOURCE).getString("metaFileName")),
+        FILE_NAME(getResBundle().getString("metaFileName")),
         /**
          * The type of the file
          */
-        FILE_TYPE(ResourceBundle.getBundle(RESOURCE).getString("metaFileType")),
+        FILE_TYPE(getResBundle().getString("metaFileType")),
         /**
          * The size of the file
          */
-        FILE_SIZE(ResourceBundle.getBundle(RESOURCE).getString("metaSize")),
+        FILE_SIZE(getResBundle().getString("metaSize")),
         /**
          * The date of creation of the file
          */
-        FILE_CREATION_DATE(ResourceBundle.getBundle(RESOURCE).getString("metaCreationDate")),
+        FILE_CREATION_DATE(getResBundle().getString("metaCreationDate")),
         /**
          * The date of the last modification of the file
          */
-        FILE_LAST_MODIFIED_DATE(ResourceBundle.getBundle(RESOURCE).getString("metaLastModifiedDate")),
+        FILE_LAST_MODIFIED_DATE(getResBundle().getString("metaLastModifiedDate")),
         /**
          * The date of the last access of the file
          */
-        FILE_LAST_ACCESSED_DATE(ResourceBundle.getBundle(RESOURCE).getString("metaLastAccessedDate")),
+        FILE_LAST_ACCESSED_DATE(getResBundle().getString("metaLastAccessedDate")),
         /**
          * The height of the image
          */
-        FILE_HEIGHT(ResourceBundle.getBundle(RESOURCE).getString("metaHeight")),
+        FILE_HEIGHT(getResBundle().getString("metaHeight")),
         /**
          * The width of the image
          */
-        FILE_WIDTH(ResourceBundle.getBundle(RESOURCE).getString("metaWidth")),
+        FILE_WIDTH(getResBundle().getString("metaWidth")),
         /**
          * The image type of the image
          */
-        FILE_IMAGE_TYPE(ResourceBundle.getBundle(RESOURCE).getString("metaImageType")),
+        FILE_IMAGE_TYPE(getResBundle().getString("metaImageType")),
         /**
          * The amount of color components of the image
          */
-        FILE_COLOR_COMPONENTS(ResourceBundle.getBundle(RESOURCE).getString("metaColorComponents")),
+        FILE_COLOR_COMPONENTS(getResBundle().getString("metaColorComponents")),
         /**
          * The bit depth of the image
          */
-        FILE_BIT_DEPTH(ResourceBundle.getBundle(RESOURCE).getString("metaBitDepth")),
+        FILE_BIT_DEPTH(getResBundle().getString("metaBitDepth")),
         /**
          * The transparency type of the image
          */
-        FILE_TRANSPARENCY(ResourceBundle.getBundle(RESOURCE).getString("metaTransparency")),
+        FILE_TRANSPARENCY(getResBundle().getString("metaTransparency")),
         /**
          * Whether the image type supports transparency
          */
-        FILE_ALPHA(ResourceBundle.getBundle(RESOURCE).getString("metaAlpha")),
+        FILE_ALPHA(getResBundle().getString("metaAlpha")),
         /**
          * Whether the alpha of the image is premultiplied
          */
-        FILE_ALPHA_TYPE(ResourceBundle.getBundle(RESOURCE).getString("metaAlphaType"));
+        FILE_ALPHA_TYPE(getResBundle().getString("metaAlphaType"));
 
         /**
          * The {@link String} representation of the metadata type
@@ -106,6 +135,7 @@ public interface MetaData extends Comparable<MetaData> {
 
         /**
          * Creates a new {@link MetaData.Type metadata type} with the given {@link String} representation
+         *
          * @param type A {@link String}: The metadata type
          */
         Type(String type) {
@@ -114,6 +144,7 @@ public interface MetaData extends Comparable<MetaData> {
 
         /**
          * Creates a new {@link MetaData} and assigns given {@link String}
+         *
          * @param data A {@link String}: The value of the metadata
          * @return A {@link MetaData} object: The metadata with the assigned value
          */
@@ -146,32 +177,5 @@ public interface MetaData extends Comparable<MetaData> {
                 }
             };
         }
-    }
-
-    /**
-     * Creates a {@link Set} of {@link MetaData} with the given {@link Function} to assign the values to a
-     * {@link MetaData.Type metadata type}
-     * @param metaDataCreator A {@link Function}: The function used to assign the values to a metadata type
-     * @return A {@link Set} of {@link MetaData}: The metadata with the assigned values
-     */
-    static Set<MetaData> createMetaData(Function<MetaData.Type, String> metaDataCreator) {
-        Set<MetaData> metaData = new TreeSet<>();
-        for (MetaData.Type type : MetaData.Type.values()) {
-            metaData.add(type.create(metaDataCreator.apply(type)));
-        }
-        return metaData;
-    }
-
-    /**
-     * Creates a {@link Set} of {@link MetaData} with the given {@link Function} to assign the value representing no
-     * access to the image
-     * @return A {@link Set} of {@link MetaData}: The metadata with the assigned no-access values
-     */
-    static Set<MetaData> createNoAccessMetaData() {
-        Set<MetaData> metaData = new TreeSet<>();
-        for (MetaData.Type type : MetaData.Type.values()) {
-            metaData.add(type.create(ResourceBundle.getBundle(RESOURCE).getString("noAccess")));
-        }
-        return metaData;
     }
 }

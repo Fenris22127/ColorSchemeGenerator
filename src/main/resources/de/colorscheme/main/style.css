@@ -1,0 +1,137 @@
+* {
+    -fx-dark-green: #303533;
+    -fx-mid-green: #515B48;
+    -fx-mid-green-glow: #515B4819;
+    -fx-light-green: #8B9569;
+    -fx-light-green-glow: #8B956919;
+    -fx-brown: #A3927F;
+    -fx-brown-white: #BAB2A9;
+    -fx-white: #D3D6D7;
+}
+
+#basePane {
+    -fx-background-color: linear-gradient(to top, rgba(220,222,223,1) 0%, rgba(255,255,255,1) 35%);
+}
+
+#numberColors {
+    -fx-border-color: -fx-mid-green;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+}
+
+#upload {
+    -fx-background-color: #ffffff;
+    -fx-border-color: -fx-light-green;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+
+}
+
+#upload:hover {
+    -fx-background-color: rgba(139, 149, 105, 0.8);
+    -fx-text-fill: #ffffff;
+    -fx-font: bold 14px "Courier New";
+    -fx-text-alignment: justify;
+}
+
+#upload:pressed {
+    -fx-background-color: rgba(139, 149, 105, 0.6);
+}
+
+#progress_field {
+    -fx-border-color: -fx-brown;
+    -fx-border-radius: 4px;
+}
+
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button {
+    -fx-background-color: linear-gradient(to bottom, rgba(133,141,124,1) 0%, rgba(112,125,100,1) 35%, rgba(112,125,100,1) 65%, rgba(133,141,124,1) 100%);
+}
+
+.spinner .increment-arrow-button:hover,
+.spinner .decrement-arrow-button:hover {
+    -fx-background-color: linear-gradient(to bottom, rgba(145,152,137,1) 0%, rgba(126,138,116,1) 35%, rgba(126,138,116,1) 65%, rgba(145,152,137,1) 100%);
+}
+
+.spinner .increment-arrow-button .increment-arrow,
+.spinner .decrement-arrow-button .decrement-arrow {
+    -fx-background-color: white;
+}
+
+.spinner:focused {
+    -fx-faint-focus-color: -fx-mid-green-glow;
+    -fx-focus-color: -fx-mid-green;
+}
+
+.check-box:focused {
+    -fx-faint-focus-color: -fx-light-green-glow;
+    -fx-focus-color: -fx-light-green;
+}
+
+.progress-bar {
+    -fx-accent: -fx-brown;
+}
+
+#progress-white-text {
+    -fx-text-fill: white;
+    -fx-font: bold 14px "Courier New";
+}
+
+.tab-pane .tab-header-area .tab {
+    -fx-faint-focus-color: -fx-light-green-glow;
+    -fx-focus-color: -fx-light-green;
+}
+
+#download {
+    -fx-background-color: #ffffff;
+    -fx-border-color: -fx-brown;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+
+}
+
+#download:hover {
+    -fx-background-color: rgba(186, 178, 169, 0.8);
+    -fx-text-fill: #ffffff;
+    -fx-font: bold 14px "Courier New";
+    -fx-text-alignment: justify;
+}
+
+#download:pressed {
+    -fx-background-color: rgba(186, 178, 169, 0.6);
+}
+
+.choice-box {
+    -fx-border-color: -fx-dark-green;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+    -fx-mark-color: -fx-dark-green;
+    -fx-background-color: white;
+    -fx-font: normal 12px "Courier New";
+}
+
+
+.choice-box .context-menu {
+    -fx-background-color: white;
+}
+
+.choice-box .menu-item:focused {
+    -fx-background-color: -fx-dark-green;
+}
+
+.choice-box .menu-item > .label {
+    -fx-text-fill: black;
+}
+
+.choice-box .menu-item:focused > .label {
+    -fx-text-fill: white;
+}
+
+.harmonicsPane {
+    -fx-background-color: white;
+}
+
+.toggle-button:focused {
+    -fx-faint-focus-color: -fx-light-green-glow;
+    -fx-focus-color: -fx-light-green;
+}

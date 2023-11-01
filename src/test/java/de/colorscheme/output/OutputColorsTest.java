@@ -2,16 +2,14 @@ package de.colorscheme.output;
 
 import org.junit.jupiter.api.Test;
 
-import javax.swing.*;
+import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.geom.Arc2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class OutputColorsTest {
 
@@ -22,6 +20,23 @@ class OutputColorsTest {
         List<MetaData> metaList = new LinkedList<>(metaData);
         Collections.reverse(metaList);
         metaList.forEach(System.out::println);
+    }
+
+    @Test
+    void testReturn() {
+        testInterrupted();
+        System.out.println("Back");
+    }
+
+    @Test
+    void testInterrupted() {
+        try {
+            BufferedImage image = ImageIO.read(Paths.get("C:\\Users\\Elisa\\Documents\\Icelan (by Jonny Auh).jpg").toFile());
+        } catch (IOException e) {
+            return;
+        }
+        System.out.println("Image read");
+        System.out.println("Stuff");
     }
 
     @Test

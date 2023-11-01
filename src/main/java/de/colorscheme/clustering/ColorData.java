@@ -1,6 +1,6 @@
 package de.colorscheme.clustering;
 
-import de.colorscheme.app.App;
+import de.colorscheme.app.AppController;
 import de.fenris.logger.ColorLogger;
 import javafx.geometry.Point3D;
 
@@ -12,8 +12,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.colorscheme.app.App.getOutputField;
-import static de.colorscheme.app.App.getTask;
+import static de.colorscheme.app.AppController.getResBundle;
 import static java.util.logging.Level.INFO;
 
 /**
@@ -88,9 +87,8 @@ public class ColorData {
      * <span color="#6897BB">width * height</span> match the number of elements stored in {@link #pixelColor}. <br>
      * If the {@link #pixelCount total amount of pixels} and the amount of pixels stored in {@link #pixelColor} differ,
      * a custom exception {@link PixelListSizeException PixelListSizeException} is thrown and the
-     * {@link javax.swing.SwingWorker SwingWorker} in {@link de.colorscheme.app.StartProcess StartProcess} is
-     * cancelled. The user is informed about
-     * the error via the {@link App#getOutputField() textfield}.
+     * {@link javafx.concurrent.Task task} in {@link AppController} is cancelled. The user is informed about
+     * the error via the textfield.
      *
      * @param image A {@link BufferedImage}: The image to be read
      **/
@@ -112,15 +110,16 @@ public class ColorData {
             }
             pixelCount = width * height;
             //compare recorded pixels and total pixels
-            if (Double.compare(pixelCount, pixelColor.size()) != 0) {
+            if ((int) pixelCount != pixelColor.size()) {
                 throw new PixelListSizeException("");
             }
-        }catch (PixelListSizeException e) {
-            getOutputField().setForeground(Color.RED);
-            getOutputField().setText("An error occurred while getting the pixels in the image! " +
-                    "Expected and actual amount of pixels differ!" + System.lineSeparator() + "Expected: " +
-                    (int) pixelCount + System.lineSeparator() + "Actual: " + pixelColor.size());
-            getTask().cancel(true);
+        }
+        //recorded pixels and total pixels in image differ
+        catch (PixelListSizeException e) {
+            AppController.addToOutputField(getResBundle().getString("pixelError") + System.lineSeparator() +
+                    getResBundle().getString("pixelErrorExpected") + (int) pixelCount + System.lineSeparator() +
+                    getResBundle().getString("pixelErrorActual") + pixelColor.size(), true);
+            AppController.setCancelled(true);
 
             LOGGER.log(Level.SEVERE, String.format("%s: Expected and actual amount of pixels differ! Expected: %e%nActual: %d%n",
                     e.getClass().getSimpleName(), pixelCount, pixelColor.size()));
@@ -240,7 +239,9 @@ public class ColorData {
         //if no minimum has been set yet, set current point to minimum
         if (minimum.equals(new Point3D(-1, -1, -1))) {
             minimum = p;
-        } else { //check for smaller coordinates and update minimum accordingly
+        }
+        //check for smaller coordinates and update minimum accordingly
+        else {
             if (x < minimum.getX() ||
                     y < minimum.getY() ||
                     z < minimum.getZ()) {
@@ -296,7 +297,9 @@ public class ColorData {
         //if no maximum has been set yet, set current point to maximum
         if (maximum.equals(new Point3D(256, 256, 256))) {
             maximum = p;
-        } else { //check for larger coordinates and update maximum accordingly
+        }
+        //check for larger coordinates and update maximum accordingly
+        else {
             if (x > maximum.getX() ||
                     y > maximum.getY() ||
                     z > maximum.getZ()) {
