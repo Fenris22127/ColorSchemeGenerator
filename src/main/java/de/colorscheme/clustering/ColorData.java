@@ -1,6 +1,7 @@
 package de.colorscheme.clustering;
 
 import de.colorscheme.app.AppController;
+import de.colorscheme.app.NewController;
 import de.fenris.logger.ColorLogger;
 import javafx.geometry.Point3D;
 
@@ -12,7 +13,8 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.colorscheme.app.AppController.getResBundle;
+/*import static de.colorscheme.app.AppController.getResBundle;*/
+import static de.colorscheme.app.NewController.getResBundle;
 import static java.util.logging.Level.INFO;
 
 /**
@@ -116,7 +118,7 @@ public class ColorData {
         }
         //recorded pixels and total pixels in image differ
         catch (PixelListSizeException e) {
-            AppController.addToOutputField(getResBundle().getString("pixelError") + System.lineSeparator() +
+            NewController.addToOutputField(getResBundle().getString("pixelError") + System.lineSeparator() +
                     getResBundle().getString("pixelErrorExpected") + (int) pixelCount + System.lineSeparator() +
                     getResBundle().getString("pixelErrorActual") + pixelColor.size(), true);
             AppController.setCancelled(true);

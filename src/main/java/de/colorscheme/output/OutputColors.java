@@ -8,6 +8,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import de.colorscheme.app.AppController;
+import de.colorscheme.app.NewController;
 import de.colorscheme.clustering.ColorData;
 import de.fenris.logger.ColorLogger;
 import javafx.geometry.Point3D;
@@ -30,7 +31,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import static de.colorscheme.app.AppController.getResBundle;
+/*import static de.colorscheme.app.AppController.getResBundle;*/
+import static de.colorscheme.app.NewController.getResBundle;
 import static de.colorscheme.clustering.KMeans.getCentroids;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
@@ -407,30 +409,30 @@ public class OutputColors {
         hsbColors[2] /= getCentroids();
 
         Paragraph colorDetails = new Paragraph();
-        Phrase colorDetailsTitle = new Phrase(AppController.getResBundle().getString("avgTitle"), bold);
+        Phrase colorDetailsTitle = new Phrase(NewController.getResBundle().getString("avgTitle"), bold);
         colorDetails.add(colorDetailsTitle);
         colorDetails.setAlignment(Element.ALIGN_CENTER);
         doc.add(colorDetails);
 
         Paragraph avg = new Paragraph();
         Phrase avgColor = new Phrase("• " +
-                AppController.getResBundle().getString("avgColorPre") +
+                NewController.getResBundle().getString("avgColorPre") +
                 determineHue(hsbColors[0]), regular);
         avgColor.add(Chunk.NEWLINE);
 
         avgColor.add(((hsbColors[1] < 0.5 ? "• " +
-                AppController.getResBundle().getString("avgSaturationUnSat")
-                : "• " + AppController.getResBundle().getString("avgSaturationSat"))
+                NewController.getResBundle().getString("avgSaturationUnSat")
+                : "• " + NewController.getResBundle().getString("avgSaturationSat"))
                 .concat(String.format(" (%s %.2f %%)",
-                        AppController.getResBundle().getString("avgSaturation"),
+                        NewController.getResBundle().getString("avgSaturation"),
                         hsbColors[1] * 100))));
         avgColor.add(Chunk.NEWLINE);
 
         avgColor.add((hsbColors[2] < 0.5 ? "• " +
-                AppController.getResBundle().getString("avgBrightnessDark")
-                : "• " + AppController.getResBundle().getString("avgBrightnessLight"))
+                NewController.getResBundle().getString("avgBrightnessDark")
+                : "• " + NewController.getResBundle().getString("avgBrightnessLight"))
                 .concat(String.format(" (%s %.2f %%)",
-                        AppController.getResBundle().getString("avgBrightness"),
+                        NewController.getResBundle().getString("avgBrightness"),
                         hsbColors[2] * 100)));
         avgColor.add(Chunk.NEWLINE);
 
@@ -450,16 +452,16 @@ public class OutputColors {
         int h = (newHue - 29) / 60;
         String color;
         if (newHue < 30) {
-            color = AppController.getResBundle().getString("avgRed");
+            color = NewController.getResBundle().getString("avgRed");
         } else {
             switch (h) {
-                case 0 -> color = AppController.getResBundle().getString("avgYellow");
-                case 1 -> color = AppController.getResBundle().getString("avgGreen");
-                case 2 -> color = AppController.getResBundle().getString("avgCyan");
-                case 3 -> color = AppController.getResBundle().getString("avgBlue");
-                case 4 -> color = AppController.getResBundle().getString("avgPurple");
-                case 5 -> color = AppController.getResBundle().getString("avgRed");
-                default -> color = AppController.getResBundle().getString("avgIndeterminate");
+                case 0 -> color = NewController.getResBundle().getString("avgYellow");
+                case 1 -> color = NewController.getResBundle().getString("avgGreen");
+                case 2 -> color = NewController.getResBundle().getString("avgCyan");
+                case 3 -> color = NewController.getResBundle().getString("avgBlue");
+                case 4 -> color = NewController.getResBundle().getString("avgPurple");
+                case 5 -> color = NewController.getResBundle().getString("avgRed");
+                default -> color = NewController.getResBundle().getString("avgIndeterminate");
             }
         }
         return color;
@@ -474,20 +476,20 @@ public class OutputColors {
     private static String getColorSpace(int index) {
         String model;
         switch (index) {
-            case 1 -> model = AppController.getResBundle().getString("metaColorModel1");
-            case 2 -> model = AppController.getResBundle().getString("metaColorModel2");
-            case 3 -> model = AppController.getResBundle().getString("metaColorModel3");
-            case 4 -> model = AppController.getResBundle().getString("metaColorModel4");
-            case 5 -> model = AppController.getResBundle().getString("metaColorModel5");
-            case 6 -> model = AppController.getResBundle().getString("metaColorModel6");
-            case 7 -> model = AppController.getResBundle().getString("metaColorModel7");
-            case 8 -> model = AppController.getResBundle().getString("metaColorModel8");
-            case 9 -> model = AppController.getResBundle().getString("metaColorModel9");
-            case 10 -> model = AppController.getResBundle().getString("metaColorModel10");
-            case 11 -> model = AppController.getResBundle().getString("metaColorModel11");
-            case 12 -> model = AppController.getResBundle().getString("metaColorModel12");
-            case 13 -> model = AppController.getResBundle().getString("metaColorModel13");
-            default -> model = AppController.getResBundle().getString("metaColorModelDefault");
+            case 1 -> model = NewController.getResBundle().getString("metaColorModel1");
+            case 2 -> model = NewController.getResBundle().getString("metaColorModel2");
+            case 3 -> model = NewController.getResBundle().getString("metaColorModel3");
+            case 4 -> model = NewController.getResBundle().getString("metaColorModel4");
+            case 5 -> model = NewController.getResBundle().getString("metaColorModel5");
+            case 6 -> model = NewController.getResBundle().getString("metaColorModel6");
+            case 7 -> model = NewController.getResBundle().getString("metaColorModel7");
+            case 8 -> model = NewController.getResBundle().getString("metaColorModel8");
+            case 9 -> model = NewController.getResBundle().getString("metaColorModel9");
+            case 10 -> model = NewController.getResBundle().getString("metaColorModel10");
+            case 11 -> model = NewController.getResBundle().getString("metaColorModel11");
+            case 12 -> model = NewController.getResBundle().getString("metaColorModel12");
+            case 13 -> model = NewController.getResBundle().getString("metaColorModel13");
+            default -> model = NewController.getResBundle().getString("metaColorModelDefault");
         }
         return model;
     }
@@ -528,17 +530,17 @@ public class OutputColors {
                     case FILE_COLOR_COMPONENTS -> String.valueOf(img.getColorModel().getNumComponents());
                     case FILE_BIT_DEPTH -> String.valueOf(img.getColorModel().getPixelSize());
                     case FILE_TRANSPARENCY -> switch (img.getColorModel().getTransparency()) {
-                        case 1 -> AppController.getResBundle().getString("metaTransparency1");
-                        case 2 -> AppController.getResBundle().getString("metaTransparency2");
-                        case 3 -> AppController.getResBundle().getString("metaTransparency3");
-                        default -> AppController.getResBundle().getString("metaTransparencyDefault");
+                        case 1 -> NewController.getResBundle().getString("metaTransparency1");
+                        case 2 -> NewController.getResBundle().getString("metaTransparency2");
+                        case 3 -> NewController.getResBundle().getString("metaTransparency3");
+                        default -> NewController.getResBundle().getString("metaTransparencyDefault");
                     };
                     case FILE_ALPHA -> (img.getColorModel().hasAlpha() ?
-                            AppController.getResBundle().getString("metaAlphaYes") :
-                            AppController.getResBundle().getString("metaAlphaNo"));
+                            NewController.getResBundle().getString("metaAlphaYes") :
+                            NewController.getResBundle().getString("metaAlphaNo"));
                     case FILE_ALPHA_TYPE -> (img.getColorModel().isAlphaPremultiplied() ?
-                            AppController.getResBundle().getString("metaAlphaPremultiplied") :
-                            AppController.getResBundle().getString("metaAlphaNotPremultiplied"));
+                            NewController.getResBundle().getString("metaAlphaPremultiplied") :
+                            NewController.getResBundle().getString("metaAlphaNotPremultiplied"));
                 });
     }
 

@@ -1,0 +1,395 @@
+* {
+    -fx-dark-green: #303533;
+    -fx-mid-green: #515B48;
+    -fx-mid-green-glow: #515B4819;
+    -fx-light-green: #8B9569;
+    -fx-light-green-glow: #8B956919;
+    -fx-brown: #A3927F;
+    -fx-brown-white: #BAB2A9;
+    -fx-grey: #D3D6D7;
+    -fx-darker-grey: #A9ABAC;
+}
+
+#background{
+    /*-fx-background-image: url("Hover2.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: cover;*/
+}
+
+#icon {
+    -fx-background-image: url("LogoOutline.png");
+    -fx-background-size: 79 auto;
+    -fx-background-repeat: no-repeat;
+}
+
+#title {
+    -fx-font-family: "Quattrocento Sans Regular";
+    -fx-font-size: 36px;
+    -fx-text-fill: black;
+}
+
+#uploadPane {
+    -fx-max-width: 300px;
+    /*-fx-background-color: rgba(255, 255, 255, 0.8);*/
+    /*-fx-border-color: rgba(0, 0, 255, 0.5);*/
+    -fx-border-color: #A9ABAC;
+    -fx-border-width: 4;
+    -fx-border-style: segments(9, 12)  line-cap round ;
+    -fx-border-radius: 3px;
+}
+
+.firstUpload:hover {
+    -fx-background-color: rgba(210, 210, 210, 0.7);
+    -fx-border-color: #8A8D8E;
+    -fx-background-insets: 0;
+    -fx-background-radius: 3px;
+}
+
+#uploadButton {
+    -fx-background-color: transparent;
+    -fx-border-radius: 3px;
+    -fx-content-display: top;
+    -fx-font-family: Mulish Regular;
+    -fx-font-size: 18px;
+    -fx-text-fill: black;
+}
+
+#uploadButton:pressed {
+    -fx-background-color: rgba(210, 210, 210, 0.8);
+    -fx-text-fill: rgba(0, 0, 0, 0.8);
+}
+
+#startBtn,
+#downloadBtn {
+    -fx-background-color: -fx-mid-green;
+    -fx-background-radius: 6px;
+    -fx-font-family: "Mulish Bold";
+    -fx-font-size: 14px;
+    -fx-text-fill: -fx-grey;
+    -fx-padding: 10 30;
+    -fx-pref-height: 39;
+}
+
+#startBtn:pressed,
+#downloadBtn:pressed {
+    -fx-background-color: #41493A;
+}
+
+#reuploadButton {
+    -fx-background-color: -fx-grey;
+    -fx-background-radius: 6px;
+    -fx-border-color: transparent;
+    -fx-padding: 10;
+    -fx-min-width: 39;
+    -fx-max-width: 39;
+    -fx-pref-width: 39;
+    -fx-pref-height: 39;
+}
+
+#reuploadButton:pressed {
+    -fx-background-color: #BEC1C1;
+}
+
+.check-box {
+    -fx-label-padding: 0 0 0 15;
+    -fx-font-family: "Mulish Regular";
+    -fx-font-size: 14px;
+}
+
+.check-box .box {
+    -fx-border-width: 0.12em;
+    -fx-border-color: -fx-darker-grey;
+    -fx-background-color: white;
+    -fx-font-size: 1.3em;
+    -fx-border-radius: 0.2em;
+}
+
+.check-box:selected .mark {
+    -fx-alignment: center;
+    -fx-background-color: -fx-darker-grey;
+    -fx-shape: "M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"
+}
+
+.check-box:indeterminate {
+}
+
+.check-box:indeterminate .box {
+}
+
+.check-box:indeterminate .mark {
+    -fx-shape: "M20 14H4V10H20";
+    -fx-font-size: 1.15em;
+    -fx-background-color: -fx-darker-grey;
+}
+
+.check-box:disabled {
+    -fx-cursor: not-allowed;
+}
+
+.check-box:disabled .box {
+    -fx-background-color: white;
+    -fx-border-color: #808080;
+
+}
+
+.check-box:disabled :selected .mark {
+    -fx-background-color: #808080;
+    -fx-font-size: 1.15em;
+}
+
+#autoDownload {
+    -fx-font-family: "Mulish Regular";
+    -fx-font-size: 14px;
+    -fx-text-fill: black;
+}
+
+.textlabel {
+    -fx-font-family: "Mulish Regular";
+    -fx-font-size: 14px;
+    -fx-text-fill: black;
+}
+
+.spinner .increment-arrow-button .increment-arrow {
+    -fx-padding: 0.55em 0.6em;  /* 2 4 2 4 */
+    -fx-shape: "M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z";
+    -fx-background-color: -fx-darker-grey;
+}
+.spinner .decrement-arrow-button .decrement-arrow {
+    -fx-padding: 0.02em 0.6em; /* 2 4 2 4 */
+    -fx-shape: "M19,13H5V11H19V13Z";
+    -fx-background-color: -fx-darker-grey;
+}
+
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button {
+    -fx-padding: 1em 1.2em;
+    -fx-background-radius: 0.3em;
+    -fx-background-color: transparent;
+}
+
+.spinner .increment-arrow-button:hover,
+.spinner .decrement-arrow-button:hover {
+    -fx-background-color: rgba(210, 210, 210, 0.5);
+}
+
+.spinner .increment-arrow-button:pressed,
+.spinner .decrement-arrow-button:pressed {
+    -fx-background-color: rgba(210, 210, 210, 0.7);
+}
+
+.spinner {
+    -fx-border-width: 0.12em;
+    -fx-border-color: -fx-darker-grey;
+    -fx-border-radius: 0.35em;
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-text-alignment: center;
+}
+
+.spinner > .text-field {
+    -fx-background-color: transparent;
+    -fx-font-family: "Mulish Regular";
+    -fx-font-size: 14px;
+    -fx-text-fill: black;
+    -fx-alignment: center;
+    -fx-display-caret: false;
+}
+
+.spinner .text-field:focused {
+    -fx-faint-focus-color: rgba(100, 100, 100, 0.0);
+    -fx-focus-color: rgba(0, 0, 0, 0.15);
+}
+
+.titled-pane {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0.8em;
+    -fx-border-width: 0.12em;
+    -fx-border-color: -fx-darker-grey;
+    -fx-border-radius: 0.8em;
+    -fx-padding: 0;
+}
+
+.titled-pane > .title,
+.titled-pane:collapsed > .title,
+.titled-pane:focused > .title
+{
+    -fx-background-color: transparent;
+    -fx-font-family: "Mulish SemiBold";
+    -fx-font-size: 16px;
+    -fx-text-fill: black;
+    -fx-padding: 0.5em 0.7em 0.5em 0.7em;
+}
+
+.titled-pane:focused > .title
+{
+    -fx-background-color: transparent;
+    -fx-border-radius: 0.8em;
+}
+
+.titled-pane > .title > .arrow-button
+{
+    -fx-background-color: null;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-translate-x: 30em;
+    -fx-padding: 0 0 0.4em 0;
+    -fx-rotate: 45;
+}
+
+.titled-pane > .title > .arrow-button .arrow
+{
+    -fx-background-color: -fx-darker-grey;
+    -fx-padding: 0.4em;
+    /*-fx-padding: 0.25em 0.3125em 0.25em 0.3125em; !* 3 3.75 3 3.75 *!*/
+    -fx-shape: "M.536 1044.409v-1.997h9v-9h2v11z";
+}
+.titled-pane:collapsed > .title > .arrow-button .arrow
+{
+    -fx-background-color: -fx-darker-grey;
+    -fx-padding: 0.4em;
+    -fx-shape: "M4.468 1048.341h1.996v-9h9v-2h-11z";
+}
+
+.titled-pane:focused > .title:focused > .arrow-button .arrow,
+.titled-pane:focused > .title > .arrow-button .arrow,
+.titled-pane:collapsed:focused > .title > .arrow-button .arrow
+{
+    -fx-background-color: -fx-darker-grey;
+    -fx-faint-focus-color: transparent;
+    -fx-focus-color: transparent;
+}
+
+.titled-pane:collapsed > .title > .arrow-button
+{
+    -fx-padding: 0 0 0.4em 0;
+    -fx-rotate: 135;
+}
+
+.titled-pane > *.content
+{
+    -fx-background-color: transparent;
+    -fx-padding: 0em 2em 0em 2em;
+    -fx-border-radius: 0.8em;
+    -fx-background-radius: 0.8em;
+}
+
+.titled-pane > .content {
+    -fx-padding: 0.8em 1.8em 0em 1.8em;
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+
+}
+
+.colourbutton {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0.35em;
+    -fx-border-width: 0.12em;
+    -fx-border-color: -fx-darker-grey;
+    -fx-border-radius: 0.35em;
+    -fx-font-family: "Mulish Bold";
+    -fx-font-size: 14px;
+    -fx-text-fill: -fx-grey;
+    -fx-padding: 0 0 0 0;
+    -fx-pref-height: 2.95em;
+    -fx-pref-width: 2.95em;
+    -fx-cursor: hand;
+}
+
+.toggle-button:selected {
+    -fx-background-color: -fx-mid-green;
+    -fx-background-radius: 0.35em;
+    -fx-border-color: transparent;
+}
+
+#downloadBtn:disabled {
+    -fx-border-width: 0.12em;
+    -fx-border-color: -fx-darker-grey;
+    -fx-border-radius: 0.35em;
+    -fx-text-fill: -fx-darker-grey;
+    -fx-background-color: transparent;
+}
+
+.progress-bar {
+    -fx-background-color: -fx-grey;
+    /*-fx-indeterminate-bar-length: 60;
+    -fx-indeterminate-bar-escape: true;
+    -fx-indeterminate-bar-flip: true;
+    -fx-indeterminate-bar-animation-time: 2;*/
+
+    -fx-border-radius: 0.5em;
+    -fx-background-radius: 0.5em;
+}
+
+.progress-bar .track {
+    -fx-background-color: -fx-grey;
+}
+
+.progress-bar .bar {
+    -fx-background-color: -fx-mid-green;
+    -fx-padding: 0.416667em; /* 5 */
+
+    -fx-background-insets: 2;
+    -fx-border-radius: 0.35em;
+    -fx-background-radius: 0.35em;
+}
+
+
+.progress-bar:disabled {
+    -fx-opacity: -fx-disabled-opacity;
+}
+
+.progressTitleLabel {
+    -fx-font-family: "Mulish Regular";
+    -fx-font-size: 12px;
+    -fx-text-fill: black;
+}
+
+#progressLabel {
+    -fx-font-family: "Mulish SemiBold";
+    -fx-font-size: 12px;
+    -fx-text-fill: black;
+}
+
+.choice-box {
+    -fx-border-width: 0.12em;
+    -fx-border-color: -fx-darker-grey;
+    -fx-border-radius: 0.35em;
+    -fx-mark-color: -fx-darker-grey;
+    -fx-background-color: transparent;
+    -fx-font-family: "Mulish Regular";
+    -fx-font-size: 12px;
+}
+
+
+.choice-box .context-menu {
+    -fx-background-color: white;
+    -fx-padding: 0;
+}
+
+.choice-box .menu-item:focused {
+    -fx-background-color: -fx-darker-grey;
+}
+
+.choice-box .menu-item > .label {
+    -fx-text-fill: black;
+}
+
+.choice-box .menu-item:focused > .label {
+    -fx-text-fill: white;
+}
+
+.text-area,
+.text-area .content {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.text-area .content {
+    -fx-padding: 0 0.5em;
+}
+
+.text-area .scroll-pane {
+    -fx-hbar-policy: NEVER;
+    -fx-vbar-policy: NEVER;
+}

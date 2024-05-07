@@ -5,7 +5,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
 
-import static de.colorscheme.app.AppController.getResBundle;
+/*import static de.colorscheme.app.AppController.getResBundle;*/
+import static de.colorscheme.app.NewController.getResBundle;
 
 /**
  * Represents the metadata of an image file and allows values to be assigned to the metadata types.

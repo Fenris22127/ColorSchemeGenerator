@@ -5,6 +5,7 @@ import javafx.geometry.Point3D;
 import java.util.AbstractCollection;
 
 import static de.colorscheme.app.AppController.*;
+import static de.colorscheme.app.NewController.getResBundle;
 
 /**
  * The class providing the methods for the KMeans clustering process used to determine the image's main colours. <br>

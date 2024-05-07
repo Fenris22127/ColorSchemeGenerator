@@ -221,9 +221,9 @@ public class AppController implements Initializable {
         cancelled = isCancelled;
     }
 
-    public static ResourceBundle getResBundle() {
+    /*public static ResourceBundle getResBundle() {
         return bundle;
-    }
+    }*/
 
     public static void addToOutputField(String text, boolean isError) {
         if (isError) {
