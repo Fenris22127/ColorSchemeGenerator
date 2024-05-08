@@ -4,9 +4,8 @@ import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.*;
+import com.itextpdf.text.pdf.draw.LineSeparator;
 import de.colorscheme.app.AppController;
 import de.colorscheme.app.NewController;
 import de.colorscheme.clustering.ColorData;
@@ -25,15 +24,14 @@ import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 /*import static de.colorscheme.app.AppController.getResBundle;*/
 import static de.colorscheme.app.NewController.getResBundle;
 import static de.colorscheme.clustering.KMeans.getCentroids;
+import static de.colorscheme.output.ColorWheel.*;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 
@@ -57,27 +55,26 @@ public class OutputColors {
      */
     private static final Font bold = FontFactory.getFont(FontFactory.HELVETICA, 11, Font.BOLD);
 
-    /**
-     * The {@link Font} used for the {@link Document} title
-     */
-    private static final Font header = FontFactory.getFont(FontFactory.HELVETICA, 30, Font.BOLD);
 
     /**
      * The {@link Font} used for the {@link Document}s regular content
      */
-    private static final Font regular = FontFactory.getFont(FontFactory.HELVETICA, 11, Font.NORMAL);
-
-    /**
-     * The {@link Font} used for the {@link Document}s small content
-     */
-    private static final Font small = FontFactory.getFont(FontFactory.HELVETICA, 10, Font.NORMAL);
-
+    private static Font regular = FontFactory.getFont("../fonts/Mulish-Regular.ttf", 8, Font.NORMAL);
     private static final Path schemeWheelPath = Path.of("src/main/resources/img/SchemeWheel.png");
+    private static final Path RESOURCE_BASE = Path.of("src/main/resources/de/colorscheme/");
+
+
+    //private static final Path schemeWheelPath = Path.of("src/main/resources/img/SchemeWheel.png");
 
     /**
      * The {@link String} containing the path where the file will be downloaded to
      */
     private static String downloadPath;
+    private static Font MULISH_REGULAR;
+    private static Font MULISH_EXTRABOLD;
+    private static Font QUATTROCENTO_SANS_REGULAR;
+    private static Font QUATTROCENTO_SANS_BOLD;
+    private static PdfWriter writer;
 
     /**
      * Private constructor to hide the public one
@@ -112,6 +109,11 @@ public class OutputColors {
      * couldn't be created
      */
     public static void createOutput(ColorData c, Path imagePath) {
+        MULISH_REGULAR = FontFactory.getFont("src/main/resources/de/colorscheme/main/fonts/Mulish-Regular.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 12, Font.NORMAL, BaseColor.BLACK);
+        MULISH_EXTRABOLD = FontFactory.getFont("src/main/resources/de/colorscheme/main/fonts/Mulish-ExtraBold.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 32, Font.NORMAL, BaseColor.BLACK);
+        QUATTROCENTO_SANS_REGULAR = FontFactory.getFont("src/main/resources/de/colorscheme/main/fonts/QuattrocentoSans-Regular.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 16, Font.NORMAL, BaseColor.BLACK);
+        QUATTROCENTO_SANS_BOLD = FontFactory.getFont("src/main/resources/de/colorscheme/main/fonts/QuattrocentoSans-Bold.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 16, Font.NORMAL, BaseColor.BLACK);
+
         StringBuilder fileDestinationBuilder = new StringBuilder();
         String imgName = fileName(imagePath.toString());
 
@@ -176,7 +178,7 @@ public class OutputColors {
     private static void outputWrite(ColorData c, Path path, Path imagePath) {
         try {
             Document doc = new Document(PageSize.A4, 0, 0, 0, 0);
-            PdfWriter.getInstance(doc, new FileOutputStream(path.toString()));
+            writer = PdfWriter.getInstance(doc, new FileOutputStream(path.toString()));
             doc.open();
             addContent(c, doc, imagePath);
             doc.close();
@@ -261,11 +263,18 @@ public class OutputColors {
      */
     private static void addContent(ColorData c, Document doc, Path imagePath) {
         try {
-            doc.newPage();
-            doc.setMargins(0, 0, 0, 0);
-            LinkedList<BaseColor> colors = getColors(c);
+            if (getCentroids() > 5) {
+                regular = FontFactory.getFont("src/main/resources/de/colorscheme/main/fonts/Mulish-Regular.ttf", 9, Font.NORMAL);
+            } else {
+                regular = FontFactory.getFont("src/main/resources/de/colorscheme/main/fonts/Mulish-Regular.ttf", 11, Font.NORMAL);
+            }
 
-            Paragraph title = new Paragraph("Color Scheme", header);
+            float margin = 61F;
+            doc.setMargins(margin, margin, 42, margin);
+            doc.newPage();
+            //LinkedList<BaseColor> colors = getColors(c); //TODO: Check if this is correct
+
+            /*Paragraph title = new Paragraph("Color Scheme", header);
             title.setAlignment(Element.ALIGN_CENTER);
             addEmptyLine(title, 1);
             doc.add(title);
@@ -287,27 +296,73 @@ public class OutputColors {
 
             Paragraph space = new Paragraph();
             addEmptyLine(space, 2);
+            doc.add(space);*/
+            //Add header
+            Chunk titleChunk = new Chunk("COLOR SCHEME", MULISH_EXTRABOLD);
+            titleChunk.setCharacterSpacing(1.2F);
+            Paragraph title = new Paragraph(titleChunk);
+            title.setAlignment(Element.ALIGN_CENTER);
+            doc.add(title);
+
+            LineSeparator line = new LineSeparator(3F, 60, BaseColor.BLACK, Element.ALIGN_CENTER, -10);
+            doc.add(line);
+
+            Chunk docImgChunk = new Chunk(String.valueOf(imagePath.getFileName()), QUATTROCENTO_SANS_REGULAR);
+            docImgChunk.setCharacterSpacing(0.7F);
+
+            //Add image
+            Paragraph docImg = new Paragraph(31, docImgChunk);
+            docImg.setAlignment(Element.ALIGN_CENTER);
+            doc.add(docImg);
+
+            Paragraph space = new Paragraph(new Paragraph(" "));
+            space.setMultipliedLeading(2.8F);
             doc.add(space);
 
+            //Add colours
             float[] hsbColors = new float[3];
+            Image img = Image.getInstance(imagePath.toString());
+            if (img.getWidth() < img.getHeight()) {
+                addForVerticalImage(c, doc, img, margin, hsbColors); //Works
+            } else {
+                addForHorizontalImage(c, doc, img, hsbColors); //Works
+            }
+
+            space = new Paragraph(new Paragraph(" "));
+            space.setMultipliedLeading(1.5F);
+            doc.add(space);
+            doc.add(new Paragraph("COLOR SCHEME AVERAGES", QUATTROCENTO_SANS_BOLD));
+            addAverageTable(doc, hsbColors);
+
+            space = new Paragraph(new Paragraph(" "));
+            space.setMultipliedLeading(2F);
+            doc.add(space);
+            checkNewPage(doc);
+
+            /*float[] hsbColors = new float[3];
             addMainColors(doc, colors, hsbColors);
 
             Paragraph empty = new Paragraph();
             addEmptyLine(empty, 20);
-            doc.add(empty);
+            doc.add(empty);*/
 
-            if (ColorWheel.createColorWheel(colors)) {
+            Rectangle pageSize = new Rectangle(doc.getPageSize());
+            float width = pageSize.getWidth();
+            float height = pageSize.getHeight();
+            float width40 = width / 10 * 4;
+            float height40 = height / 10 * 4;
+
+            if (ColorWheel.createColorWheel(getColors(c))) {
                 Image colorWheel = Image.getInstance(schemeWheelPath.toString());
                 colorWheel.setAlignment(Element.ALIGN_CENTER);
                 colorWheel.scaleToFit(width40, height40);
                 Paragraph imgParagraph = new Paragraph();
-                Chunk imgChunk = new Chunk(colorWheel, 0, 0);
-                imgParagraph.add(imgChunk);
+                imgParagraph.add(colorWheel);
                 imgParagraph.setAlignment(Element.ALIGN_CENTER);
                 doc.add(imgParagraph);
             }
 
-            Paragraph clrWheelSpacing = new Paragraph();
+            /*Paragraph clrWheelSpacing = new Paragraph();
             addEmptyLine(clrWheelSpacing, 2);
             doc.add(clrWheelSpacing);
 
@@ -315,9 +370,11 @@ public class OutputColors {
 
             Paragraph spacing = new Paragraph();
             addEmptyLine(spacing, 2);
-            doc.add(spacing);
+            doc.add(spacing);*/
 
-            PdfPTable meta = new PdfPTable(2);
+
+
+            /*PdfPTable meta = new PdfPTable(2);
             Set<MetaData> metaData = OutputColors.readMetaData(imagePath);
             List<MetaData> metaList = new LinkedList<>(metaData);
             Collections.reverse(metaList);
@@ -335,7 +392,31 @@ public class OutputColors {
                 cell.setPaddingBottom(5);
                 meta.addCell(cell);
             }
-            doc.add(meta);
+            doc.add(meta);*/
+
+            doc.add(new Paragraph("IMAGE META DATA", QUATTROCENTO_SANS_BOLD));
+            addMetaTable(doc, imagePath);
+
+            space = new Paragraph(new Paragraph(" "));
+            space.setMultipliedLeading(2F);
+            doc.add(space);
+            checkNewPage(doc);
+
+            doc.add(new Paragraph("COLOR HARMONICS", QUATTROCENTO_SANS_BOLD));
+            space = new Paragraph(new Paragraph(" "));
+            space.setMultipliedLeading(1F);
+            doc.add(space);
+
+            List<ColorHarmony> harmonies = new LinkedList<>();
+            harmonies.addAll(Arrays.asList(
+                    ColorHarmony.COMPLEMENTARY,
+                    ColorHarmony.SPLIT_COMPLEMENTARY,
+                    ColorHarmony.MONOCHROMATIC,
+                    ColorHarmony.ANALOGOUS,
+                    ColorHarmony.TRIADIC,
+                    ColorHarmony.TETRADIC
+            ));
+            addHarmony(c, doc, harmonies); //TODO: Add color harmonics list
 
         } catch (DocumentException e) {
             AppController.addToOutputField(getResBundle().getString("docAddElementsError"), true);
@@ -350,6 +431,576 @@ public class OutputColors {
             Logger.getAnonymousLogger().log(SEVERE, "{}: Could not read image to display in created document!",
                     e.getClass().getSimpleName());
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * <b>Image format: Portrait</b><br>
+     * Adds the image and the main colors of the image with their HEX, HSB and RGB values to the {@link Document}.
+     *
+     * @param doc       A {@link Document}: The document to be written in
+     * @param img       An {@link Image}: The image to be added to the document
+     * @param margin    A {@link Float}: The margin of the document
+     * @param hsbColors A {@link Float} array: The average HSB values of the main colors
+     * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
+     */
+    private static void addForVerticalImage(ColorData c, Document doc, Image img, float margin, float[] hsbColors) throws DocumentException {
+        Rectangle pageSize = new Rectangle(doc.getPageSize());
+        img.scaleToFit(330, 350);
+
+        Rectangle rec = new Rectangle(350, 350);
+        rec.setBackgroundColor(BaseColor.RED);
+
+        doc.add(img);
+        float topPosition = 670.5F;
+        float spacer = 10.0F;
+        float height = (img.getScaledHeight() - (getCentroids() - 1) * spacer) / getCentroids();
+
+        PdfContentByte canvas = writer.getDirectContent();
+
+        ColumnText ct = new ColumnText(canvas);
+        for (int i = 0; i < getCentroids(); i++) {
+            BaseColor color = getColors(c).get(i);
+
+            regular.setColor(checkContrast(color));
+
+            Color awtColor = new Color(color.getRed(), color.getGreen(), color.getBlue());
+            float[] hsb = Color.RGBtoHSB(awtColor.getRed(), awtColor.getGreen(), awtColor.getBlue(), null);
+            hsbColors[0] += hsb[0];
+            hsbColors[1] += hsb[1];
+            hsbColors[2] += hsb[2];
+            Rectangle rect = new Rectangle(
+                    img.getScaledWidth() + margin + spacer, // top left X start
+                    topPosition - i * height - i * spacer, // top left Y start
+                    pageSize.getWidth() - margin, // bottom right X end (width)
+                    topPosition - (i + 1) * height - i * spacer); // bottom right Y end (height)
+            rect.setBorder(0);
+            rect.setBackgroundColor(color);
+            canvas.rectangle(rect);
+
+            String hex = getHex(color);
+            ct.setSimpleColumn(rect);
+            Paragraph colorValues = new Paragraph();
+            Paragraph hexVal = new Paragraph(" HEX: " + hex, regular);
+            Paragraph hslVal = new Paragraph(
+                    String.format(" HSB: %d°, %d%%, %d%%",
+                            Math.round(hsb[0] * 360),
+                            Math.round(hsb[1] * 100),
+                            Math.round(hsb[2] * 100)), regular);
+            Paragraph rgbVal = new Paragraph(
+                    String.format(" RGB: %d, %d, %d",
+                            awtColor.getRed(),
+                            awtColor.getGreen(),
+                            awtColor.getBlue()), regular);
+            colorValues.add(hexVal);
+            colorValues.add(hslVal);
+            colorValues.add(rgbVal);
+            ct.addElement(colorValues);
+            ct.go();
+        }
+    }
+
+    /**
+     * <b>Image format: Landscape or square</b><br>
+     * Adds the image and the main colors of the image with their HEX, HSB and RGB values to the {@link Document}.
+     *
+     * @param doc       A {@link Document}: The document to be written in
+     * @param img       An {@link Image}: The image to be added to the document
+     * @param hsbColors A {@link Float} array: The average HSB values of the main colors
+     * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
+     */
+    private static void addForHorizontalImage(ColorData c, Document doc, Image img, float[] hsbColors) throws DocumentException {
+        Rectangle pageSize = new Rectangle(doc.getPageSize());
+        float pageWidth = pageSize.getWidth();
+        float width80 = pageWidth / 10 * 8F;
+        img.scaleToFit(width80, 350);
+        img.setAlignment(Element.ALIGN_CENTER);
+        doc.add(img);
+        float spacer = 10.0F;
+        float topPosition = 670.5F - img.getScaledHeight() - spacer;
+        float width = (img.getScaledWidth() - (getCentroids() - 1) * spacer) / getCentroids();
+        float start = (pageWidth - img.getScaledWidth()) / 2;
+
+        PdfContentByte canvas = writer.getDirectContent();
+        ColumnText ct = new ColumnText(canvas);
+        for (int i = 0; i < getCentroids(); i++) {
+            BaseColor color = getColors(c).get(i);
+            Color awtColor = new Color(color.getRed(), color.getGreen(), color.getBlue());
+
+            float[] hsb = Color.RGBtoHSB(awtColor.getRed(), awtColor.getGreen(), awtColor.getBlue(), null);
+            hsbColors[0] += hsb[0];
+            hsbColors[1] += hsb[1];
+            hsbColors[2] += hsb[2];
+
+            Rectangle rect = new Rectangle(
+                    start + i * width + i * spacer, // top left X start
+                    topPosition, // top left Y start
+                    start + (i + 1) * width + i * spacer, // bottom right X end (width)
+                    topPosition - spacer - 140); // bottom right Y end (height)
+            rect.setBorder(0);
+            rect.setBackgroundColor(color);
+            canvas.rectangle(rect);
+
+            String hex = getHex(color);
+            ct.setSimpleColumn(rect);
+            Paragraph colorValues = new Paragraph();
+            Paragraph hexHeader = new Paragraph(" HEX:", getMulish(10, "Bold", checkContrastAWT(color)));
+            Paragraph hexVal = new Paragraph(" " + hex, getMulish(9, "Regular", checkContrastAWT(color)));
+            hexVal.setSpacingAfter(4);
+            Paragraph hslHeader = new Paragraph(" HSB:", getMulish(10, "Bold", checkContrastAWT(color)));
+            Paragraph hslVal = new Paragraph(
+                    String.format(" %d°, %d%%, %d%%",
+                            Math.round(hsb[0] * 360),
+                            Math.round(hsb[1] * 100),
+                            Math.round(hsb[2] * 100)), getMulish(9, "Regular", checkContrastAWT(color)));
+            hslVal.setSpacingAfter(4);
+            Paragraph rgbHeader = new Paragraph(" RGB:", getMulish(10, "Bold", checkContrastAWT(color)));
+            Paragraph rgbVal = new Paragraph(
+                    String.format(" %d, %d, %d",
+                            awtColor.getRed(),
+                            awtColor.getGreen(),
+                            awtColor.getBlue()), getMulish(9, "Regular", checkContrastAWT(color)));
+            rgbVal.setSpacingAfter(4);
+            colorValues.add(hexHeader);
+            colorValues.add(hexVal);
+            colorValues.add(hslHeader);
+            colorValues.add(hslVal);
+            colorValues.add(rgbHeader);
+            colorValues.add(rgbVal);
+            ct.addElement(colorValues);
+            ct.go();
+        }
+        Paragraph space = new Paragraph(new Paragraph(" "));
+        space.setLeading(topPosition - 140);
+        doc.add(space);
+    }
+
+    //TODO: New
+    private static void addAverageTable(Document doc, float[] hsbColors) throws DocumentException {
+        PdfPTable table = new PdfPTable(2);
+        table.setWidthPercentage(100);
+        table.setSpacingBefore(14);
+        table.setSpacingAfter(20);
+        table.setWidths(new int[]{1, 2});
+        Paragraph header = new Paragraph("Average", getMulish(9, "Bold", hexToColor("#404040")));
+        Paragraph value = new Paragraph("Value", getMulish(9, "Bold", hexToColor("#404040")));
+        PdfPCell avgHeader = getHeaderCell(header);
+        PdfPCell valueHeader = getHeaderCell(value);
+
+        table.addCell(avgHeader);
+        table.addCell(valueHeader);
+        String[] averages = getAverage(hsbColors);
+
+        Font mulishSemibold = getMulish(12, "Semibold", Color.BLACK);
+        Paragraph color = new Paragraph("Colour", mulishSemibold);
+        Paragraph colorAvg = new Paragraph(averages[0], getMulish(12));
+        table.addCell(getACell(color));
+        table.addCell(getACell(colorAvg));
+        Paragraph saturation = new Paragraph("Saturation", mulishSemibold);
+        Paragraph saturationAvg = new Paragraph(averages[1], getMulish(12));
+        table.addCell(getBCell(saturation));
+        table.addCell(getBCell(saturationAvg));
+        Paragraph brightness = new Paragraph("Brightness", mulishSemibold);
+        Paragraph brightnessAvg = new Paragraph(averages[2], getMulish(12));
+        table.addCell(getACell(brightness, true));
+        table.addCell(getACell(brightnessAvg, true));
+
+        doc.add(table);
+    }
+
+    //TODO: New
+    private static void addMetaTable(Document doc, Path imagePath) throws DocumentException {
+        Set<MetaData> metaData = readMetaData(imagePath);
+        List<MetaData> metaList = new LinkedList<>(metaData);
+        Collections.reverse(metaList);
+
+        PdfPTable table = new PdfPTable(2);
+        table.setWidthPercentage(100);
+        table.setSpacingBefore(14);
+        table.setSpacingAfter(20);
+        table.setWidths(new int[]{1, 2});
+        Paragraph header = new Paragraph("Meta Data", getMulish(9, "bold", hexToColor("#404040")));
+        Paragraph value = new Paragraph("Value", getMulish(9, "bold", hexToColor("#404040")));
+        PdfPCell metaHeader = getHeaderCell(header);
+        PdfPCell valueHeader = getHeaderCell(value);
+
+        table.addCell(metaHeader);
+        table.addCell(valueHeader);
+
+        boolean isBRow = false;
+        for (int i = 0; i < metaList.size(); i++) {
+            Paragraph metaName = new Paragraph(metaList.get(i).getDescriptor(), getMulish(12, "semibold", Color.BLACK));
+            Paragraph metaValue = new Paragraph(metaList.get(i).getData(), getMulish(12));
+            if (!isBRow) {
+                if (i == metaList.size() - 1) {
+                    table.addCell(getACell(metaName, true));
+                    table.addCell(getACell(metaValue, true));
+                } else {
+                    table.addCell(getACell(metaName));
+                    table.addCell(getACell(metaValue));
+                    isBRow = true;
+                }
+            } else {
+                if (i == metaList.size() - 1) {
+                    table.addCell(getBCell(metaName, true));
+                    table.addCell(getBCell(metaValue, true));
+                } else {
+                    table.addCell(getBCell(metaName));
+                    table.addCell(getBCell(metaValue));
+                    isBRow = false;
+                }
+            }
+        }
+
+        doc.add(table);
+    }
+
+    //TODO: New
+    private static void addHarmony(ColorData c, Document doc, List<ColorHarmony> harmonies) throws DocumentException {
+        for (ColorHarmony harmony : harmonies) {
+            switch (harmony) {
+                case COMPLEMENTARY:
+                    checkNewPage(doc, 133.0);
+                    addComplementary(c, doc);
+                    break;
+                case SPLIT_COMPLEMENTARY:
+                    checkNewPage(doc, 168.0);
+                    addSplitComplementary(c, doc);
+                    break;
+                case MONOCHROMATIC:
+                    checkNewPage(doc, 234.032);
+                    addMonochromatic(c, doc);
+                    break;
+                case ANALOGOUS:
+                    checkNewPage(doc, 167.808);
+                    addAnalogous(c, doc);
+                    break;
+                case TRIADIC:
+                    checkNewPage(doc, 164.032);
+                    addTriadic(c, doc);
+                    break;
+                case TETRADIC:
+                    checkNewPage(doc, 199.032);
+                    addTetradic(c, doc);
+                    break;
+            }
+        }
+    }
+
+    //TODO: Add JavaDoc
+    private static void addComplementary(ColorData c, Document doc) throws DocumentException {
+        addHarmonyHeader(doc, "Complementary");
+
+        PdfPTable table = new PdfPTable(getCentroids());
+        table.setWidthPercentage(100);
+        for (int i = 0; i < getCentroids(); i++) {
+            BaseColor bc = getColors(c).get(i);
+            float[] hsb = Color.RGBtoHSB(bc.getRed(), bc.getGreen(), bc.getBlue(), null);
+            List<javafx.scene.paint.Color> col = getComplementaryColourList(hsb);
+
+            PdfPCell cell = getHarmonyCells(bc, col);
+            table.addCell(cell);
+            doc.add(table);
+        }
+    }
+
+    //TODO: Add JavaDoc
+    private static void addSplitComplementary(ColorData c, Document doc) throws DocumentException {
+        addHarmonyHeader(doc, "Split Complementary");
+
+        PdfPTable table = new PdfPTable(getCentroids());
+        table.setWidthPercentage(100);
+        for (int i = 0; i < getCentroids(); i++) {
+            BaseColor bc = getColors(c).get(i);
+            float[] hsb = Color.RGBtoHSB(bc.getRed(), bc.getGreen(), bc.getBlue(), null);
+            List<javafx.scene.paint.Color> col = getSplitComplementaryColour(hsb);
+
+            PdfPCell cell = getHarmonyCells(bc, col);
+            table.addCell(cell);
+            doc.add(table);
+        }
+    }
+
+    //TODO: Add JavaDoc
+    private static void addMonochromatic(ColorData c, Document doc) throws DocumentException {
+        addHarmonyHeader(doc, "Monochromatic");
+
+        PdfPTable table = new PdfPTable(getCentroids());
+        table.setWidthPercentage(100);
+        for (int i = 0; i < getCentroids(); i++) {
+            BaseColor bc = getColors(c).get(i);
+            float[] hsb = Color.RGBtoHSB(bc.getRed(), bc.getGreen(), bc.getBlue(), null);
+            List<javafx.scene.paint.Color> col = getMonochromaticColour(hsb);
+
+            PdfPCell cell = getHarmonyCells(bc, col);
+            table.addCell(cell);
+            doc.add(table);
+        }
+    }
+
+    //TODO: Add JavaDoc
+    private static void addAnalogous(ColorData c, Document doc) throws DocumentException {
+        addHarmonyHeader(doc, "Analogous");
+
+        PdfPTable table = new PdfPTable(getCentroids());
+        table.setWidthPercentage(100);
+        for (int i = 0; i < getCentroids(); i++) {
+            BaseColor bc = getColors(c).get(i);
+            float[] hsb = Color.RGBtoHSB(bc.getRed(), bc.getGreen(), bc.getBlue(), null);
+            List<javafx.scene.paint.Color> col = getAnalogousColour(hsb);
+
+            PdfPCell cell = getHarmonyCells(bc, col);
+            table.addCell(cell);
+            doc.add(table);
+        }
+    }
+
+    //TODO: Add JavaDoc
+    private static void addTriadic(ColorData c, Document doc) throws DocumentException {
+        addHarmonyHeader(doc, "Triadic");
+
+        PdfPTable table = new PdfPTable(getCentroids());
+        table.setWidthPercentage(100);
+        for (int i = 0; i < getCentroids(); i++) {
+            BaseColor bc = getColors(c).get(i);
+            float[] hsb = Color.RGBtoHSB(bc.getRed(), bc.getGreen(), bc.getBlue(), null);
+            List<javafx.scene.paint.Color> col = getTriadicColour(hsb);
+
+            PdfPCell cell = getHarmonyCells(bc, col);
+            table.addCell(cell);
+            doc.add(table);
+        }
+    }
+
+    //TODO: Add JavaDoc
+    private static void addTetradic(ColorData c, Document doc) throws DocumentException {
+        addHarmonyHeader(doc, "Tetradic");
+
+        PdfPTable table = new PdfPTable(getCentroids());
+        table.setWidthPercentage(100);
+        for (int i = 0; i < getCentroids(); i++) {
+            BaseColor bc = getColors(c).get(i);
+            float[] hsb = Color.RGBtoHSB(bc.getRed(), bc.getGreen(), bc.getBlue(), null);
+            List<javafx.scene.paint.Color> col = getTetradicColour(hsb);
+
+            PdfPCell cell = getHarmonyCells(bc, col);
+            table.addCell(cell);
+            doc.add(table);
+        }
+    }
+
+    //TODO: New
+    private static void addHarmonyHeader(Document doc, String header) throws DocumentException {
+        Paragraph space1 = new Paragraph(new Paragraph(" "));
+        space1.setMultipliedLeading(1F);
+        doc.add(space1);
+        Image im;
+        String file = header.toLowerCase().replace(" ", "");
+        try {
+            Path complementaryBubble = Paths.get(
+                    String.format("src/main/resources/de/colorscheme/app/icons/%s_bubble.png", file));
+            im = Image.getInstance(complementaryBubble.toString());
+            im.scaleAbsolute(22, 22);
+        } catch (IOException | BadElementException e) {
+            throw new RuntimeException(e);
+        }
+        PdfPTable tab = new PdfPTable(2);
+        tab.setWidthPercentage(100);
+        tab.setWidths(new float[]{5, 75});
+        PdfPCell imgCell = new PdfPCell(im);
+        imgCell.setBorder(0);
+        PdfPCell pCell = new PdfPCell(new Phrase(header, QUATTROCENTO_SANS_BOLD));
+        pCell.setBorder(0);
+        pCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        pCell.setPadding(0);
+        pCell.setPaddingBottom(6F);
+        tab.addCell(imgCell);
+        tab.addCell(pCell);
+        doc.add(tab);
+
+        Paragraph space2 = new Paragraph(new Paragraph(" "));
+        space2.setMultipliedLeading(0.5F);
+        doc.add(space2);
+    }
+
+    //TODO: New
+    private static PdfPCell getHeaderCell(Paragraph label) {
+        PdfPCell cell = new PdfPCell(label);
+        cell.setPaddingTop(8);
+        cell.setPaddingLeft(2);
+        cell.setPaddingBottom(10);
+        cell.setBackgroundColor(new BaseColor(hexToColor("#F2F2F2").getRGB()));
+        cell.setBorder(0);
+        cell.setBorderWidthBottom(1);
+        cell.setBorderColorBottom(new BaseColor(hexToColor("#F3F3F4").getRGB()));
+        return cell;
+    }
+
+    //TODO: New
+    private static PdfPCell getHarmonyCells(BaseColor bc, List<javafx.scene.paint.Color> c) {
+        PdfPCell cell = new PdfPCell();
+        cell.setBorder(0);
+        cell.setPadding(5);
+        PdfPTable innerTable = new PdfPTable(1);
+        innerTable.setWidthPercentage(100);
+
+        innerTable.addCell(getHarmonicMainCell(bc));
+        c.forEach(color -> innerTable.addCell(getHarmonicCell(new BaseColor((int) (color.getRed() * 255), (int) (color.getGreen() * 255), (int) (color.getBlue() * 255)))));
+
+        cell.addElement(innerTable);
+        return cell;
+    }
+
+    //TODO: New
+    private static PdfPCell getHarmonicMainCell(BaseColor color) {
+        PdfPCell innerCell = new PdfPCell();
+        innerCell.setBorder(0);
+        innerCell.setPadding(15);
+        innerCell.setBackgroundColor(color);
+        innerCell.setFixedHeight(50);
+
+        return innerCell;
+    }
+
+    //TODO: New
+    private static PdfPCell getHarmonicCell(BaseColor c) {
+        PdfPCell innerCell = new PdfPCell();
+
+        innerCell.setCellEvent((cell1, position, canvases) -> {
+            float x1 = position.getLeft();
+            float x2 = position.getRight();
+            float y1 = position.getTop() - 5;
+            float y2 = position.getBottom() + 5;
+            PdfContentByte canvas = canvases[PdfPTable.BACKGROUNDCANVAS];
+            canvas.rectangle(x1, y1, x2 - x1, y2 - y1);
+            canvas.setColorFill(c);
+            canvas.fill();
+        });
+        innerCell.setBorder(0);
+        innerCell.setPadding(10);
+        innerCell.setPaddingLeft(5);
+        innerCell.setFixedHeight(35);
+        String hex = getHex(c);
+        innerCell.setPhrase(new Phrase(hex, getMulish(8, "regular", checkContrastAWT(c))));
+
+        return innerCell;
+    }
+
+    private static PdfPCell getACell(Paragraph label) {
+        PdfPCell cell = new PdfPCell(label);
+        cell.setPaddingTop(6);
+        cell.setPaddingLeft(2);
+        cell.setPaddingBottom(7);
+        cell.setBorder(0);
+        cell.setBorderWidthBottom(1);
+        cell.setBorderColorBottom(new BaseColor(hexToColor("#F3F3F4").getRGB()));
+        return cell;
+    }
+
+    private static PdfPCell getACell(Paragraph label, boolean isLast) {
+        PdfPCell cell = new PdfPCell(label);
+        cell.setPaddingTop(6);
+        cell.setPaddingLeft(2);
+        cell.setPaddingBottom(7);
+        cell.setBorder(0);
+        if (!isLast) {
+            cell.setBorderWidthBottom(1);
+        }
+        cell.setBorderColorBottom(new BaseColor(hexToColor("#F3F3F4").getRGB()));
+        return cell;
+    }
+
+    private static PdfPCell getBCell(Paragraph label, boolean isLast) {
+        PdfPCell cell = new PdfPCell(label);
+        cell.setPaddingTop(6);
+        cell.setPaddingLeft(2);
+        cell.setPaddingBottom(7);
+        cell.setBackgroundColor(new BaseColor(hexToColor("#FAFAFA").getRGB()));
+        cell.setBorder(0);
+        if (!isLast) {
+            cell.setBorderWidthBottom(1);
+        }
+        cell.setBorderColorBottom(new BaseColor(hexToColor("#F3F3F4").getRGB()));
+        return cell;
+    }
+
+    private static PdfPCell getBCell(Paragraph label) {
+        PdfPCell cell = new PdfPCell(label);
+        cell.setPaddingTop(6);
+        cell.setPaddingLeft(2);
+        cell.setPaddingBottom(7);
+        cell.setBackgroundColor(new BaseColor(hexToColor("#FAFAFA").getRGB()));
+        cell.setBorder(0);
+        cell.setBorderWidthBottom(1);
+        cell.setBorderColorBottom(new BaseColor(hexToColor("#F3F3F4").getRGB()));
+        return cell;
+    }
+
+    /*//TODO: New
+    *//**
+     * @return A {@link LinkedList} of {@link BaseColor}s: A {@link LinkedList} containing the main
+     * {@link BaseColor colors} of the selected image
+     *//*
+    private static LinkedList<BaseColor> getBaseColors() {
+        LinkedList<BaseColor> schemeColors = new LinkedList<>();
+        for (int i = 0; i < getCentroids(); i++) {
+            Point3D p = getColors().get(i);
+            int x = (int) p.getX();
+            int y = (int) p.getY();
+            int z = (int) p.getZ();
+            BaseColor color = new BaseColor(x, y, z);
+            schemeColors.add(color);
+        }
+        return schemeColors;
+    }*/
+
+    //TODO: Add JavaDoc
+    private static Color checkContrastAWT(BaseColor color) {
+        BaseColor col = checkContrast(color);
+        return new Color(col.getRed(), col.getGreen(), col.getBlue());
+    }
+
+    //TODO: Add JavaDoc
+    private static BaseColor checkContrast(BaseColor color) {
+        //check against white
+        double whiteContrast = ContrastChecker.getConstrastRatio(color, BaseColor.WHITE);
+
+        //check against black
+        double blackContrast = ContrastChecker.getConstrastRatio(color, BaseColor.BLACK);
+
+        //compare contrast
+        if (whiteContrast > blackContrast) {
+            return BaseColor.WHITE;
+        }
+        return BaseColor.BLACK;
+    }
+
+    //TODO: Add JavaDoc
+    private static String getHex(BaseColor color) {
+        return String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
+    }
+
+    //TODO: Add JavaDoc
+    private static Font getMulish(float fontSize) {
+        return FontFactory.getFont("mulish regular", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, fontSize, Font.NORMAL, BaseColor.BLACK);
+    }
+
+    //TODO: Add JavaDoc
+    private static Font getMulish(float fontSize, String fontWeight, Color color) {
+        return FontFactory.getFont("src/main/resources/de/colorscheme/main/fonts/Mulish-" + fontWeight + ".ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, fontSize, Font.NORMAL, new BaseColor(color.getRGB()));
+    }
+
+    //TODO: Add JavaDoc
+    private static void checkNewPage(Document doc) {
+        if (writer.getVerticalPosition(true) < 250) {
+            doc.newPage();
+        }
+    }
+
+    //TODO: Add JavaDoc
+    private static void checkNewPage(Document doc, double h) {
+        if (writer.getVerticalPosition(true) - h < 61F) {
+            doc.newPage();
         }
     }
 
@@ -439,6 +1090,35 @@ public class OutputColors {
         avg.setIndentationLeft(220);
         avg.add(avgColor);
         doc.add(avg);
+    }
+
+    //TODO: New
+    /**
+     * Adds the description of the average HSB values of the main colors to the {@link Document}.
+     *
+     * @param hsbColors A {@link Float} array: The average HSB values of the main colors
+     * @return A {@link String} array: The description of the average HSB values of the main colors
+     */
+    private static String[] getAverage(float[] hsbColors) {
+        hsbColors[0] /= getCentroids();
+        hsbColors[1] /= getCentroids();
+        hsbColors[2] /= getCentroids();
+
+        String color = getResBundle().getString("avgColorPre") +
+                determineHue(hsbColors[0]);
+
+        String saturation = (hsbColors[1] < 0.5 ? getResBundle().getString("avgSaturationUnSat")
+                : getResBundle().getString("avgSaturationSat"))
+                .concat(String.format(" (%s %.2f %%)",
+                        getResBundle().getString("avgSaturation"),
+                        hsbColors[1] * 100));
+
+        String brightness = (hsbColors[2] < 0.5 ? getResBundle().getString("avgBrightnessDark")
+                : getResBundle().getString("avgBrightnessLight"))
+                .concat(String.format(" (%s %.2f %%)",
+                        getResBundle().getString("avgBrightness"),
+                        hsbColors[2] * 100));
+        return new String[]{color, saturation, brightness};
     }
 
     /**
@@ -613,5 +1293,25 @@ public class OutputColors {
      */
     protected static String fileName(String path) {
         return new File(path).getName();
+    }
+
+    //TODO: Add JavaDoc
+    private static float[] hexToRgb(String hex) {
+        if (hex.startsWith("#")) {
+            hex = hex.substring(1);
+        }
+        if (hex.length() > 6) {
+            throw new IllegalArgumentException("Hex value is too long! Expected length: 6, actual length: " + hex.length());
+        }
+        float red = Integer.valueOf(hex.substring(0, 2), 16);
+        float green = Integer.valueOf(hex.substring(2, 4), 16);
+        float blue = Integer.valueOf(hex.substring(4, 6), 16);
+        return new float[]{red, green, blue};
+    }
+
+    //TODO: Add JavaDoc
+    private static Color hexToColor(String hex) {
+        float[] rgb = hexToRgb(hex);
+        return new Color((int) rgb[0], (int) rgb[1], (int) rgb[2]);
     }
 }

@@ -378,6 +378,26 @@ public class NewController implements Initializable {
         }
     }
 
+    /**
+     * Creates the output file and writes the color scheme to it
+     */
+    @FXML
+    private void downloadFile() {
+        if (!autoDownload.isSelected()) {
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            directoryChooser.setTitle(bundle.getString("chooseDirSaveIn"));
+            directoryChooser.setInitialDirectory(Path.of(System.getProperty("user.home")).toFile());
+            File chosen = directoryChooser.showDialog(getStage());
+            if (chosen != null) {
+                OutputColors.setDownloadPath(String.valueOf(chosen.toPath()));
+                createOutput(getColorData(), fileName);
+                progressTextField.appendText(bundle.getString("startDownloaded"));
+            }
+        } else {
+            createOutput(getColorData(), fileName);
+        }
+    }
+
 
     /**
      * An inner class that extends {@link Task} and is used to read the image and generate the color scheme
@@ -472,26 +492,6 @@ public class NewController implements Initializable {
                 image = resize(image);
             }
             return image;
-        }
-
-        /**
-         * Creates the output file and writes the color scheme to it
-         */
-        @FXML
-        private void downloadFile() {
-            if (!autoDownload.isSelected()) {
-                DirectoryChooser directoryChooser = new DirectoryChooser();
-                directoryChooser.setTitle(bundle.getString("chooseDirSaveIn"));
-                directoryChooser.setInitialDirectory(Path.of(System.getProperty("user.home")).toFile());
-                File chosen = directoryChooser.showDialog(getStage());
-                if (chosen != null) {
-                    OutputColors.setDownloadPath(String.valueOf(chosen.toPath()));
-                    createOutput(getColorData(), fileName);
-                    progressTextField.appendText(bundle.getString("startDownloaded"));
-                }
-            } else {
-                createOutput(getColorData(), fileName);
-            }
         }
     }
 }

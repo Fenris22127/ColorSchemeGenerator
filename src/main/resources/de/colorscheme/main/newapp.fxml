@@ -88,7 +88,7 @@
          </TitledPane>
          <HBox alignment="BOTTOM_LEFT" prefWidth="200.0">
             <children>
-               <Button fx:id="downloadBtn" disable="true" mnemonicParsing="false" text="Download" />
+               <Button fx:id="downloadBtn" disable="true" mnemonicParsing="false" onAction="#downloadFile" text="Download" />
                <Region prefWidth="200.0" HBox.hgrow="ALWAYS" />
                <ChoiceBox fx:id="languageChoice" prefWidth="100.0" />
             </children>
