@@ -5,10 +5,10 @@ import javafx.geometry.Point3D;
 import java.util.AbstractCollection;
 
 import static de.colorscheme.app.AppController.*;
-import static de.colorscheme.app.NewController.getResBundle;
+import static de.colorscheme.app.AppController.getResBundle;
 
 /**
- * The class providing the methods for the KMeans clustering process used to determine the image's main colours. <br>
+ * The class providing the methods for the KMeans clustering process used to determine the image's main colors. <br>
  *
  * @author &copy; 2023 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
  * @version 1.2
@@ -23,7 +23,7 @@ public class KMeans {
     private static final Double PRECISION = 0.0;
 
     /**
-     * The amount of centroids to be generated for KMeans, determining how many colors will be generated from the image
+     * The number of centroids to be generated for KMeans, determining how many colors will be generated from the image
      */
     private static int centroids = 0;
 
@@ -34,7 +34,7 @@ public class KMeans {
     }
 
     /**
-     * Returns amount of centroids to be generated for KMeans
+     * Returns number of centroids to be generated for KMeans
      *
      * @return An {@link Integer}: The value of {@link #centroids}
      */
@@ -135,14 +135,13 @@ public class KMeans {
      *
      * @param colorData      A {@link ColorData} object: The instance used for all processes for the currently inspected
      *                       image
-     * @param totalCentroids An {@link Integer int}: The amount of centroids to be calculated
+     * @param totalCentroids An {@link Integer int}: The number of centroids to be calculated
      **/
     public static void kMeans(ColorData colorData, int totalCentroids) {
         centroids = totalCentroids;
         kMeansPlusPlus(colorData, centroids);
         if (colorData.getCentroids().isEmpty()) {
             addToOutputField(getResBundle().getString("emptyCentroidList"), true);
-            setCancelled(true);
         }
 
         Double sumSquaredErrors = Double.MAX_VALUE;

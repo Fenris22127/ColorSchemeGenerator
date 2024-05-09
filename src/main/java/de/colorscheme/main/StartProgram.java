@@ -1,9 +1,9 @@
 package de.colorscheme.main;
 
+import de.colorscheme.utils.FontUtils;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -12,8 +12,8 @@ import java.util.Objects;
 /**
  * The class which starts the application and loads the fxml file.
  *
- * @author &copy; 2023 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
- * @version 1.1
+ * @author &copy; 2024 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
+ * @version 1.2
  * @since 18.0.1
  */
 public class StartProgram extends Application {
@@ -42,8 +42,8 @@ public class StartProgram extends Application {
      */
     @Override
     public void start(Stage primaryStage) throws IOException {
-
-        loadFont(
+        FontUtils fontUtils = new FontUtils();
+        fontUtils.loadFont(
                 "QuattrocentoSans-Bold.TTF",
                 "QuattrocentoSans-Regular.TTF",
                 "Mulish-Regular.TTF",
@@ -52,20 +52,13 @@ public class StartProgram extends Application {
                 "Mulish-SemiBold.TTF");
 
         stage = primaryStage;
-        final FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("newapp.fxml"));
-        //Scene scene = new Scene(fxmlLoader.load(), 600, 600);
+        final FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("app.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 628, 712);
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("style.css")).toExternalForm());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("newstyle.css")).toExternalForm());
         stage.setTitle("Color Scheme Generator");
         stage.setScene(scene);
         stage.getIcons().add(new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResourceAsStream("logoFX.png"))));
 
         stage.show();
-    }
-
-    private void loadFont(String... fontName) {
-        for (String font : fontName)
-            Font.loadFont(Objects.requireNonNull(StartProgram.class.getResource("fonts/" + font)).toExternalForm(), 10);
     }
 }

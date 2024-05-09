@@ -11,7 +11,7 @@ sourceCompatibility = '18'
 targetCompatibility = '18'
 
 ext {
-    junitVersion = '5.9.0'
+    junitVersion = '5.11.0-M1'
 }
 
 tasks.withType(JavaCompile).configureEach {

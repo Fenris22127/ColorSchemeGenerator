@@ -1,7 +1,6 @@
 package de.colorscheme.clustering;
 
 import de.colorscheme.app.AppController;
-import de.colorscheme.app.NewController;
 import de.fenris.logger.ColorLogger;
 import javafx.geometry.Point3D;
 
@@ -13,15 +12,14 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/*import static de.colorscheme.app.AppController.getResBundle;*/
-import static de.colorscheme.app.NewController.getResBundle;
+import static de.colorscheme.app.AppController.getResBundle;
 import static java.util.logging.Level.INFO;
 
 /**
  * Reads an image and stores all pixels rgb-values <br>
  * Contains the methods required in {@link KMeans}
  *
- * @author &copy; 2023 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
+ * @author &copy; 2024 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
  * @version 1.2
  * @since 17.0.1
  */
@@ -49,7 +47,7 @@ public class ColorData {
      */
     private final LinkedList<Point3D> centroids = new LinkedList<>();
     /**
-     * Used to store the amount of pixels in the image to test for possible errors while recording pixels to list
+     * Used to store the number of pixels in the image to test for possible errors while recording pixels to list
      */
     private double pixelCount = 0;
     /**
@@ -89,8 +87,8 @@ public class ColorData {
      * <span color="#6897BB">width * height</span> match the number of elements stored in {@link #pixelColor}. <br>
      * If the {@link #pixelCount total amount of pixels} and the amount of pixels stored in {@link #pixelColor} differ,
      * a custom exception {@link PixelListSizeException PixelListSizeException} is thrown and the
-     * {@link javafx.concurrent.Task task} in {@link AppController} is cancelled. The user is informed about
-     * the error via the textfield.
+     * {@link javafx.concurrent.Task task} in {@link AppController} is canceled.
+     * The user is informed about the error via the text field.
      *
      * @param image A {@link BufferedImage}: The image to be read
      **/
@@ -99,7 +97,7 @@ public class ColorData {
             double width = image.getWidth();
             double height = image.getHeight();
 
-            //Read pixel to color, then to Point3D and store in list
+            //Read pixel to color, then to Point3D and store in the list
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
                     Color c = new Color(image.getRGB(x, y));
@@ -115,17 +113,13 @@ public class ColorData {
             if ((int) pixelCount != pixelColor.size()) {
                 throw new PixelListSizeException("");
             }
-        }
-        //recorded pixels and total pixels in image differ
-        catch (PixelListSizeException e) {
-            NewController.addToOutputField(getResBundle().getString("pixelError") + System.lineSeparator() +
+        } catch (PixelListSizeException e) { //recorded pixels and total pixels in image differ
+            AppController.addToOutputField(getResBundle().getString("pixelError") + System.lineSeparator() +
                     getResBundle().getString("pixelErrorExpected") + (int) pixelCount + System.lineSeparator() +
                     getResBundle().getString("pixelErrorActual") + pixelColor.size(), true);
-            AppController.setCancelled(true);
 
             LOGGER.log(Level.SEVERE, String.format("%s: Expected and actual amount of pixels differ! Expected: %e%nActual: %d%n",
                     e.getClass().getSimpleName(), pixelCount, pixelColor.size()));
-            e.printStackTrace();
         }
     }
 
@@ -147,14 +141,14 @@ public class ColorData {
         if (originalWidth > originalHeight) {
             //scale width to fit
             newWidth = 150;
-            //scale height to maintain aspect ratio
+            //scale height to maintain the aspect ratio
             newHeight = (newWidth * originalHeight) / originalWidth;
         }
         // first check if we need to scale width
         if (originalWidth < originalHeight) {
             //scale width to fit
             newHeight = 150;
-            //scale height to maintain aspect ratio
+            //scale height to maintain the aspect ratio
             newWidth = (newHeight * originalWidth) / originalHeight;
         }
         if (originalWidth == originalHeight) {
@@ -216,9 +210,8 @@ public class ColorData {
      *         the {@link Point3D point} given to the method
      *     </li>
      *     <li>
-     *         If no minimum has been set yet, meaning {@link #minimum} is
-     *         <code color="#B5B5B5">(x: -1, y: -1, z: -1</code>, the {@link Point3D point} given to the method will
-     *         be set as the new {@link #minimum}
+     *         If no minimum has been set yet, ({@link #minimum} = <code color="#B5B5B5">(x: -1, y: -1, z: -1)</code>,
+     *         the {@link Point3D point} given to the method will be set as the new {@link #minimum}
      *     </li>
      *     <li>
      *         If {@link #minimum} has been set already, check, if the {@link Point3D point} given to the method
@@ -238,12 +231,10 @@ public class ColorData {
         double y = p.getY();
         double z = p.getZ();
 
-        //if no minimum has been set yet, set current point to minimum
+        //if no minimum has been set yet, set the current point as the minimum
         if (minimum.equals(new Point3D(-1, -1, -1))) {
             minimum = p;
-        }
-        //check for smaller coordinates and update minimum accordingly
-        else {
+        } else { //check for smaller coordinates and update the minimum accordingly
             if (x < minimum.getX() ||
                     y < minimum.getY() ||
                     z < minimum.getZ()) {
@@ -296,12 +287,10 @@ public class ColorData {
         double y = p.getY();
         double z = p.getZ();
 
-        //if no maximum has been set yet, set current point to maximum
+        //if no maximum has been set yet, set the current point as the maximum
         if (maximum.equals(new Point3D(256, 256, 256))) {
             maximum = p;
-        }
-        //check for larger coordinates and update maximum accordingly
-        else {
+        } else { //check for larger coordinates and update the maximum accordingly
             if (x > maximum.getX() ||
                     y > maximum.getY() ||
                     z > maximum.getZ()) {
@@ -331,7 +320,7 @@ public class ColorData {
      * (<code color="#B5B5B5">pixelColor.length()</code>), adds the x, y and z values
      * to the sum of x, y and z values of the other {@link Point3D points} in the cluster. <br>
      * When the iteration is finished, the average value for x, y and z is calculated by dividing the sum by the
-     * total amount of pixels in the cluster. <br>
+     * total number of pixels in the cluster. <br>
      *
      * @param pointsInCluster List of all {@link Point3D points} in a cluster
      * @return A {@link Point3D} with the average values for x, y and z of the {@link Point3D points} in a cluster
@@ -381,7 +370,7 @@ public class ColorData {
      * Recomputes all centroids by using the {@link #calculateCentroid(int) calculateCentroid()} method <br>
      * Adds the recomputed centroid to the {@link LinkedList} {@link #centroids}
      *
-     * @param totalCentroids Total amount of centroids
+     * @param totalCentroids Total number of centroids
      */
     protected void recomputeCentroids(int totalCentroids) {
         for (int i = 0; i < totalCentroids; i++) {
@@ -449,8 +438,8 @@ public class ColorData {
 
     /**
      * ✓ <i>Successfully calculates centroids as far away from each other as possible</i> <br>
-     * Calculates a weighted centroid based on roulette wheel selection with the fitness being the distance of a pixel
-     * to its nearest centroid
+     * Calculates a weighted centroid based on roulette-wheel selection
+     * with the fitness being the distance of a pixel to its nearest centroid
      * <ol>
      *     <li>
      *         Sets the sum of the total fitness of all pixels to 0
@@ -481,7 +470,7 @@ public class ColorData {
         //Total sum of fitness
         double totalSum = 0.0;
 
-        //Calculate total sum of fitness: Only pixels that are not centroids will be added to the sum
+        //Calculate the total sum of fitness: Only pixels that are not centroids will be added to the sum
         for (int currentPxIndex = (pixelColor.size() - 1); currentPxIndex >= 0; currentPxIndex--) {
             if (!indicesOfCentroids.contains(currentPxIndex)) {
                 totalSum += fitness(currentPxIndex);
@@ -491,17 +480,18 @@ public class ColorData {
         //Set threshold: If crossed, the element crossing it will be selected
         double threshold = random.nextDouble(0, totalSum);
 
-        //The sum of all elements together until threshold is reached
+        //The sum of all elements together until the threshold is reached
         double currentSum = 0.0;
 
         //Select pixel based on chance and fitness: Only pixels that are not centroids may be selected
         for (int currentPxIndex = (pixelColor.size() - 1); currentPxIndex >= 0; currentPxIndex--) {
             if (!indicesOfCentroids.contains(currentPxIndex)) {
 
-                //Add fitness of currently selected element to partial sum of previous elements fitness
+                //Add fitness of the currently selected element to the partial sum of previous elements fitness
                 currentSum += fitness(currentPxIndex);
 
-                //Check, if sum added fitness of current element exceeds the threshold and return pixel, if it does
+                //Check, if the sum added fitness of the current element exceeds the threshold
+                //and return the pixel if it does
                 if (currentSum >= threshold) {
                     indicesOfCentroids.add(currentPxIndex);
                     return pixelColor.get(currentPxIndex).getPixel();
@@ -547,7 +537,7 @@ public class ColorData {
     private double fitness(int pixelNr) {
         double distClosestCentroid = Double.MAX_VALUE;
 
-        //if no centroids have been set yet, return highest number
+        //if no centroids have been set yet, return the highest number
         //(no centroids = no closest centroid to be found)
         if (indicesOfCentroids.isEmpty()) {
             return distClosestCentroid;
@@ -658,7 +648,7 @@ public class ColorData {
      */
     static class Pixels {
         /**
-         * {@link Point3D} storing a pixel's colour with {@link Color#getRed() red} as the {@link Point3D#getX() x},
+         * {@link Point3D} storing a pixel's color with {@link Color#getRed() red} as the {@link Point3D#getX() x},
          * {@link Color#getGreen() green} as the {@link Point3D#getY() y}
          * and {@link Color#getBlue() blue} as the {@link Point3D#getZ() z} coordinates
          */

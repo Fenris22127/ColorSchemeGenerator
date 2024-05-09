@@ -10,12 +10,6 @@
     -fx-darker-grey: #A9ABAC;
 }
 
-#background{
-    /*-fx-background-image: url("Hover2.png");
-    -fx-background-repeat: no-repeat;
-    -fx-background-size: cover;*/
-}
-
 #icon {
     -fx-background-image: url("LogoOutline.png");
     -fx-background-size: 79 auto;
@@ -200,7 +194,8 @@
     -fx-focus-color: rgba(0, 0, 0, 0.15);
 }
 
-.titled-pane {
+.titled-pane,
+.titled-pane:disabled {
     -fx-background-color: transparent;
     -fx-background-radius: 0.8em;
     -fx-border-width: 0.12em;
@@ -217,6 +212,17 @@
     -fx-font-family: "Mulish SemiBold";
     -fx-font-size: 16px;
     -fx-text-fill: black;
+    -fx-padding: 0.5em 0.7em 0.5em 0.7em;
+}
+
+.titled-pane:disabled > .title,
+.titled-pane:collapsed:disabled > .title,
+.titled-pane:focused:disabled > .title
+{
+    -fx-background-color: transparent;
+    -fx-font-family: "Mulish SemiBold";
+    -fx-font-size: 16px;
+    -fx-text-fill: -fx-darker-grey;
     -fx-padding: 0.5em 0.7em 0.5em 0.7em;
 }
 

@@ -4,7 +4,6 @@ import de.colorscheme.clustering.ColorData;
 import de.colorscheme.output.ColorHarmony;
 import de.colorscheme.output.OutputColors;
 import de.fenris.logger.ColorLogger;
-import javafx.animation.AnimationTimer;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -14,90 +13,70 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.util.converter.NumberStringConverter;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.colorscheme.clustering.ColorData.resize;
-import static de.colorscheme.clustering.KMeans.kMeans;
 import static de.colorscheme.main.StartProgram.getStage;
 import static de.colorscheme.output.OutputColors.createOutput;
 
 /**
  * The controller for the FXML file which is the main window of the program.
  *
- * @author &copy; 2023 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
- * @version 1.2
+ * @author &copy; 2024 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
+ * @version 2.0
  * @since 18.0.1
  */
 public class AppController implements Initializable {
     /**
      * A {@link Boolean} indicating whether the program is in debug mode or not.
      */
-    private static final boolean IS_DEBUG = false;
+    protected static final boolean IS_DEBUG = false;
     /**
      * Creates a {@link ColorLogger} for this class
      */
     private static final Logger LOGGER = ColorLogger.newLogger(AppController.class.getName());
     /**
-     * The {@link Image} which is displayed when the process has been completed
+     * The path to the user's home directory
      */
-    private static final ImageView done = new ImageView(Objects.requireNonNull(AppController.class.getResource("done.png")).toExternalForm());
+    private static final String USER_HOME = System.getProperty("user.home");
+    /**
+     * A {@link List} containing the different color harmonies that can be used to calculate from the main colors.
+     */
+    private static final List<ColorHarmony> harmony = new LinkedList<>();
     /**
      * The {@link ResourceBundle} containing the {@link String}s for the program in the language chosen by the user
      */
-    private static ResourceBundle bundle;
+    protected static ResourceBundle bundle;
     /**
-     * A {@link Boolean} indicating whether the process has been cancelled or not
+     * The {@link Scene} object for the current scene
      */
-    private static boolean cancelled = false;
-
+    private static Scene currentScene;
     /**
      * The {@link ColorData} object used for all processes for the currently inspected image
      */
     private static ColorData colorData;
-
     /**
      * The {@link StringProperty} for the {@link Label} displaying the progress in the GUI
      */
     private static StringProperty textProp;
-    private static Scene currentScene;
-    private static ColorHarmony harmony = ColorHarmony.COMPLEMENTARY;
-    @FXML
-    private static ToggleButton complementary;
-    @FXML
-    private static ToggleButton splitComplementary;
-    @FXML
-    private static ToggleButton analogous;
-    @FXML
-    private static ToggleButton triadic;
-    @FXML
-    private static ToggleButton tetradic;
-    @FXML
-    private static ToggleButton monochromatic;
 
     static {
         String language = System.getProperty("user.language");
@@ -108,52 +87,71 @@ public class AppController implements Initializable {
         }
     }
 
-    public HBox colorsBox;
     /**
      * The {@link Path} containing the path to the image chosen by the user
      */
     protected Path fileName;
-    @FXML
-    private VBox basePane;
-    @FXML
-    private Pane harmonicPane;
-    @FXML
-    private CheckBox includeHarmonics;
     /**
-     * The {@link TextArea} displaying the progress of the process in text form
+     * The {@link Button} for uploading an image
      */
     @FXML
-    private TextArea progressTextField;
+    private Button uploadButton;
     /**
-     * The {@link Spinner} for the number of colors the user wants to have in the resulting color scheme
+     * The {@link HBox} containing the start button and the progress bar
      */
     @FXML
-    private Spinner<Integer> numberColors;
+    private HBox startBox;
     /**
-     * The {@link CheckBox} for enabling or disabling the auto-download feature
+     * The {@link Button} for starting the process
      */
     @FXML
-    private CheckBox checkbox;
+    private Button startBtn;
+    /**
+     * The {@link Button} for re-uploading an image
+     */
+    @FXML
+    private Button reuploadButton;
+    /**
+     * The {@link Button} for downloading the color scheme
+     */
+    @FXML
+    private Button downloadBtn;
+    /**
+     * The {@link VBox} containing the upload pane
+     */
+    @FXML
+    private VBox uploadPane;
+    /**
+     * The {@link VBox} containing the progress bar and the progress text field
+     */
+    @FXML
+    private VBox progressBox;
+    /**
+     * The {@link Spinner} for choosing the number of colors in the color scheme
+     */
+    @FXML
+    private Spinner<Integer> spinner;
     /**
      * The {@link ProgressBar} displaying the progress of the process
      */
     @FXML
     private ProgressBar progressBar;
     /**
-     * The {@link Label} displaying the progress of the process in percent
+     * The {@link TextArea} displaying the progress of the process
      */
     @FXML
-    private Label progressLabel;
+    private TextArea progressTextField;
     /**
-     * The {@link Label} displaying the icon indicating that the process has been completed
+     * The {@link TitledPane} containing the different color harmonies
+     * that can be used to calculate from the main colors
      */
     @FXML
-    private Label progressImage;
+    private TitledPane harmonicsDropdown;
     /**
-     * The {@link Button} for downloading the resulting color scheme
+     * The {@link Label} for the {@link #spinner}
      */
     @FXML
-    private Button download;
+    private Label numberOfColors;
     /**
      * The {@link ChoiceBox} for choosing the language of the program. Currently only English and German are supported.
      */
@@ -165,43 +163,60 @@ public class AppController implements Initializable {
     @FXML
     private Label title;
     /**
-     * The {@link Image} which is displayed in the {@link ImageView} after the user has chosen an image
+     * The {@link Label} displaying the progress of the process
      */
     @FXML
-    private ImageView imageFrame;
+    private Label progressLabel;
     /**
-     * The {@link Label} displaying the text for {@link #numberColors}
+     * The {@link Label} displaying the name of the file chosen by the user
      */
     @FXML
-    private Label colorAmountLabel;
+    private Label fileNameLabel;
     /**
-     * The {@link Button} for uploading an image
+     * The {@link CheckBox} for automatically downloading the color scheme
      */
     @FXML
-    private Button upload;
+    private CheckBox autoDownload;
     /**
-     * The {@link Tab} with the main content of the program
+     * The {@link CheckBox} for adding harmonics to the color scheme
      */
     @FXML
-    private Tab generateTab;
+    private CheckBox addHarmonics;
     /**
-     * The {@link Tab} with uploaded image
+     * The {@link ToggleButton}s for the complementary color harmony
      */
     @FXML
-    private Tab imageTab;
+    private ToggleButton complementary;
     /**
-     * The {@link Label} displaying the text for when no image has been selected for {@link #imageFrame} to display
+     * The {@link ToggleButton}s for the monochromatic color harmony
      */
     @FXML
-    private Label noImageLabel;
-    private HBox hbox;
-    private double height = 0;
-    private double opacity = 1;
+    private ToggleButton monochromatic;
+    /**
+     * The {@link ToggleButton}s for the analogous color harmony
+     */
+    @FXML
+    private ToggleButton analogous;
+    /**
+     * The {@link ToggleButton}s for the split complementary color harmony
+     */
+    @FXML
+    private ToggleButton splitcomplementary;
+    /**
+     * The {@link ToggleButton}s for the triadic color harmony
+     */
+    @FXML
+    private ToggleButton triadic;
+    /**
+     * The {@link ToggleButton}s for the tetradic color harmony
+     */
+    @FXML
+    private ToggleButton tetradic;
 
     /**
-     * Returns the {@link TextField} displaying the progress of the process
+     * Returns the {@link TextArea} displaying the progress of the process
      *
-     * @return A {@link TextField}: The TextField displaying the progress of the process
+     * @return A {@link TextArea}: The TextField displaying the progress of the process
      */
     public static TextArea getTextField() {
         Node node = currentScene.lookup("#progressTextField");
@@ -213,21 +228,58 @@ public class AppController implements Initializable {
     }
 
     /**
-     * Sets {@link #cancelled} to {@code true} and cancels the process
+     * Returns the {@link List} of {@link ColorHarmony}s that are to be included in the color scheme
      *
-     * @param isCancelled A {@link Boolean}: {@code true} if the process has been cancelled, {@code false} otherwise
+     * @return A {@link List} of {@link ColorHarmony}s: The color harmonies to be included in the color scheme
      */
-    public static void setCancelled(boolean isCancelled) {
-        cancelled = isCancelled;
+    public static List<ColorHarmony> getHarmony() {
+        return harmony;
     }
 
-    /*public static ResourceBundle getResBundle() {
-        return bundle;
-    }*/
+    /**
+     * Adds or removes the harmonies from the list of harmonies to be included in the color scheme
+     *
+     * @param actionEvent The {@link ActionEvent} that triggered the method
+     */
+    private void setHarmony(ActionEvent actionEvent) {
+        ToggleButton tBtn = (ToggleButton) actionEvent.getSource();
+        ToggleButton button = (ToggleButton) actionEvent.getSource();
+        if (!button.isSelected()) {
+            styleButtons(tBtn, tBtn.getId().concat("_light"));
+            harmony.remove(ColorHarmony.valueOf(button.getId().toUpperCase()));
+        } else {
+            switch (button.getId()) {
+                case "complementary" -> harmony.add(ColorHarmony.COMPLEMENTARY);
+                case "splitcomplementary" -> harmony.add(ColorHarmony.SPLITCOMPLEMENTARY);
+                case "analogous" -> harmony.add(ColorHarmony.ANALOGOUS);
+                case "triadic" -> harmony.add(ColorHarmony.TRIADIC);
+                case "tetradic" -> harmony.add(ColorHarmony.TETRADIC);
+                case "monochromatic" -> harmony.add(ColorHarmony.MONOCHROMATIC);
+                default -> throw new IllegalStateException("Unexpected value: " + button.getId());
+            }
+        }
+    }
 
+    /**
+     * Returns the {@link ResourceBundle} containing the {@link String}s for the program in the language
+     * chosen by the user
+     *
+     * @return A {@link ResourceBundle}:
+     * The {@link ResourceBundle} containing the {@link String}s for the program in the language chosen by the user
+     */
+    public static ResourceBundle getResBundle() {
+        return bundle;
+    }
+
+    /**
+     * Adds a {@link String} to the {@link TextArea} displaying the progress of the process
+     *
+     * @param text    A {@link String}: The text to be added to the {@link TextArea}
+     * @param isError A {@link Boolean}: Whether the text is an error message or not
+     */
     public static void addToOutputField(String text, boolean isError) {
         if (isError) {
-            Objects.requireNonNull(getTextField()).setStyle("-fx-text-fill: red");
+            Objects.requireNonNull(getTextField()).setStyle("-fx-text-fill: #cc0000");
             Objects.requireNonNull(getTextField()).appendText(text + System.lineSeparator());
             Objects.requireNonNull(getTextField()).setStyle("-fx-text-fill: black");
         } else {
@@ -235,117 +287,89 @@ public class AppController implements Initializable {
         }
     }
 
+    /**
+     * Opens a file chooser for the user to choose an image
+     *
+     * @return A {@link Path}: The path to the image chosen by the user
+     */
     private static Path selectFile() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(bundle.getString("selectImgUpload"));
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.bmp", "*.gif"));
-        fileChooser.setInitialDirectory(Path.of(System.getProperty("user.home")).toFile());
+        fileChooser.setInitialDirectory(Path.of(USER_HOME).toFile());
         File chosen = fileChooser.showOpenDialog(getStage());
 
         return chosen == null ? null : chosen.toPath();
     }
 
-    public void setScene(Scene scene) {
-        currentScene = scene;
-    }
-
-    public ColorData getColorData() {
+    /**
+     * Gets the {@link ColorData} object used for all processes for the currently inspected image
+     *
+     * @return A {@link ColorData}: The {@link ColorData} object used for all processes for the currently inspected image
+     */
+    public static ColorData getColorData() {
         return colorData;
     }
 
+    /**
+     * Sets the {@link ColorData} object used for all processes for the currently inspected image
+     *
+     * @param data A {@link ColorData}: The {@link ColorData} object used for all processes for the currently inspected image
+     */
     public static void setColorData(ColorData data) {
         colorData = data;
     }
 
     /**
-     * The setup methods that's called when the program is started
+     * Initializes the GUI
      *
-     * @param location  The location used to resolve relative paths for the root object, or
-     *                  {@code null} if the location is not known.
-     * @param resources The resources used to localize the root object, or {@code null} if
-     *                  the root object was not localized.
+     * @param url            The {@link URL} of the FXML file
+     * @param resourceBundle The {@link ResourceBundle} containing the {@link String}s for the program in the language chosen by the user
      */
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        setScene(numberColors.getScene());
-        numberColors.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 10, 4));
-        IntegerProperty progressProp = new SimpleIntegerProperty((int) progressBar.getProgress());
-        textProp = progressLabel.textProperty();
-        Bindings.bindBidirectional(textProp, progressProp, new NumberStringConverter("#'%'"));
-        done.setPreserveRatio(true);
-        done.setFitHeight(32);
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Hide the box for starting the process, the progress bar and the label containing the file name
+        startBox.setVisible(false);
+        startBox.setManaged(false);
+        progressBox.setVisible(false);
+        progressBox.setManaged(false);
+        progressTextField.setVisible(false);
+        progressTextField.setManaged(false);
+        fileNameLabel.setVisible(false);
+        fileNameLabel.setManaged(false);
 
+        // Set the image for the upload button
+        ImageView imageView = new ImageView(Objects.requireNonNull(getClass().getResource("upload_darker.png")).toExternalForm());
+        imageView.setPreserveRatio(true);
+        imageView.setFitHeight(25);
+        uploadButton.setGraphic(imageView);
+        uploadButton.setGraphicTextGap(13);
+
+        // Set the image for the re-upload button
+        imageView = new ImageView(Objects.requireNonNull(getClass().getResource("upload_darker.png")).toExternalForm());
+        imageView.setPreserveRatio(true);
+        imageView.setFitHeight(18);
+        reuploadButton.setGraphic(imageView);
+        reuploadButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+        // Styles the buttons for the different color harmonies
+        styleButtons(complementary, "complementary_light");
+        styleButtons(monochromatic, "monochromatic_light");
+        styleButtons(analogous, "analogous_light");
+        styleButtons(splitcomplementary, "splitcomplementary_light");
+        styleButtons(triadic, "triadic_light");
+        styleButtons(tetradic, "tetradic_light");
+
+        // Styles the spinner for choosing the number of colors
+        spinner.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
+        spinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 6, 4));
+
+        // Sets the available languages in the choice box
         languageChoice.setItems(FXCollections.observableList(List.of("English", "Deutsch")));
         languageChoice.setValue("Language");
 
-        Image compIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icons/complementary_icon.png")), 30, 30, true, true);
-        complementary = new ToggleButton();
-        complementary.setId("complementary");
-        complementary.setGraphic(new ImageView(compIcon));
-        complementary.setStyle("-fx-background-radius: 50px; -fx-padding: 0;");
-
-        Image monoIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icons/monochromatic_icon.png")), 30, 30, true, true);
-        monochromatic = new ToggleButton();
-        monochromatic.setId("monochromatic");
-        monochromatic.setGraphic(new ImageView(monoIcon));
-        monochromatic.setStyle("-fx-background-radius: 50px; -fx-padding: 0;");
-
-        Image analogIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icons/analogous_icon.png")), 30, 30, true, true);
-        analogous = new ToggleButton();
-        analogous.setId("analogous");
-        analogous.setGraphic(new ImageView(analogIcon));
-        analogous.setStyle("-fx-background-radius: 50px; -fx-padding: 0;");
-
-        Image splitCompIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icons/split-complementary_icon.png")), 30, 30, true, true);
-        splitComplementary = new ToggleButton();
-        splitComplementary.setId("split_complementary");
-        splitComplementary.setGraphic(new ImageView(splitCompIcon));
-        splitComplementary.setStyle("-fx-background-radius: 50px; -fx-padding: 0;");
-
-        Image triIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icons/triadic_icon.png")), 30, 30, true, true);
-        triadic = new ToggleButton();
-        triadic.setId("triadic");
-        triadic.setGraphic(new ImageView(triIcon));
-        triadic.setStyle("-fx-background-radius: 50px; -fx-padding: 0 1px 0 0;");
-
-        Image tetIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icons/tetradic_icon.png")), 30, 30, true, true);
-        tetradic = new ToggleButton();
-        tetradic.setId("tetradic");
-        tetradic.setGraphic(new ImageView(tetIcon));
-        tetradic.setStyle("-fx-background-radius: 50px; -fx-padding: 0 1px 0 0;");
-
-        hbox = new HBox();
-        hbox.setSpacing(10);
-        hbox.setPadding(new Insets(5, 0, 0, 5));
-
-        List<ToggleButton> buttons = List.of(complementary, splitComplementary, analogous, triadic, tetradic, monochromatic);
-        for (ToggleButton button : buttons) {
-            button.getGraphic().setOpacity(0);
-            button.setPrefSize(40, 40);
-            button.setMaxSize(40, 40);
-            button.setMinSize(40, 40);
-            button.setOnAction(this::toggleButton);
-
-            button.setClip(new Rectangle(42, 42));
-        }
-        AnimationTimer collapse = new CollapsePane();
-        AnimationTimer expand = new ExpandPane();
-        includeHarmonics.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, event -> {
-            if (includeHarmonics.isSelected()) {
-                collapse.stop();
-                expand.start();
-            } else {
-                expand.stop();
-                collapse.start();
-            }
-        });
-        hbox.setPrefSize(400, 0);
-        hbox.setMaxHeight(0);
-        hbox.setMinHeight(0);
-        harmonicPane.getChildren().add(hbox);
-
-
+        // Sets the language of the program according to the choice of the user
         languageChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             bundle = switch (newValue.intValue()) {
                 case 0 -> ResourceBundle.getBundle("messages_EN");
@@ -353,85 +377,203 @@ public class AppController implements Initializable {
                 default -> throw new IllegalStateException("Unexpected value: " + newValue.intValue());
             };
             title.setText(bundle.getString("appTitle"));
-            colorAmountLabel.setText(bundle.getString("appColorAmount"));
-            checkbox.setText(bundle.getString("appAutoDownload"));
-            includeHarmonics.setText(bundle.getString("appIncludeHarmonics"));
-            download.setText(bundle.getString("appDownload"));
-            upload.setText(bundle.getString("appUpload"));
-            generateTab.setText(bundle.getString("appGenerate"));
-            imageTab.setText(bundle.getString("appImage"));
-            noImageLabel.setText(bundle.getString("appNoImage"));
+            autoDownload.setText(bundle.getString("appAutoDownload"));
+            numberOfColors.setText(bundle.getString("appColorAmount"));
+            addHarmonics.setText(bundle.getString("appIncludeHarmonics"));
+            downloadBtn.setText(bundle.getString("appDownload"));
+            uploadButton.setText(bundle.getString("appUpload"));
+            harmonicsDropdown.setText(bundle.getString("appHarmonics"));
         });
 
-        if (IS_DEBUG) {
-            LOGGER.log(Level.INFO, "Spinner Default Value: {0}", numberColors.getValue());
+        // Binds the progress bar to the progress label
+        IntegerProperty progressProp = new SimpleIntegerProperty((int) progressBar.getProgress());
+        textProp = progressLabel.textProperty();
+        Bindings.bindBidirectional(textProp, progressProp, new NumberStringConverter("#'%'"));
+
+    }
+
+    /**
+     * Styles the buttons for the different color harmonies
+     *
+     * @param button   The {@link ToggleButton} to be styled
+     * @param fileName The name of the file containing the icon for the button
+     */
+    private void styleButtons(ToggleButton button, String fileName) {
+        int iconSize = 42;
+        ImageView imageView = new ImageView(Objects.requireNonNull(getClass().getResource("icons/" + fileName + ".png")).toExternalForm());
+        imageView.setPreserveRatio(true);
+        imageView.setFitHeight(iconSize);
+        button.setGraphic(imageView);
+        button.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+    }
+
+    /**
+     * Toggles the visibility of the harmonics dropdown
+     *
+     * @param event The {@link ActionEvent} that triggered the method
+     */
+    @FXML
+    private void toggleHarmonicsCheckbox(ActionEvent event) {
+        CheckBox check = (CheckBox) event.getSource();
+        if (check.isSelected()) {
+            harmonicsDropdown.setDisable(false);
+            harmonicsDropdown.setExpanded(true);
+        } else {
+            harmonicsDropdown.setDisable(true);
+            harmonicsDropdown.setExpanded(false);
         }
     }
 
-    private void toggleButton(ActionEvent actionEvent) {
-        ToggleButton tBtn = (ToggleButton) actionEvent.getSource();
-        List<ToggleButton> buttons = List.of(complementary, splitComplementary, analogous, triadic, tetradic, monochromatic);
-        for (ToggleButton button : buttons) {
-            if (button != tBtn) {
-                button.setSelected(false);
-            } else {
-                button.setSelected(true);
-                switch (button.getId()) {
-                    case "complementary" -> harmony = ColorHarmony.COMPLEMENTARY;
-                    case "split_complementary" -> harmony = ColorHarmony.SPLIT_COMPLEMENTARY;
-                    case "analogous" -> harmony = ColorHarmony.ANALOGOUS;
-                    case "triadic" -> harmony = ColorHarmony.TRIADIC;
-                    case "tetradic" -> harmony = ColorHarmony.TETRADIC;
-                    case "monochromatic" -> harmony = ColorHarmony.MONOCHROMATIC;
-                    default -> throw new IllegalStateException("Unexpected value: " + button.getId());
-                }
-            }
+    /**
+     * Toggles the style of the buttons for the different color harmonies
+     * and adds or removes the harmonies from the list
+     *
+     * @param event The {@link ActionEvent} that triggered the method
+     */
+    @FXML
+    private void toggleBtn(ActionEvent event) {
+        ToggleButton o = (ToggleButton) event.getSource();
+        if (o.isSelected()) {
+            styleButtons(o, o.getId().concat("_selected"));
+        } else {
+            styleButtons(o, o.getId().concat("_light"));
         }
+        setHarmony(event);
+    }
+
+    /**
+     * Toggles the visibility of the start button,
+     * the progress bar and field and the file name label and starts the process
+     */
+    @FXML
+    private void startProcess() {
+        startBtn.setVisible(false);
+        startBtn.setManaged(false);
+        progressBox.setVisible(true);
+        progressBox.setManaged(true);
+        progressTextField.setVisible(true);
+        progressTextField.setManaged(true);
+        startBox.setPrefHeight(Region.USE_COMPUTED_SIZE);
+        fileNameLabel.setVisible(false);
+        fileNameLabel.setManaged(false);
+
+        startProgram();
+    }
+
+    /**
+     * Opens/Reopens the file chooser for the user to choose a new image
+     */
+    @FXML
+    private void upload() {
+        Path file = selectFile();
+        if (file != null) {
+            fileName = file;
+        }
+
+        if (IS_DEBUG) {
+            LOGGER.log(Level.INFO, String.format("File name: %s", fileName));
+        }
+
+        reset();
+        setScene(startBox.getScene());
+        if (fileName != null) {
+            uploadButton.setVisible(false);
+            uploadButton.setManaged(false);
+            uploadPane.getStyleClass().clear();
+
+            fileNameLabel.setText(fileName.getFileName().toString());
+            fileNameLabel.setVisible(true);
+            fileNameLabel.setManaged(true);
+            startBox.setVisible(true);
+            startBox.setManaged(true);
+        }
+    }
+
+    /**
+     * Returns the path to the image chosen by the user
+     *
+     * @return A {@link Path}: The path to the image chosen by the user
+     */
+    public Path getFileName() {
+        return fileName;
+    }
+
+    /**
+     * Returns the {@link Button} for downloading the color scheme
+     *
+     * @return A {@link Button}: The button for downloading the color scheme
+     */
+    public Button getDownloadBtn() {
+        return downloadBtn;
+    }
+
+    /**
+     * Returns the {@link CheckBox} for automatically downloading the color scheme
+     *
+     * @return A {@link CheckBox}: The checkbox for automatically downloading the color scheme
+     */
+    public CheckBox getAutoDownload() {
+        return autoDownload;
+    }
+
+    /**
+     * Returns the {@link Spinner} for choosing the number of colors in the color scheme
+     *
+     * @return A {@link Spinner}: The spinner for choosing the number of colors in the color scheme
+     */
+    public Spinner<Integer> getSpinner() {
+        return spinner;
+    }
+
+    /**
+     * Returns the {@link Scene} object for the current scene
+     *
+     * @param scene A {@link Scene}: The scene to be set as the current scene
+     */
+    public void setScene(Scene scene) {
+        currentScene = scene;
     }
 
     /**
      * Resets the GUI to its initial state to start a new process
      */
     private void reset() {
+        startBtn.setVisible(true);
+        startBtn.setManaged(true);
+        progressBox.setVisible(false);
+        progressBox.setManaged(false);
+        progressTextField.setVisible(false);
+        progressTextField.setManaged(false);
+        startBox.setPrefHeight(182);
+        fileNameLabel.setVisible(true);
+        fileNameLabel.setManaged(true);
+
         progressBar.progressProperty().unbind();
         Bindings.unbindBidirectional(textProp, progressBar.progressProperty());
         progressBar.progressProperty().set(0);
         textProp.set("0%");
-        download.setDisable(true);
-        progressImage.setGraphic(null);
+        downloadBtn.setDisable(true);
         progressTextField.setText("");
     }
 
     /**
-     * Opens a file chooser for the user to choose an image and starts a new {@link ReadImage} {@link Task} for reading
+     * Opens a file chooser for the user to choose an image and starts a new  {@link Task} for reading
      * the image and generating the color scheme
      */
     @FXML
-    protected void uploadImage() {
-        reset();
-        fileName = selectFile();
-        if (checkbox.isSelected()) {
-            OutputColors.setDownloadPath(System.getProperty("user.home").concat("/Downloads"));
+    protected void startProgram() {
+        if (autoDownload.isSelected()) {
+            OutputColors.setDownloadPath(USER_HOME.concat("/Downloads"));
         }
         if (fileName != null) {
             if (IS_DEBUG) {
-                LOGGER.log(Level.INFO, "File chosen.");
+                LOGGER.log(Level.INFO, harmony.toString());
             }
-            Task<Void> task = new ReadImage();
-            progressBar.progressProperty().bind(task.progressProperty());
+            ReadImage readImage = new ReadImage();
+            readImage.setController(this);
+            progressBar.progressProperty().bind(readImage.progressProperty());
             Bindings.bindBidirectional(textProp, progressBar.progressProperty(), new NumberStringConverter("#%"));
-            progressBar.progressProperty().addListener((observable, oldValue, newValue) -> {
-                if (Double.compare(newValue.doubleValue(), 1.0) == 0) {
-                    progressImage.setGraphic(done);
-                }
-                if (newValue.doubleValue() < 0.45) {
-                    progressLabel.setStyle("-fx-text-fill: black");
-                }
-                if (newValue.doubleValue() > 0.45) {
-                    progressLabel.setStyle("-fx-text-fill: white");
-                }
-            });
-            Thread thread = new Thread(task);
+            Thread thread = new Thread(readImage);
             thread.setDaemon(true);
             thread.start();
         }
@@ -441,11 +583,11 @@ public class AppController implements Initializable {
      * Creates the output file and writes the color scheme to it
      */
     @FXML
-    private void downloadFile() {
-        if (!checkbox.isSelected()) {
+    protected void downloadFile() {
+        if (!autoDownload.isSelected()) {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setTitle(bundle.getString("chooseDirSaveIn"));
-            directoryChooser.setInitialDirectory(Path.of(System.getProperty("user.home")).toFile());
+            directoryChooser.setInitialDirectory(Path.of(USER_HOME).toFile());
             File chosen = directoryChooser.showDialog(getStage());
             if (chosen != null) {
                 OutputColors.setDownloadPath(String.valueOf(chosen.toPath()));
@@ -456,146 +598,4 @@ public class AppController implements Initializable {
             createOutput(getColorData(), fileName);
         }
     }
-
-    private class CollapsePane extends AnimationTimer {
-        @Override
-        public void handle(long now) {
-            collapse();
-        }
-
-        private void collapse() {
-            height -= 7;
-            opacity -= 0.1;
-
-            basePane.setMinHeight(basePane.getMinHeight() - 7);
-            hbox.setPrefHeight(height);
-            hbox.setMaxHeight(height);
-            hbox.setMinHeight(height);
-            List<ToggleButton> harmonics = List.of(complementary, monochromatic, analogous, splitComplementary, triadic, tetradic);
-            for (ToggleButton harmonic : harmonics) {
-                harmonic.getGraphic().setOpacity(0);
-                harmonic.clipProperty().setValue(new Rectangle(42, height));
-            }
-            hbox.getChildren().clear();
-            if (height <= 0) {
-                stop();
-            }
-        }
-    }
-
-    private class ExpandPane extends AnimationTimer {
-        @Override
-        public void handle(long now) {
-            expand();
-        }
-
-        private void expand() {
-            height += 7;
-            opacity += 0.1;
-            basePane.setMinHeight(basePane.getMinHeight() + 7);
-            hbox.setMaxHeight(height);
-            hbox.setPrefHeight(height);
-            hbox.setMinHeight(height);
-            List<ToggleButton> harmonics = List.of(complementary, monochromatic, analogous, splitComplementary, triadic, tetradic);
-            if (hbox.getChildren().isEmpty()) {
-                hbox.getChildren().addAll(harmonics);
-            } else {
-                for (ToggleButton harmonic : harmonics) {
-                    harmonic.getGraphic().setOpacity(1);
-                    harmonic.clipProperty().setValue(new Rectangle(42, height));
-                }
-            }
-            if (height >= 44) {
-                stop();
-            }
-        }
-    }
-
-    /**
-     * An inner class that extends {@link Task} and is used to read the image and generate the color scheme
-     */
-    private class ReadImage extends Task<Void> {
-        /**
-         * The method that's called when the {@link Task} is started. <br>
-         * Reads the image and generates the color scheme
-         *
-         * @return {@code null}
-         * @throws Exception If an error occurs while reading the image
-         */
-        @Override
-        protected Void call() throws Exception {
-            updateProgress(10, 100);
-            progressTextField.appendText(
-                    bundle.getString("startFoundFile")
-                            + System.lineSeparator());
-
-            BufferedImage img;
-            try {
-                img = findImage();
-                imageFrame.setImage(new Image(fileName.toUri().toString()));
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "IOException: Could not read file!");
-                progressTextField.appendText(bundle.getString("errorReadingFile"));
-                return null;
-            }
-
-            updateProgress(24, 100);
-            progressTextField.appendText(
-                    bundle.getString("startReadingColours")
-                            + System.lineSeparator());
-            TimeUnit.MILLISECONDS.sleep(1000);
-
-            setColorData(new ColorData(img));
-            if (!cancelled) {
-                updateProgress(68, 100);
-                progressTextField.appendText(bundle.getString("startDeterminingColours")
-                        + System.lineSeparator());
-            }
-
-            if (!cancelled) {
-                kMeans(getColorData(), numberColors.getValue());
-                updateProgress(86, 100);
-                progressTextField.appendText(bundle.getString("startCreatingScheme")
-                        + System.lineSeparator());
-            }
-
-            if (!cancelled) {
-                updateProgress(99, 100);
-                progressTextField.appendText(bundle.getString("startFinishing")
-                        + System.lineSeparator());
-            }
-
-            if (!cancelled) {
-                TimeUnit.MILLISECONDS.sleep(1000);
-                updateProgress(100, 100);
-                progressTextField.appendText(bundle.getString("startDone")
-                        + System.lineSeparator());
-                download.setDisable(false);
-            }
-            if (checkbox.isSelected() && !cancelled) {
-                downloadFile();
-            }
-            return null;
-        }
-
-        /**
-         * Gets the image from the path saved in {@link #fileName fileName} by {@link } and
-         * resizes it to 150 pixels on the longest side, using the {@link ColorData#resize(BufferedImage) resize} method,
-         * while keeping the aspect ratio.
-         *
-         * @return A {@link BufferedImage} - The image selected by the user in its original size or scaled down, if it
-         * exceeds a certain Dimension
-         * @throws IOException An {@link IOException} - If the selected file cannot be read
-         */
-        private BufferedImage findImage() throws IOException {
-            BufferedImage image = ImageIO.read(fileName.toFile());
-            double width = image.getWidth();
-            double height = image.getHeight();
-            if (width > 150 || height > 150) {
-                image = resize(image);
-            }
-            return image;
-        }
-    }
 }
-

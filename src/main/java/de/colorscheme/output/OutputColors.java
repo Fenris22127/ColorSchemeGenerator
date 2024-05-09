@@ -7,8 +7,9 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.draw.LineSeparator;
 import de.colorscheme.app.AppController;
-import de.colorscheme.app.NewController;
 import de.colorscheme.clustering.ColorData;
+import de.colorscheme.utils.ColorUtils;
+import de.colorscheme.utils.FontUtils;
 import de.fenris.logger.ColorLogger;
 import javafx.geometry.Point3D;
 
@@ -16,6 +17,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,15 +30,14 @@ import java.util.*;
 import java.util.List;
 import java.util.logging.Logger;
 
-/*import static de.colorscheme.app.AppController.getResBundle;*/
-import static de.colorscheme.app.NewController.getResBundle;
+import static de.colorscheme.app.AppController.getHarmony;
+import static de.colorscheme.app.AppController.getResBundle;
 import static de.colorscheme.clustering.KMeans.getCentroids;
 import static de.colorscheme.output.ColorWheel.*;
-import static java.util.logging.Level.SEVERE;
-import static java.util.logging.Level.WARNING;
+import static java.util.logging.Level.*;
 
 /**
- * Writes the color scheme of the selected image into a pdf containing the image, image name, colours
+ * Writes the color scheme of the selected image into a pdf containing the image, image name, colors
  * and their rgb- and hex-code
  *
  * @author &copy; 2023 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
@@ -51,30 +52,28 @@ public class OutputColors {
     private static final Logger LOGGER = ColorLogger.newLogger(OutputColors.class.getName());
 
     /**
-     * The {@link Font} used for the {@link Document} bold text
-     */
-    private static final Font bold = FontFactory.getFont(FontFactory.HELVETICA, 11, Font.BOLD);
-
-
-    /**
      * The {@link Font} used for the {@link Document}s regular content
      */
     private static Font regular = FontFactory.getFont("../fonts/Mulish-Regular.ttf", 8, Font.NORMAL);
     private static final Path schemeWheelPath = Path.of("src/main/resources/img/SchemeWheel.png");
     private static final Path RESOURCE_BASE = Path.of("src/main/resources/de/colorscheme/");
 
+    private static final String TABLE_HEADER_COLOR = "#404040";
+    private static final String TABLE_BORDER_COLOR = "#F3F3F4";
+    private static final String TABLE_B_CELL_COLOR = "#FAFAFA";
 
-    //private static final Path schemeWheelPath = Path.of("src/main/resources/img/SchemeWheel.png");
 
     /**
      * The {@link String} containing the path where the file will be downloaded to
      */
     private static String downloadPath;
-    private static Font MULISH_REGULAR;
-    private static Font MULISH_EXTRABOLD;
-    private static Font QUATTROCENTO_SANS_REGULAR;
-    private static Font QUATTROCENTO_SANS_BOLD;
+    private static Font mulishExtrabold;
+    private static Font quattrocentoSansRegular;
+    private static Font quattrocentoSansBold;
     private static PdfWriter writer;
+
+    private static final ColorUtils colorUtils = new ColorUtils();
+    private static final FontUtils fontUtils = new FontUtils();
 
     /**
      * Private constructor to hide the public one
@@ -109,10 +108,9 @@ public class OutputColors {
      * couldn't be created
      */
     public static void createOutput(ColorData c, Path imagePath) {
-        MULISH_REGULAR = FontFactory.getFont("src/main/resources/de/colorscheme/main/fonts/Mulish-Regular.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 12, Font.NORMAL, BaseColor.BLACK);
-        MULISH_EXTRABOLD = FontFactory.getFont("src/main/resources/de/colorscheme/main/fonts/Mulish-ExtraBold.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 32, Font.NORMAL, BaseColor.BLACK);
-        QUATTROCENTO_SANS_REGULAR = FontFactory.getFont("src/main/resources/de/colorscheme/main/fonts/QuattrocentoSans-Regular.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 16, Font.NORMAL, BaseColor.BLACK);
-        QUATTROCENTO_SANS_BOLD = FontFactory.getFont("src/main/resources/de/colorscheme/main/fonts/QuattrocentoSans-Bold.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 16, Font.NORMAL, BaseColor.BLACK);
+        mulishExtrabold = fontUtils.getMulishExtraBold();
+        quattrocentoSansRegular = fontUtils.getQuattrocentoSansRegular();
+        quattrocentoSansBold = fontUtils.getQuattrocentoSansBold();
 
         StringBuilder fileDestinationBuilder = new StringBuilder();
         String imgName = fileName(imagePath.toString());
@@ -121,19 +119,19 @@ public class OutputColors {
 
         Path finalPath = Paths.get(fileDestinationBuilder.append(downloadPath).append("\\").append(filename).toString());
 
-        //If a file of the same name exists, find number of files with the same name and set filename accordingly
+        //If a file of the same name exists, find the number of files with the same name and set filename accordingly
         if (Files.exists(finalPath)) {
             Path newNamePath = getFileName(finalPath);
             outputWrite(c, newNamePath, imagePath);
         }
-        //If file object was created successfully and file at destination doesn't exist yet, create new file
+        //If the file object was created successfully and the file at destination doesn't exist yet, create a new file
         if (!Files.exists(finalPath)) {
             outputWrite(c, Paths.get(fileDestinationBuilder.toString()), imagePath);
         }
     }
 
     /**
-     * Determines the file name of a file of the original name exists already. <br>
+     * Determines the file name if a file of the original name exists already. <br>
      * <p>
      * Sets the filename as: Filename (x + 1).pdf with x being the number of files with the same name.
      *
@@ -185,18 +183,12 @@ public class OutputColors {
             Files.deleteIfExists(schemeWheelPath);
         } catch (IOException e) {
             AppController.addToOutputField(getResBundle().getString("docAccessFileError"), true);
-            AppController.setCancelled(true);
-
-            LOGGER.log(SEVERE, "{0}: FileOutputStream could not access created document!",
-                    e.getClass().getSimpleName());
-            e.printStackTrace();
+            LOGGER.log(SEVERE, String.format("%s: FileOutputStream could not access created document!",
+                    e.getClass().getSimpleName()));
         } catch (DocumentException e) {
             AppController.addToOutputField(getResBundle().getString("docWriteInFileError"), true);
-            AppController.setCancelled(true);
-
-            LOGGER.log(SEVERE, "{0}: Could not instantiate PdfWriter!",
-                    e.getClass().getSimpleName());
-            e.printStackTrace();
+            LOGGER.log(SEVERE, String.format("%s: Could not instantiate PdfWriter!",
+                    e.getClass().getSimpleName()));
         }
     }
 
@@ -209,16 +201,16 @@ public class OutputColors {
      *     </li>
      *     <li>
      *         Creates a {@link Paragraph new paragraph} for the title, sets the content to "Color Scheme",
-     *         the {@link Font} to {@link #header} and sets the {@link Paragraph#setAlignment(int) alignment} to
+     *         the {@link Font} to ... and sets the {@link Paragraph#setAlignment(int) alignment} to
      *         {@link Element#ALIGN_CENTER center}. <br>
-     *         Then, an {@link #addEmptyLine(Paragraph, int) empty line} is added for spacing before adding the
+     *         Then, an ... is added for spacing before adding the
      *         {@link Paragraph} to the {@link Document}.
      *     </li>
      *     <li>
      *         Then, a {@link Paragraph new paragraph} containing the image name, determined by
-     *         {@link #fileName(String) fileName()}, in the {@link #small} {@link Font} is created,
+     *         {@link #fileName(String) fileName()}, in the ... {@link Font} is created,
      *         the text is {@link Paragraph#setAlignment(int) aligned} in the {@link Element#ALIGN_CENTER middle}
-     *         and an {@link #addEmptyLine(Paragraph, int) empty line} is added for spacing before adding the
+     *         and an ... is added for spacing before adding the
      *         {@link Paragraph} to the {@link Document}.
      *     </li>
      *     <li>
@@ -231,7 +223,7 @@ public class OutputColors {
      *     </li>
      *     <li>
      *         Following that, a {@link Paragraph new paragraph} containing an
-     *         {@link #addEmptyLine(Paragraph, int) empty line} is added for spacing and added to the {@link Document}.
+     *         ... is added for spacing and added to the {@link Document}.
      *     </li>
      *     <li>
      *         Then, a new {@link PdfPTable table} with the number of columns equaling the amount of main colors to be
@@ -264,41 +256,17 @@ public class OutputColors {
     private static void addContent(ColorData c, Document doc, Path imagePath) {
         try {
             if (getCentroids() > 5) {
-                regular = FontFactory.getFont("src/main/resources/de/colorscheme/main/fonts/Mulish-Regular.ttf", 9, Font.NORMAL);
+                regular = fontUtils.getMulishRegular(9);
             } else {
-                regular = FontFactory.getFont("src/main/resources/de/colorscheme/main/fonts/Mulish-Regular.ttf", 11, Font.NORMAL);
+                regular = fontUtils.getMulishRegular(11);
             }
 
             float margin = 61F;
             doc.setMargins(margin, margin, 42, margin);
             doc.newPage();
-            //LinkedList<BaseColor> colors = getColors(c); //TODO: Check if this is correct
 
-            /*Paragraph title = new Paragraph("Color Scheme", header);
-            title.setAlignment(Element.ALIGN_CENTER);
-            addEmptyLine(title, 1);
-            doc.add(title);
-
-            Paragraph docImg = new Paragraph(fileName(imagePath.toString()), small);
-            docImg.setAlignment(Element.ALIGN_CENTER);
-            addEmptyLine(docImg, 1);
-            doc.add(docImg);
-
-            Rectangle pageSize = new Rectangle(doc.getPageSize());
-            float width = pageSize.getWidth();
-            float height = pageSize.getHeight();
-            float width40 = width / 10 * 4;
-            float height40 = height / 10 * 4;
-            Image img = Image.getInstance(imagePath.toString());
-            img.setAlignment(Element.ALIGN_CENTER);
-            img.scaleToFit(width40, height40);
-            doc.add(img);
-
-            Paragraph space = new Paragraph();
-            addEmptyLine(space, 2);
-            doc.add(space);*/
             //Add header
-            Chunk titleChunk = new Chunk("COLOR SCHEME", MULISH_EXTRABOLD);
+            Chunk titleChunk = new Chunk("COLOR SCHEME", mulishExtrabold);
             titleChunk.setCharacterSpacing(1.2F);
             Paragraph title = new Paragraph(titleChunk);
             title.setAlignment(Element.ALIGN_CENTER);
@@ -307,7 +275,7 @@ public class OutputColors {
             LineSeparator line = new LineSeparator(3F, 60, BaseColor.BLACK, Element.ALIGN_CENTER, -10);
             doc.add(line);
 
-            Chunk docImgChunk = new Chunk(String.valueOf(imagePath.getFileName()), QUATTROCENTO_SANS_REGULAR);
+            Chunk docImgChunk = new Chunk(String.valueOf(imagePath.getFileName()), quattrocentoSansRegular);
             docImgChunk.setCharacterSpacing(0.7F);
 
             //Add image
@@ -331,20 +299,14 @@ public class OutputColors {
             space = new Paragraph(new Paragraph(" "));
             space.setMultipliedLeading(1.5F);
             doc.add(space);
-            doc.add(new Paragraph("COLOR SCHEME AVERAGES", QUATTROCENTO_SANS_BOLD));
+            checkNewPage(doc);
+            doc.add(new Paragraph("COLOR SCHEME AVERAGES", quattrocentoSansBold));
             addAverageTable(doc, hsbColors);
 
             space = new Paragraph(new Paragraph(" "));
             space.setMultipliedLeading(2F);
             doc.add(space);
             checkNewPage(doc);
-
-            /*float[] hsbColors = new float[3];
-            addMainColors(doc, colors, hsbColors);
-
-            Paragraph empty = new Paragraph();
-            addEmptyLine(empty, 20);
-            doc.add(empty);*/
 
             Rectangle pageSize = new Rectangle(doc.getPageSize());
             float width = pageSize.getWidth();
@@ -362,39 +324,7 @@ public class OutputColors {
                 doc.add(imgParagraph);
             }
 
-            /*Paragraph clrWheelSpacing = new Paragraph();
-            addEmptyLine(clrWheelSpacing, 2);
-            doc.add(clrWheelSpacing);
-
-            addAverage(doc, hsbColors);
-
-            Paragraph spacing = new Paragraph();
-            addEmptyLine(spacing, 2);
-            doc.add(spacing);*/
-
-
-
-            /*PdfPTable meta = new PdfPTable(2);
-            Set<MetaData> metaData = OutputColors.readMetaData(imagePath);
-            List<MetaData> metaList = new LinkedList<>(metaData);
-            Collections.reverse(metaList);
-
-            for (int i = 0; i < metaData.size(); i++) {
-                String key = metaList.get(i).getDescriptor();
-                Paragraph p = new Paragraph();
-                p.setFont(bold);
-                p.add(key);
-                meta.addCell(new PdfPCell(p));
-                p = new Paragraph();
-                p.setFont(regular);
-                p.add(metaList.get(i).getData());
-                PdfPCell cell = new PdfPCell(p);
-                cell.setPaddingBottom(5);
-                meta.addCell(cell);
-            }
-            doc.add(meta);*/
-
-            doc.add(new Paragraph("IMAGE META DATA", QUATTROCENTO_SANS_BOLD));
+            doc.add(new Paragraph("IMAGE META DATA", quattrocentoSansBold));
             addMetaTable(doc, imagePath);
 
             space = new Paragraph(new Paragraph(" "));
@@ -402,35 +332,23 @@ public class OutputColors {
             doc.add(space);
             checkNewPage(doc);
 
-            doc.add(new Paragraph("COLOR HARMONICS", QUATTROCENTO_SANS_BOLD));
-            space = new Paragraph(new Paragraph(" "));
-            space.setMultipliedLeading(1F);
-            doc.add(space);
+            if (!getHarmony().isEmpty()){
+                doc.add(new Paragraph("COLOR HARMONICS", quattrocentoSansBold));
+                space = new Paragraph(new Paragraph(" "));
+                space.setMultipliedLeading(1F);
+                doc.add(space);
 
-            List<ColorHarmony> harmonies = new LinkedList<>();
-            harmonies.addAll(Arrays.asList(
-                    ColorHarmony.COMPLEMENTARY,
-                    ColorHarmony.SPLIT_COMPLEMENTARY,
-                    ColorHarmony.MONOCHROMATIC,
-                    ColorHarmony.ANALOGOUS,
-                    ColorHarmony.TRIADIC,
-                    ColorHarmony.TETRADIC
-            ));
-            addHarmony(c, doc, harmonies); //TODO: Add color harmonics list
+                addHarmony(c, doc, getHarmony());
+            }
 
         } catch (DocumentException e) {
             AppController.addToOutputField(getResBundle().getString("docAddElementsError"), true);
-            AppController.setCancelled(true);
-
-            Logger.getAnonymousLogger().log(SEVERE, "{}: Could not add element to created document!",
-                    e.getClass().getSimpleName());
-            e.printStackTrace();
+            LOGGER.log(SEVERE, String.format("%s: Could not add element to created document!",
+                    e.getClass().getSimpleName()));
         } catch (IOException e) {
             AppController.addToOutputField(getResBundle().getString("docAddImageReadError"), true);
-            AppController.setCancelled(true);
-            Logger.getAnonymousLogger().log(SEVERE, "{}: Could not read image to display in created document!",
-                    e.getClass().getSimpleName());
-            e.printStackTrace();
+            LOGGER.log(SEVERE, String.format("%s: Could not read image to display in created document!",
+                    e.getClass().getSimpleName()));
         }
     }
 
@@ -478,7 +396,7 @@ public class OutputColors {
             rect.setBackgroundColor(color);
             canvas.rectangle(rect);
 
-            String hex = getHex(color);
+            String hex = colorUtils.getHex(color);
             ct.setSimpleColumn(rect);
             Paragraph colorValues = new Paragraph();
             Paragraph hexVal = new Paragraph(" HEX: " + hex, regular);
@@ -541,25 +459,25 @@ public class OutputColors {
             rect.setBackgroundColor(color);
             canvas.rectangle(rect);
 
-            String hex = getHex(color);
+            String hex = colorUtils.getHex(color);
             ct.setSimpleColumn(rect);
             Paragraph colorValues = new Paragraph();
-            Paragraph hexHeader = new Paragraph(" HEX:", getMulish(10, "Bold", checkContrastAWT(color)));
-            Paragraph hexVal = new Paragraph(" " + hex, getMulish(9, "Regular", checkContrastAWT(color)));
+            Paragraph hexHeader = new Paragraph(" HEX:", fontUtils.getMulish(10, "Bold", checkContrastAWT(color)));
+            Paragraph hexVal = new Paragraph(" " + hex, fontUtils.getMulish(9, "Regular", checkContrastAWT(color)));
             hexVal.setSpacingAfter(4);
-            Paragraph hslHeader = new Paragraph(" HSB:", getMulish(10, "Bold", checkContrastAWT(color)));
+            Paragraph hslHeader = new Paragraph(" HSB:", fontUtils.getMulish(10, "Bold", checkContrastAWT(color)));
             Paragraph hslVal = new Paragraph(
                     String.format(" %d°, %d%%, %d%%",
                             Math.round(hsb[0] * 360),
                             Math.round(hsb[1] * 100),
-                            Math.round(hsb[2] * 100)), getMulish(9, "Regular", checkContrastAWT(color)));
+                            Math.round(hsb[2] * 100)), fontUtils.getMulish(9, "Regular", checkContrastAWT(color)));
             hslVal.setSpacingAfter(4);
-            Paragraph rgbHeader = new Paragraph(" RGB:", getMulish(10, "Bold", checkContrastAWT(color)));
+            Paragraph rgbHeader = new Paragraph(" RGB:", fontUtils.getMulish(10, "Bold", checkContrastAWT(color)));
             Paragraph rgbVal = new Paragraph(
                     String.format(" %d, %d, %d",
                             awtColor.getRed(),
                             awtColor.getGreen(),
-                            awtColor.getBlue()), getMulish(9, "Regular", checkContrastAWT(color)));
+                            awtColor.getBlue()), fontUtils.getMulish(9, "Regular", checkContrastAWT(color)));
             rgbVal.setSpacingAfter(4);
             colorValues.add(hexHeader);
             colorValues.add(hexVal);
@@ -575,15 +493,20 @@ public class OutputColors {
         doc.add(space);
     }
 
-    //TODO: New
+    /**
+     * Adds the average color values of the selected image to a {@link PdfPTable} in the {@link Document}.
+     * @param doc The {@link Document} to be written in
+     * @param hsbColors The average HSB values of the main colors
+     * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
+     */
     private static void addAverageTable(Document doc, float[] hsbColors) throws DocumentException {
         PdfPTable table = new PdfPTable(2);
         table.setWidthPercentage(100);
         table.setSpacingBefore(14);
         table.setSpacingAfter(20);
         table.setWidths(new int[]{1, 2});
-        Paragraph header = new Paragraph("Average", getMulish(9, "Bold", hexToColor("#404040")));
-        Paragraph value = new Paragraph("Value", getMulish(9, "Bold", hexToColor("#404040")));
+        Paragraph header = new Paragraph("Average", fontUtils.getMulish(9, "Bold", colorUtils.hexToColor(TABLE_HEADER_COLOR)));
+        Paragraph value = new Paragraph("Value", fontUtils.getMulish(9, "Bold", colorUtils.hexToColor(TABLE_HEADER_COLOR)));
         PdfPCell avgHeader = getHeaderCell(header);
         PdfPCell valueHeader = getHeaderCell(value);
 
@@ -591,24 +514,29 @@ public class OutputColors {
         table.addCell(valueHeader);
         String[] averages = getAverage(hsbColors);
 
-        Font mulishSemibold = getMulish(12, "Semibold", Color.BLACK);
+        Font mulishSemibold = fontUtils.getMulish(12, "Semibold", Color.BLACK);
         Paragraph color = new Paragraph("Colour", mulishSemibold);
-        Paragraph colorAvg = new Paragraph(averages[0], getMulish(12));
-        table.addCell(getACell(color));
-        table.addCell(getACell(colorAvg));
+        Paragraph colorAvg = new Paragraph(averages[0], fontUtils.getMulish());
+        table.addCell(getACell(color, false));
+        table.addCell(getACell(colorAvg, false));
         Paragraph saturation = new Paragraph("Saturation", mulishSemibold);
-        Paragraph saturationAvg = new Paragraph(averages[1], getMulish(12));
-        table.addCell(getBCell(saturation));
-        table.addCell(getBCell(saturationAvg));
+        Paragraph saturationAvg = new Paragraph(averages[1], fontUtils.getMulish());
+        table.addCell(getBCell(saturation, false));
+        table.addCell(getBCell(saturationAvg, false));
         Paragraph brightness = new Paragraph("Brightness", mulishSemibold);
-        Paragraph brightnessAvg = new Paragraph(averages[2], getMulish(12));
+        Paragraph brightnessAvg = new Paragraph(averages[2], fontUtils.getMulish());
         table.addCell(getACell(brightness, true));
         table.addCell(getACell(brightnessAvg, true));
 
         doc.add(table);
     }
 
-    //TODO: New
+    /**
+     * Adds the metadata of the selected image to a {@link PdfPTable} in the {@link Document}.
+     * @param doc The {@link Document} to be written in
+     * @param imagePath The {@link Path} to the selected image
+     * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
+     */
     private static void addMetaTable(Document doc, Path imagePath) throws DocumentException {
         Set<MetaData> metaData = readMetaData(imagePath);
         List<MetaData> metaList = new LinkedList<>(metaData);
@@ -619,8 +547,9 @@ public class OutputColors {
         table.setSpacingBefore(14);
         table.setSpacingAfter(20);
         table.setWidths(new int[]{1, 2});
-        Paragraph header = new Paragraph("Meta Data", getMulish(9, "bold", hexToColor("#404040")));
-        Paragraph value = new Paragraph("Value", getMulish(9, "bold", hexToColor("#404040")));
+        table.setHeaderRows(1);
+        Paragraph header = new Paragraph("Meta Data", fontUtils.getMulish(9, "bold", colorUtils.hexToColor(TABLE_HEADER_COLOR)));
+        Paragraph value = new Paragraph("Value", fontUtils.getMulish(9, "bold", colorUtils.hexToColor(TABLE_HEADER_COLOR)));
         PdfPCell metaHeader = getHeaderCell(header);
         PdfPCell valueHeader = getHeaderCell(value);
 
@@ -629,15 +558,15 @@ public class OutputColors {
 
         boolean isBRow = false;
         for (int i = 0; i < metaList.size(); i++) {
-            Paragraph metaName = new Paragraph(metaList.get(i).getDescriptor(), getMulish(12, "semibold", Color.BLACK));
-            Paragraph metaValue = new Paragraph(metaList.get(i).getData(), getMulish(12));
+            Paragraph metaName = new Paragraph(metaList.get(i).getDescriptor(), fontUtils.getMulish(12, "semibold", Color.BLACK));
+            Paragraph metaValue = new Paragraph(metaList.get(i).getData(), fontUtils.getMulish());
             if (!isBRow) {
                 if (i == metaList.size() - 1) {
                     table.addCell(getACell(metaName, true));
                     table.addCell(getACell(metaValue, true));
                 } else {
-                    table.addCell(getACell(metaName));
-                    table.addCell(getACell(metaValue));
+                    table.addCell(getACell(metaName, false));
+                    table.addCell(getACell(metaValue, false));
                     isBRow = true;
                 }
             } else {
@@ -645,8 +574,8 @@ public class OutputColors {
                     table.addCell(getBCell(metaName, true));
                     table.addCell(getBCell(metaValue, true));
                 } else {
-                    table.addCell(getBCell(metaName));
-                    table.addCell(getBCell(metaValue));
+                    table.addCell(getBCell(metaName, false));
+                    table.addCell(getBCell(metaValue, false));
                     isBRow = false;
                 }
             }
@@ -655,7 +584,13 @@ public class OutputColors {
         doc.add(table);
     }
 
-    //TODO: New
+    /**
+     * Adds the selected color harmonies to the {@link Document}.
+     * @param c The {@link ColorData} object
+     * @param doc The {@link Document} to be written in
+     * @param harmonies The {@link List} of {@link ColorHarmony} objects
+     * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
+     */
     private static void addHarmony(ColorData c, Document doc, List<ColorHarmony> harmonies) throws DocumentException {
         for (ColorHarmony harmony : harmonies) {
             switch (harmony) {
@@ -663,7 +598,7 @@ public class OutputColors {
                     checkNewPage(doc, 133.0);
                     addComplementary(c, doc);
                     break;
-                case SPLIT_COMPLEMENTARY:
+                case SPLITCOMPLEMENTARY:
                     checkNewPage(doc, 168.0);
                     addSplitComplementary(c, doc);
                     break;
@@ -687,7 +622,12 @@ public class OutputColors {
         }
     }
 
-    //TODO: Add JavaDoc
+    /**
+     * Adds the complementary color harmony to the {@link Document}.
+     * @param c The {@link ColorData} object
+     * @param doc The {@link Document} to be written in
+     * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
+     */
     private static void addComplementary(ColorData c, Document doc) throws DocumentException {
         addHarmonyHeader(doc, "Complementary");
 
@@ -704,7 +644,12 @@ public class OutputColors {
         }
     }
 
-    //TODO: Add JavaDoc
+    /**
+     * Adds the split complementary color harmony to the {@link Document}.
+     * @param c The {@link ColorData} object
+     * @param doc The {@link Document} to be written in
+     * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
+     */
     private static void addSplitComplementary(ColorData c, Document doc) throws DocumentException {
         addHarmonyHeader(doc, "Split Complementary");
 
@@ -721,7 +666,12 @@ public class OutputColors {
         }
     }
 
-    //TODO: Add JavaDoc
+    /**
+     * Adds the monochromatic color harmony to the {@link Document}.
+     * @param c The {@link ColorData} object
+     * @param doc The {@link Document} to be written in
+     * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
+     */
     private static void addMonochromatic(ColorData c, Document doc) throws DocumentException {
         addHarmonyHeader(doc, "Monochromatic");
 
@@ -738,7 +688,12 @@ public class OutputColors {
         }
     }
 
-    //TODO: Add JavaDoc
+    /**
+     * Adds the analogous color harmony to the {@link Document}.
+     * @param c The {@link ColorData} object
+     * @param doc The {@link Document} to be written in
+     * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
+     */
     private static void addAnalogous(ColorData c, Document doc) throws DocumentException {
         addHarmonyHeader(doc, "Analogous");
 
@@ -755,7 +710,12 @@ public class OutputColors {
         }
     }
 
-    //TODO: Add JavaDoc
+    /**
+     * Adds the triadic color harmony to the {@link Document}.
+     * @param c The {@link ColorData} object
+     * @param doc The {@link Document} to be written in
+     * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
+     */
     private static void addTriadic(ColorData c, Document doc) throws DocumentException {
         addHarmonyHeader(doc, "Triadic");
 
@@ -772,7 +732,12 @@ public class OutputColors {
         }
     }
 
-    //TODO: Add JavaDoc
+    /**
+     * Adds the tetradic color harmony to the {@link Document}.
+     * @param c The {@link ColorData} object
+     * @param doc The {@link Document} to be written in
+     * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
+     */
     private static void addTetradic(ColorData c, Document doc) throws DocumentException {
         addHarmonyHeader(doc, "Tetradic");
 
@@ -789,33 +754,29 @@ public class OutputColors {
         }
     }
 
-    //TODO: New
+    /**
+     * Adds a header for the color harmonies to the {@link Document} with the passed {@link String} as content.
+     * @param doc A {@link Document}: The document to be written in
+     * @param header A {@link String}: The content of the header
+     * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
+     */
     private static void addHarmonyHeader(Document doc, String header) throws DocumentException {
         Paragraph space1 = new Paragraph(new Paragraph(" "));
         space1.setMultipliedLeading(1F);
         doc.add(space1);
-        Image im;
+        Image im = null;
         String file = header.toLowerCase().replace(" ", "");
         try {
             Path complementaryBubble = Paths.get(
-                    String.format("src/main/resources/de/colorscheme/app/icons/%s_bubble.png", file));
+                    String.format("%s/app/icons/%s_bubble.png", RESOURCE_BASE, file));
             im = Image.getInstance(complementaryBubble.toString());
             im.scaleAbsolute(22, 22);
-        } catch (IOException | BadElementException e) {
-            throw new RuntimeException(e);
+        } catch (MalformedURLException e) {
+            LOGGER.log(SEVERE, "Malformed URL for image!", e);
+        } catch (IOException e) {
+            LOGGER.log(SEVERE,  "Could not read image!", e);
         }
-        PdfPTable tab = new PdfPTable(2);
-        tab.setWidthPercentage(100);
-        tab.setWidths(new float[]{5, 75});
-        PdfPCell imgCell = new PdfPCell(im);
-        imgCell.setBorder(0);
-        PdfPCell pCell = new PdfPCell(new Phrase(header, QUATTROCENTO_SANS_BOLD));
-        pCell.setBorder(0);
-        pCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        pCell.setPadding(0);
-        pCell.setPaddingBottom(6F);
-        tab.addCell(imgCell);
-        tab.addCell(pCell);
+        PdfPTable tab = getTable(header, im);
         doc.add(tab);
 
         Paragraph space2 = new Paragraph(new Paragraph(" "));
@@ -823,20 +784,37 @@ public class OutputColors {
         doc.add(space2);
     }
 
-    //TODO: New
-    private static PdfPCell getHeaderCell(Paragraph label) {
-        PdfPCell cell = new PdfPCell(label);
-        cell.setPaddingTop(8);
-        cell.setPaddingLeft(2);
-        cell.setPaddingBottom(10);
-        cell.setBackgroundColor(new BaseColor(hexToColor("#F2F2F2").getRGB()));
-        cell.setBorder(0);
-        cell.setBorderWidthBottom(1);
-        cell.setBorderColorBottom(new BaseColor(hexToColor("#F3F3F4").getRGB()));
-        return cell;
+    /**
+     * Adds the provided {@link Image} to the {@link Document} with the passed {@link String} as header.
+     * @param header A {@link String}: The header of the image
+     * @param im An {@link Image}: The image to be added
+     * @return A {@link PdfPTable}: The table with the header and the image
+     * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
+     */
+    private static PdfPTable getTable(String header, Image im) throws DocumentException {
+        PdfPTable tab = new PdfPTable(2);
+        tab.setWidthPercentage(100);
+        tab.setWidths(new float[]{5, 75});
+        assert im != null;
+        PdfPCell imgCell = new PdfPCell(im);
+        imgCell.setBorder(0);
+        PdfPCell pCell = new PdfPCell(new Phrase(header, quattrocentoSansBold));
+        pCell.setBorder(0);
+        pCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        pCell.setPadding(0);
+        pCell.setPaddingBottom(6F);
+        tab.addCell(imgCell);
+        tab.addCell(pCell);
+        return tab;
     }
 
-    //TODO: New
+    /**
+     * Adds a {@link PdfPTable} to the {@link Document} with the passed {@link BaseColor} as the main color and the
+     * contents of the passed {@link List} of {@link javafx.scene.paint.Color}s as harmonic colors.
+     * @param bc A {@link BaseColor}: The main color
+     * @param c A {@link List} of {@link javafx.scene.paint.Color}s: The harmonic colors
+     * @return A {@link PdfPCell}: The cell with the main color and the harmonic colors
+     */
     private static PdfPCell getHarmonyCells(BaseColor bc, List<javafx.scene.paint.Color> c) {
         PdfPCell cell = new PdfPCell();
         cell.setBorder(0);
@@ -851,7 +829,12 @@ public class OutputColors {
         return cell;
     }
 
-    //TODO: New
+    /**
+     * Returns a {@link PdfPCell} with the passed {@link BaseColor} as background color.
+     * The color is one of the main colors.
+     * @param color A {@link BaseColor}: The color to set as background color
+     * @return A {@link PdfPCell}: The cell with the passed color as the background
+     */
     private static PdfPCell getHarmonicMainCell(BaseColor color) {
         PdfPCell innerCell = new PdfPCell();
         innerCell.setBorder(0);
@@ -862,7 +845,12 @@ public class OutputColors {
         return innerCell;
     }
 
-    //TODO: New
+    /**
+     * Returns a {@link PdfPCell} with the passed {@link BaseColor} as background color.
+     * The color is a harmonic color to one of the main colors.
+     * @param c A {@link BaseColor}: The color to set as background color
+     * @return A {@link PdfPCell}: The cell with the passed color as the background
+     */
     private static PdfPCell getHarmonicCell(BaseColor c) {
         PdfPCell innerCell = new PdfPCell();
 
@@ -880,23 +868,35 @@ public class OutputColors {
         innerCell.setPadding(10);
         innerCell.setPaddingLeft(5);
         innerCell.setFixedHeight(35);
-        String hex = getHex(c);
-        innerCell.setPhrase(new Phrase(hex, getMulish(8, "regular", checkContrastAWT(c))));
+        String hex = colorUtils.getHex(c);
+        innerCell.setPhrase(new Phrase(hex, fontUtils.getMulish(8, "Regular", checkContrastAWT(c))));
 
         return innerCell;
     }
 
-    private static PdfPCell getACell(Paragraph label) {
+    /**
+     * Creates a {@link PdfPCell} with the passed {@link Paragraph} as content. The cell is used as a header cell.
+     * @param label A {@link Paragraph}: The content of the cell
+     * @return A {@link PdfPCell}: The cell with the passed content
+     */
+    private static PdfPCell getHeaderCell(Paragraph label) {
         PdfPCell cell = new PdfPCell(label);
-        cell.setPaddingTop(6);
+        cell.setPaddingTop(8);
         cell.setPaddingLeft(2);
-        cell.setPaddingBottom(7);
+        cell.setPaddingBottom(10);
+        cell.setBackgroundColor(new BaseColor(colorUtils.hexToColor("#F2F2F2").getRGB()));
         cell.setBorder(0);
         cell.setBorderWidthBottom(1);
-        cell.setBorderColorBottom(new BaseColor(hexToColor("#F3F3F4").getRGB()));
+        cell.setBorderColorBottom(new BaseColor(colorUtils.hexToColor(TABLE_BORDER_COLOR).getRGB()));
         return cell;
     }
 
+    /**
+     * Returns a {@link PdfPCell} with the passed {@link Paragraph} as content and the color of the cell set to white.
+     * @param label A {@link Paragraph}: The content of the cell
+     * @param isLast A {@link Boolean}: If the cell is the last in the row
+     * @return A {@link PdfPCell}: The cell with the passed content and color
+     */
     private static PdfPCell getACell(Paragraph label, boolean isLast) {
         PdfPCell cell = new PdfPCell(label);
         cell.setPaddingTop(6);
@@ -906,61 +906,45 @@ public class OutputColors {
         if (!isLast) {
             cell.setBorderWidthBottom(1);
         }
-        cell.setBorderColorBottom(new BaseColor(hexToColor("#F3F3F4").getRGB()));
+        cell.setBorderColorBottom(new BaseColor(colorUtils.hexToColor(TABLE_BORDER_COLOR).getRGB()));
         return cell;
     }
 
+    /**
+     * Returns a {@link PdfPCell} with the passed {@link Paragraph} as content and the color of the cell set to gray.
+     * @param label A {@link Paragraph}: The content of the cell
+     * @param isLast A {@link Boolean}: If the cell is the last in the row
+     * @return A {@link PdfPCell}: The cell with the passed content and color
+     */
     private static PdfPCell getBCell(Paragraph label, boolean isLast) {
         PdfPCell cell = new PdfPCell(label);
         cell.setPaddingTop(6);
         cell.setPaddingLeft(2);
         cell.setPaddingBottom(7);
-        cell.setBackgroundColor(new BaseColor(hexToColor("#FAFAFA").getRGB()));
+        cell.setBackgroundColor(new BaseColor(colorUtils.hexToColor(TABLE_B_CELL_COLOR).getRGB()));
         cell.setBorder(0);
         if (!isLast) {
             cell.setBorderWidthBottom(1);
         }
-        cell.setBorderColorBottom(new BaseColor(hexToColor("#F3F3F4").getRGB()));
+        cell.setBorderColorBottom(new BaseColor(colorUtils.hexToColor(TABLE_BORDER_COLOR).getRGB()));
         return cell;
     }
 
-    private static PdfPCell getBCell(Paragraph label) {
-        PdfPCell cell = new PdfPCell(label);
-        cell.setPaddingTop(6);
-        cell.setPaddingLeft(2);
-        cell.setPaddingBottom(7);
-        cell.setBackgroundColor(new BaseColor(hexToColor("#FAFAFA").getRGB()));
-        cell.setBorder(0);
-        cell.setBorderWidthBottom(1);
-        cell.setBorderColorBottom(new BaseColor(hexToColor("#F3F3F4").getRGB()));
-        return cell;
-    }
-
-    /*//TODO: New
-    *//**
-     * @return A {@link LinkedList} of {@link BaseColor}s: A {@link LinkedList} containing the main
-     * {@link BaseColor colors} of the selected image
-     *//*
-    private static LinkedList<BaseColor> getBaseColors() {
-        LinkedList<BaseColor> schemeColors = new LinkedList<>();
-        for (int i = 0; i < getCentroids(); i++) {
-            Point3D p = getColors().get(i);
-            int x = (int) p.getX();
-            int y = (int) p.getY();
-            int z = (int) p.getZ();
-            BaseColor color = new BaseColor(x, y, z);
-            schemeColors.add(color);
-        }
-        return schemeColors;
-    }*/
-
-    //TODO: Add JavaDoc
+    /**
+     * Checks the contrast of the passed color against white and black and returns the color with the higher contrast.
+     * @param color A {@link BaseColor}: The color to check the contrast of
+     * @return A {@link Color}: The color with the higher contrast
+     */
     private static Color checkContrastAWT(BaseColor color) {
         BaseColor col = checkContrast(color);
         return new Color(col.getRed(), col.getGreen(), col.getBlue());
     }
 
-    //TODO: Add JavaDoc
+    /**
+     * Checks the contrast of the passed color against white and black and returns the color with the higher contrast.
+     * @param color A {@link BaseColor}: The color to check the contrast of
+     * @return A {@link BaseColor}: The color with the higher contrast
+     */
     private static BaseColor checkContrast(BaseColor color) {
         //check against white
         double whiteContrast = ContrastChecker.getConstrastRatio(color, BaseColor.WHITE);
@@ -975,29 +959,23 @@ public class OutputColors {
         return BaseColor.BLACK;
     }
 
-    //TODO: Add JavaDoc
-    private static String getHex(BaseColor color) {
-        return String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
-    }
 
-    //TODO: Add JavaDoc
-    private static Font getMulish(float fontSize) {
-        return FontFactory.getFont("mulish regular", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, fontSize, Font.NORMAL, BaseColor.BLACK);
-    }
 
-    //TODO: Add JavaDoc
-    private static Font getMulish(float fontSize, String fontWeight, Color color) {
-        return FontFactory.getFont("src/main/resources/de/colorscheme/main/fonts/Mulish-" + fontWeight + ".ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, fontSize, Font.NORMAL, new BaseColor(color.getRGB()));
-    }
-
-    //TODO: Add JavaDoc
+    /**
+     * Checks, if the current page has enough space for the next element. If not, a new page is created.
+     * @param doc The {@link Document} to check the space in
+     */
     private static void checkNewPage(Document doc) {
         if (writer.getVerticalPosition(true) < 250) {
             doc.newPage();
         }
     }
 
-    //TODO: Add JavaDoc
+    /**
+     * Checks, if the current page has enough space for the next element. If not, a new page is created.
+     * @param doc The {@link Document} to check the space in
+     * @param h A {@link Double}: The height of the next element
+     */
     private static void checkNewPage(Document doc, double h) {
         if (writer.getVerticalPosition(true) - h < 61F) {
             doc.newPage();
@@ -1005,99 +983,10 @@ public class OutputColors {
     }
 
     /**
-     * Adds the main colors of the image with their HEX and RGB values to the {@link Document}.
-     *
-     * @param doc       A {@link Document}: The document to be written in
-     * @param colors    A {@link LinkedList} with {@link BaseColor}s: The main colors of the image
-     * @param hsbColors A {@link Float} array: The average HSB values of the main colors
-     * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
-     */
-    private static void addMainColors(Document doc, LinkedList<BaseColor> colors, float[] hsbColors) throws DocumentException {
-        PdfPTable table = new PdfPTable(getCentroids());
-        for (int i = 0; i < getCentroids(); i++) {
-            PdfPCell cell = new PdfPCell();
-            cell.setFixedHeight(200);
-            cell.setBackgroundColor(colors.get(i));
-            table.addCell(cell);
-        }
-        for (int i = 0; i < getCentroids(); i++) {
-            int red = colors.get(i).getRed();
-            int green = colors.get(i).getGreen();
-            int blue = colors.get(i).getBlue();
-            float[] hsb = new float[3];
-            Color.RGBtoHSB(red, green, blue, hsb);
-            hsbColors[0] += hsb[0];
-            hsbColors[1] += hsb[1];
-            hsbColors[2] += hsb[2];
-            String rgb = "RGB: " + red + ", " + green + ", " + blue;
-            String hex = String.format("HEX: #%02X%02X%02X", red, green, blue);
-            String hsbString = "HSB: " + Math.round(hsb[0] * 360) + ", " + Math.round(hsb[1] * 100) + "%, " + Math.round(hsb[2] * 100) + "%";
-            Paragraph p = new Paragraph();
-            p.setFont(regular);
-            p.add(rgb);
-            p.add(new Chunk(System.lineSeparator().concat(System.lineSeparator())));
-            p.add(hex);
-            p.add(new Chunk(System.lineSeparator().concat(System.lineSeparator())));
-            p.add(hsbString);
-            p.setAlignment(Element.ALIGN_CENTER);
-            PdfPCell cell = new PdfPCell(p);
-            cell.setFixedHeight(70);
-            table.addCell(cell);
-        }
-        doc.add(table);
-    }
-
-    /**
-     * Adds the description of the average HSB values of the main colors to the {@link Document}.
-     *
-     * @param doc       A {@link Document}: The document to be written in
-     * @param hsbColors A {@link Float} array: The average HSB values of the main colors
-     * @throws DocumentException If the {@link Paragraph} could not be added to the document
-     */
-    private static void addAverage(Document doc, float[] hsbColors) throws DocumentException {
-        hsbColors[0] /= getCentroids();
-        hsbColors[1] /= getCentroids();
-        hsbColors[2] /= getCentroids();
-
-        Paragraph colorDetails = new Paragraph();
-        Phrase colorDetailsTitle = new Phrase(NewController.getResBundle().getString("avgTitle"), bold);
-        colorDetails.add(colorDetailsTitle);
-        colorDetails.setAlignment(Element.ALIGN_CENTER);
-        doc.add(colorDetails);
-
-        Paragraph avg = new Paragraph();
-        Phrase avgColor = new Phrase("• " +
-                NewController.getResBundle().getString("avgColorPre") +
-                determineHue(hsbColors[0]), regular);
-        avgColor.add(Chunk.NEWLINE);
-
-        avgColor.add(((hsbColors[1] < 0.5 ? "• " +
-                NewController.getResBundle().getString("avgSaturationUnSat")
-                : "• " + NewController.getResBundle().getString("avgSaturationSat"))
-                .concat(String.format(" (%s %.2f %%)",
-                        NewController.getResBundle().getString("avgSaturation"),
-                        hsbColors[1] * 100))));
-        avgColor.add(Chunk.NEWLINE);
-
-        avgColor.add((hsbColors[2] < 0.5 ? "• " +
-                NewController.getResBundle().getString("avgBrightnessDark")
-                : "• " + NewController.getResBundle().getString("avgBrightnessLight"))
-                .concat(String.format(" (%s %.2f %%)",
-                        NewController.getResBundle().getString("avgBrightness"),
-                        hsbColors[2] * 100)));
-        avgColor.add(Chunk.NEWLINE);
-
-        avg.setIndentationLeft(220);
-        avg.add(avgColor);
-        doc.add(avg);
-    }
-
-    //TODO: New
-    /**
-     * Adds the description of the average HSB values of the main colors to the {@link Document}.
+     * Adds the description of the average HSB values for the main colors to the {@link Document}.
      *
      * @param hsbColors A {@link Float} array: The average HSB values of the main colors
-     * @return A {@link String} array: The description of the average HSB values of the main colors
+     * @return A {@link String} array: The description of the average HSB values for the main colors
      */
     private static String[] getAverage(float[] hsbColors) {
         hsbColors[0] /= getCentroids();
@@ -1132,16 +1021,16 @@ public class OutputColors {
         int h = (newHue - 29) / 60;
         String color;
         if (newHue < 30) {
-            color = NewController.getResBundle().getString("avgRed");
+            color = AppController.getResBundle().getString("avgRed");
         } else {
             switch (h) {
-                case 0 -> color = NewController.getResBundle().getString("avgYellow");
-                case 1 -> color = NewController.getResBundle().getString("avgGreen");
-                case 2 -> color = NewController.getResBundle().getString("avgCyan");
-                case 3 -> color = NewController.getResBundle().getString("avgBlue");
-                case 4 -> color = NewController.getResBundle().getString("avgPurple");
-                case 5 -> color = NewController.getResBundle().getString("avgRed");
-                default -> color = NewController.getResBundle().getString("avgIndeterminate");
+                case 0 -> color = AppController.getResBundle().getString("avgYellow");
+                case 1 -> color = AppController.getResBundle().getString("avgGreen");
+                case 2 -> color = AppController.getResBundle().getString("avgCyan");
+                case 3 -> color = AppController.getResBundle().getString("avgBlue");
+                case 4 -> color = AppController.getResBundle().getString("avgPurple");
+                case 5 -> color = AppController.getResBundle().getString("avgRed");
+                default -> color = AppController.getResBundle().getString("avgIndeterminate");
             }
         }
         return color;
@@ -1156,20 +1045,20 @@ public class OutputColors {
     private static String getColorSpace(int index) {
         String model;
         switch (index) {
-            case 1 -> model = NewController.getResBundle().getString("metaColorModel1");
-            case 2 -> model = NewController.getResBundle().getString("metaColorModel2");
-            case 3 -> model = NewController.getResBundle().getString("metaColorModel3");
-            case 4 -> model = NewController.getResBundle().getString("metaColorModel4");
-            case 5 -> model = NewController.getResBundle().getString("metaColorModel5");
-            case 6 -> model = NewController.getResBundle().getString("metaColorModel6");
-            case 7 -> model = NewController.getResBundle().getString("metaColorModel7");
-            case 8 -> model = NewController.getResBundle().getString("metaColorModel8");
-            case 9 -> model = NewController.getResBundle().getString("metaColorModel9");
-            case 10 -> model = NewController.getResBundle().getString("metaColorModel10");
-            case 11 -> model = NewController.getResBundle().getString("metaColorModel11");
-            case 12 -> model = NewController.getResBundle().getString("metaColorModel12");
-            case 13 -> model = NewController.getResBundle().getString("metaColorModel13");
-            default -> model = NewController.getResBundle().getString("metaColorModelDefault");
+            case 1 -> model = AppController.getResBundle().getString("metaColorModel1");
+            case 2 -> model = AppController.getResBundle().getString("metaColorModel2");
+            case 3 -> model = AppController.getResBundle().getString("metaColorModel3");
+            case 4 -> model = AppController.getResBundle().getString("metaColorModel4");
+            case 5 -> model = AppController.getResBundle().getString("metaColorModel5");
+            case 6 -> model = AppController.getResBundle().getString("metaColorModel6");
+            case 7 -> model = AppController.getResBundle().getString("metaColorModel7");
+            case 8 -> model = AppController.getResBundle().getString("metaColorModel8");
+            case 9 -> model = AppController.getResBundle().getString("metaColorModel9");
+            case 10 -> model = AppController.getResBundle().getString("metaColorModel10");
+            case 11 -> model = AppController.getResBundle().getString("metaColorModel11");
+            case 12 -> model = AppController.getResBundle().getString("metaColorModel12");
+            case 13 -> model = AppController.getResBundle().getString("metaColorModel13");
+            default -> model = AppController.getResBundle().getString("metaColorModelDefault");
         }
         return model;
     }
@@ -1191,8 +1080,7 @@ public class OutputColors {
             img = ImageIO.read(imgPath.toFile());
             attr = Files.readAttributes(imgPath, BasicFileAttributes.class);
         } catch (IOException e) {
-            e.printStackTrace();
-            LOGGER.log(WARNING, "Could not read image to get meta data!");
+            LOGGER.log(WARNING, "Could not read image to get meta data!", e);
             return MetaData.createNoAccessMetaData();
         }
 
@@ -1210,17 +1098,17 @@ public class OutputColors {
                     case FILE_COLOR_COMPONENTS -> String.valueOf(img.getColorModel().getNumComponents());
                     case FILE_BIT_DEPTH -> String.valueOf(img.getColorModel().getPixelSize());
                     case FILE_TRANSPARENCY -> switch (img.getColorModel().getTransparency()) {
-                        case 1 -> NewController.getResBundle().getString("metaTransparency1");
-                        case 2 -> NewController.getResBundle().getString("metaTransparency2");
-                        case 3 -> NewController.getResBundle().getString("metaTransparency3");
-                        default -> NewController.getResBundle().getString("metaTransparencyDefault");
+                        case 1 -> AppController.getResBundle().getString("metaTransparency1");
+                        case 2 -> AppController.getResBundle().getString("metaTransparency2");
+                        case 3 -> AppController.getResBundle().getString("metaTransparency3");
+                        default -> AppController.getResBundle().getString("metaTransparencyDefault");
                     };
                     case FILE_ALPHA -> (img.getColorModel().hasAlpha() ?
-                            NewController.getResBundle().getString("metaAlphaYes") :
-                            NewController.getResBundle().getString("metaAlphaNo"));
+                            AppController.getResBundle().getString("metaAlphaYes") :
+                            AppController.getResBundle().getString("metaAlphaNo"));
                     case FILE_ALPHA_TYPE -> (img.getColorModel().isAlphaPremultiplied() ?
-                            NewController.getResBundle().getString("metaAlphaPremultiplied") :
-                            NewController.getResBundle().getString("metaAlphaNotPremultiplied"));
+                            AppController.getResBundle().getString("metaAlphaPremultiplied") :
+                            AppController.getResBundle().getString("metaAlphaNotPremultiplied"));
                 });
     }
 
@@ -1274,18 +1162,6 @@ public class OutputColors {
     }
 
     /**
-     * Adds a specified number of empty lines.
-     *
-     * @param paragraph A {@link Paragraph}: The target {@link Paragraph} for the empty lines
-     * @param number    An {@link Integer}: The amount of empty lines to be added
-     */
-    private static void addEmptyLine(Paragraph paragraph, int number) {
-        for (int i = 0; i < number; i++) {
-            paragraph.add(new Paragraph(" "));
-        }
-    }
-
-    /**
      * Gets the name of the file at the specified path.
      *
      * @param path A {@link String}: The path of the target file
@@ -1295,23 +1171,4 @@ public class OutputColors {
         return new File(path).getName();
     }
 
-    //TODO: Add JavaDoc
-    private static float[] hexToRgb(String hex) {
-        if (hex.startsWith("#")) {
-            hex = hex.substring(1);
-        }
-        if (hex.length() > 6) {
-            throw new IllegalArgumentException("Hex value is too long! Expected length: 6, actual length: " + hex.length());
-        }
-        float red = Integer.valueOf(hex.substring(0, 2), 16);
-        float green = Integer.valueOf(hex.substring(2, 4), 16);
-        float blue = Integer.valueOf(hex.substring(4, 6), 16);
-        return new float[]{red, green, blue};
-    }
-
-    //TODO: Add JavaDoc
-    private static Color hexToColor(String hex) {
-        float[] rgb = hexToRgb(hex);
-        return new Color((int) rgb[0], (int) rgb[1], (int) rgb[2]);
-    }
 }

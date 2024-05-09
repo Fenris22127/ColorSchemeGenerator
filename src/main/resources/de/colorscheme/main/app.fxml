@@ -1,183 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.paint.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.colorscheme.app.AppController">
-    <TabPane prefHeight="600.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE">
-        <Tab fx:id="generateTab" closable="false" text="Generate Color Scheme">
-            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="571.0" prefWidth="341.0">
-                <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308"
-                            minViewportHeight="569.0" prefHeight="574.0" prefViewportHeight="569.0" prefWidth="600.0">
-                    <padding>
-                        <Insets bottom="5.0"/>
-                    </padding>
-                    <VBox fx:id="basePane" alignment="TOP_CENTER" minHeight="569.0" prefHeight="569.0" prefWidth="600.0"
-                          style="-fx-background-color: linear-gradient(to top, rgba(220,222,223,1) 0%, rgba(255,255,255,1) 35%);"
-                          stylesheets="@style.css">
-                        <StackPane maxHeight="100.0" maxWidth="600.0" minHeight="100.0" minWidth="600.0"
-                                   prefHeight="150.0" prefWidth="600.0">
-                            <Rectangle arcHeight="5.0" arcWidth="5.0" height="125.0" rotate="-4.0"
-                                       strokeLineJoin="BEVEL" strokeType="INSIDE" strokeWidth="0.0" translateY="-9.0"
-                                       width="620.0">
-                                <fill>
-                                    <LinearGradient endY="0.4549763033175356" startX="0.36018957345971564"
-                                                    startY="1.0">
-                                        <stops>
-                                            <Stop>
-                                                <color>
-                                                    <Color red="0.5764706134796143" green="0.615686297416687"
-                                                           blue="0.4431372582912445"/>
-                                                </color>
-                                            </Stop>
-                                            <Stop offset="0.4789272030651341">
-                                                <color>
-                                                    <Color red="0.5764706134796143" green="0.615686297416687"
-                                                           blue="0.4431372582912445"/>
-                                                </color>
-                                            </Stop>
-                                            <Stop offset="1.0">
-                                                <color>
-                                                    <Color red="0.6705882549285889" green="0.6980392336845398"
-                                                           blue="0.5607843399047852"/>
-                                                </color>
-                                            </Stop>
-                                        </stops>
-                                    </LinearGradient>
-                                </fill>
-                            </Rectangle>
-                            <Label fx:id="title" text="GENERATE A COLOR SCHEME FROM AN IMAGE">
-                                <font>
-                                    <Font name="Verdana Bold" size="22.0"/>
-                                </font>
-                            </Label>
-                        </StackPane>
-                        <Label fx:id="colorAmountLabel" text="Choose the amount of colors to be picked:">
-                            <font>
-                                <Font name="Courier New" size="13.0"/>
-                            </font>
-                            <VBox.margin>
-                                <Insets top="20.0"/>
-                            </VBox.margin>
-                        </Label>
-                        <Spinner fx:id="numberColors" editable="true" prefHeight="25.0" prefWidth="60.0"
-                                 stylesheets="@style.css">
-                            <VBox.margin>
-                                <Insets bottom="10.0" top="10.0"/>
-                            </VBox.margin>
-                        </Spinner>
-                        <Button fx:id="upload" mnemonicParsing="false" onAction="#uploadImage" prefHeight="30.0"
-                                stylesheets="@style.css" text="Upload image">
-                            <VBox.margin>
-                                <Insets top="10.0"/>
-                            </VBox.margin>
-                            <padding>
-                                <Insets bottom="2.0" left="7.0" right="7.0" top="2.0"/>
-                            </padding>
-                            <font>
-                                <Font name="Courier New" size="14.0"/>
-                            </font>
-                            <cursor>
-                                <Cursor fx:constant="HAND"/>
-                            </cursor>
-                        </Button>
-                        <VBox maxWidth="400.0" prefHeight="200.0" prefWidth="400.0" spacing="10.0">
-                            <CheckBox fx:id="checkbox" mnemonicParsing="false"
-                                      text="Automatically download color scheme when finished">
-                                <VBox.margin>
-                                    <Insets top="20.0"/>
-                                </VBox.margin>
-                                <font>
-                                    <Font name="Courier New" size="12.0"/>
-                                </font>
-                            </CheckBox>
-                            <CheckBox fx:id="includeHarmonics" mnemonicParsing="false" text="Include Color Harmonics">
-                                <font>
-                                    <Font name="Courier New" size="12.0"/>
-                                </font>
-                            </CheckBox>
-                            <HBox fx:id="harmonicPane" fillHeight="false" maxWidth="400.0" minWidth="400.0"
-                                  prefWidth="400.0" styleClass="harmonicsPane"/>
-                        </VBox>
-                        <HBox maxWidth="400.0" prefWidth="200.0"/>
-                        <Pane maxHeight="250.0" maxWidth="300.0" minHeight="200.0" prefHeight="200.0" prefWidth="200.0"
-                              stylesheets="@style.css">
-                            <VBox.margin>
-                                <Insets top="10.0"/>
-                            </VBox.margin>
-                            <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="300.0" stylesheets="@style.css">
-                                <StackPane maxWidth="290.0" minWidth="290.0" prefHeight="80.0" prefWidth="190.0">
-                                    <ProgressBar fx:id="progressBar" minHeight="20.0" prefHeight="10.0"
-                                                 prefWidth="200.0" progress="0.0"/>
-                                    <Label fx:id="progressLabel" text="0%">
-                                        <font>
-                                            <Font name="Courier New Bold" size="14.0"/>
-                                        </font>
-                                    </Label>
-                                    <Label fx:id="progressImage" layoutX="147.0" layoutY="18.0">
-                                        <font>
-                                            <Font name="Courier New Bold" size="14.0"/>
-                                        </font>
-                                    </Label>
-                                </StackPane>
-                                <TextArea fx:id="progressTextField" editable="false" prefHeight="200.0"
-                                          prefWidth="200.0">
-                                    <VBox.margin>
-                                        <Insets bottom="10.0" left="10.0" right="10.0" top="5.0"/>
-                                    </VBox.margin>
-                                    <font>
-                                        <Font name="Courier New" size="12.0"/>
-                                    </font>
-                                </TextArea>
-                            </VBox>
-                        </Pane>
-                        <Button fx:id="download" disable="true" mnemonicParsing="false" onAction="#downloadFile"
-                                prefHeight="30.0" stylesheets="@style.css" text="Download">
-                            <VBox.margin>
-                                <Insets top="20.0"/>
-                            </VBox.margin>
-                            <font>
-                                <Font name="Courier New" size="14.0"/>
-                            </font>
-                            <padding>
-                                <Insets bottom="2.0" left="7.0" right="7.0" top="2.0"/>
-                            </padding>
-                        </Button>
-                        <ChoiceBox fx:id="languageChoice" maxHeight="20.0" prefHeight="20.0" prefWidth="90.0"
-                                   translateX="240.0"/>
-                        <padding>
-                            <Insets bottom="10.0"/>
-                        </padding>
-                    </VBox>
-                </ScrollPane>
+<AnchorPane maxHeight="-Infinity" prefHeight="712.0" prefWidth="628.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.colorscheme.app.AppController">
+   <VBox alignment="TOP_CENTER" layoutY="-1.0" prefWidth="628.0">
+      <HBox prefHeight="100.0" prefWidth="100.0" spacing="9.0">
+         <padding>
+            <Insets left="6.0" top="5.0" />
+         </padding>
+         <Pane fx:id="icon" maxHeight="-Infinity" prefHeight="100.0" prefWidth="80.0" />
+         <Label fx:id="title" styleClass="title" text="COLOR SCHEME GENERATOR">
+            <padding>
+               <Insets top="6.0" />
+            </padding>
+         </Label>
+      </HBox>
+      <VBox fx:id="uploadPane" alignment="TOP_CENTER" minHeight="-Infinity" prefHeight="190.0" prefWidth="100.0" styleClass="firstUpload">
+         <Button fx:id="uploadButton" mnemonicParsing="false" onAction="#upload" prefHeight="190.0" prefWidth="300.0" text="Upload image file" />
+         <HBox fx:id="startBox" alignment="CENTER" minHeight="-Infinity" prefHeight="182.0" prefWidth="300.0" spacing="5.0">
+            <VBox fx:id="progressBox" maxHeight="-Infinity" HBox.hgrow="NEVER">
+               <HBox alignment="CENTER">
+                  <Label styleClass="progressTitleLabel" text="Progress"/>
+                  <Region HBox.hgrow="ALWAYS"/>
+                  <Label fx:id="progressLabel" text="50%" textAlignment="RIGHT"/>
+               </HBox>
+               <ProgressBar fx:id="progressBar" prefHeight="15.0" prefWidth="537.0" progress="0.5"/>
+            </VBox>
+            <VBox alignment="TOP_CENTER" maxHeight="-Infinity" spacing="10.0">
+               <Label fx:id="fileNameLabel" text="Label"/>
+               <HBox spacing="5.0" VBox.vgrow="NEVER">
+                  <Button fx:id="startBtn" mnemonicParsing="false" onAction="#startProcess" text="Start"/>
+                  <Button fx:id="reuploadButton" mnemonicParsing="false" onAction="#upload"/>
+               </HBox>
+            </VBox>
+            <padding>
+               <Insets left="15.0" right="15.0" top="15.0" />
+            </padding>
+         </HBox>
+         <TextArea fx:id="progressTextField" editable="false" prefHeight="200.0" prefWidth="200.0" />
+      </VBox>
+      <VBox prefWidth="100.0" spacing="22.0">
+         <padding>
+            <Insets left="45.0" right="45.0" top="30.0" />
+         </padding>
+         <CheckBox fx:id="autoDownload" mnemonicParsing="false" styleClass="textlabel" text="Automatically download color scheme when finished" />
+         <VBox prefWidth="100.0">
+            <Label fx:id="numberOfColors" styleClass="textlabel" text="Number of colors to be picked from image">
+               <VBox.margin>
+                  <Insets bottom="6.0" />
+               </VBox.margin>
+            </Label>
+            <Spinner fx:id="spinner" editable="true" prefHeight="43.0" prefWidth="200.0" />
+         </VBox>
+         <CheckBox fx:id="addHarmonics" layoutX="55.0" layoutY="40.0" mnemonicParsing="false" onAction="#toggleHarmonicsCheckbox" styleClass="textlabel" text="Add color harmonics to output" />
+         <TitledPane fx:id="harmonicsDropdown" disable="true" expanded="false" text="Select color harmonics">
+            <AnchorPane minHeight="0.0" minWidth="0.0">
+               <HBox alignment="CENTER" spacing="42.0">
+                  <ToggleButton fx:id="complementary" mnemonicParsing="false" onAction="#toggleBtn" styleClass="colourbutton" text="Button">
+                     <tooltip><Tooltip text="Complementary" /></tooltip>
+                  </ToggleButton>
+                  <ToggleButton fx:id="monochromatic" mnemonicParsing="false" onAction="#toggleBtn" styleClass="colourbutton" text="Button">
+                     <tooltip><Tooltip text="Monochromatic" /></tooltip>
+                  </ToggleButton>
+                  <ToggleButton fx:id="analogous" mnemonicParsing="false" onAction="#toggleBtn" styleClass="colourbutton" text="Button">
+                     <tooltip><Tooltip text="Analogous" /></tooltip>
+                  </ToggleButton>
+                  <ToggleButton fx:id="splitcomplementary" mnemonicParsing="false" onAction="#toggleBtn" styleClass="colourbutton" text="Button">
+                     <tooltip><Tooltip text="Split Complementary" /></tooltip>
+                  </ToggleButton>
+                  <ToggleButton fx:id="triadic" mnemonicParsing="false" onAction="#toggleBtn" styleClass="colourbutton" text="Button">
+                     <tooltip><Tooltip text="Triadic" /></tooltip>
+                  </ToggleButton>
+                  <ToggleButton fx:id="tetradic" mnemonicParsing="false" onAction="#toggleBtn" styleClass="colourbutton" text="Button">
+                     <tooltip><Tooltip text="Tetradic" /></tooltip>
+                  </ToggleButton>
+               </HBox>
             </AnchorPane>
-        </Tab>
-        <Tab fx:id="imageTab" text="Image">
-            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                <StackPane maxHeight="571.0" maxWidth="600.0" minHeight="571.0" minWidth="600.0" prefHeight="571.0" prefWidth="600.0" style="-fx-background-color: linear-gradient(to bottom, rgba(255,255,255,1) 35%, rgba(139,149,105,0.8) 100%);">
-                    <Label fx:id="noImageLabel" alignment="CENTER" prefHeight="20.0" prefWidth="180.0" text="No image selected">
-                        <font>
-                            <Font name="Courier New" size="14.0" />
-                        </font>
-                    </Label>
-                    <ImageView fx:id="imageFrame" fitHeight="500.0" fitWidth="500.0" pickOnBounds="true" preserveRatio="true" />
-                </StackPane>
-            </AnchorPane>
-        </Tab>
-        <Tab text="Colours">
-            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                <StackPane maxHeight="571.0" maxWidth="600.0" minHeight="571.0" minWidth="600.0" prefHeight="571.0" prefWidth="600.0" style="-fx-background-color: linear-gradient(to bottom, rgba(255,255,255,1) 35%, rgba(139,149,105,0.8) 100%);">
-                    <VBox maxWidth="400.0" prefHeight="200.0" prefWidth="400.0" spacing="10.0">
-                        <HBox fx:id="colorsBox" fillHeight="false" styleClass="harmonicsPane" />
-                    </VBox>
-                </StackPane>
-            </AnchorPane>
-        </Tab>
-    </TabPane>
+         </TitledPane>
+         <HBox alignment="BOTTOM_LEFT" prefWidth="200.0">
+            <Button fx:id="downloadBtn" disable="true" mnemonicParsing="false" onAction="#downloadFile"
+                    text="Download"/>
+            <Region prefWidth="200.0" HBox.hgrow="ALWAYS"/>
+            <ChoiceBox fx:id="languageChoice" prefWidth="100.0"/>
+         </HBox>
+      </VBox>
+   </VBox>
 </AnchorPane>

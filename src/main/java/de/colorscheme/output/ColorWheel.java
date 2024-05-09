@@ -9,7 +9,6 @@ import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -39,8 +38,6 @@ public class ColorWheel {
      */
     private static final Logger LOGGER = ColorLogger.newLogger(ColorWheel.class.getName());
 
-    private static final List<javafx.scene.paint.Color> HARMONIC_COLORS = new LinkedList<>();
-
     /**
      * Private constructor to hide the public one
      */
@@ -65,46 +62,14 @@ public class ColorWheel {
         try {
             ImageIO.write(Objects.requireNonNull(colWheel), "png", f);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(SEVERE, String.format("%s: Image could not be written!", e.getClass().getSimpleName()));
         }
         return f.exists();
     }
 
-    public static boolean getHarmon(javafx.scene.paint.Color color, List<ColorHarmony> harmonyList) {
-        try {
-            java.awt.Color awtColor = new java.awt.Color((float) color.getRed(), (float) color.getGreen(), (float) color.getBlue());
-            BufferedImage wheel = ImageIO.read(
-                    Objects.requireNonNull(
-                            ClassLoader.getSystemClassLoader().getResource("wheel.png")));
-            float[] hsbValues = java.awt.Color.RGBtoHSB(awtColor.getRed(), awtColor.getGreen(), awtColor.getBlue(), null);
-            int wheelRadius = wheel.getHeight() / 2;
-            float radius = (WHEEL_SIZE / 2F) * hsbValues[1];
-            List<ComplementaryColor> complementaryColors;
-
-            HARMONIC_COLORS.clear();
-            for (ColorHarmony colorHarmony : harmonyList) {
-                complementaryColors = switch (colorHarmony) {
-                    case COMPLEMENTARY -> getComplementary(hsbValues, radius, wheelRadius);
-                    case SPLIT_COMPLEMENTARY -> getSplitComplementary(hsbValues, radius, wheelRadius);
-                    case ANALOGOUS -> getAnalogous(hsbValues, radius, wheelRadius);
-                    case TRIADIC -> getTriadic(hsbValues, radius, wheelRadius);
-                    case TETRADIC -> getTetradic(hsbValues, radius, wheelRadius);
-                    case MONOCHROMATIC -> getMonochromatic(hsbValues, radius, wheelRadius);
-                };
-                for (ComplementaryColor complementaryColor : complementaryColors) {
-                    HARMONIC_COLORS.add(complementaryColor.color);
-                }
-            }
-            return HARMONIC_COLORS.isEmpty();
-        } catch (IOException e) {
-            LOGGER.log(SEVERE, "{0}: BufferedImage could not be read!", e.getClass().getSimpleName());
-            e.printStackTrace();
-        }
-        return false;
-    }
 
     /**
-     * Flips the passed image vertically, horizontally or on both axis'.
+     * Flips the passed image vertically, horizontally or on both axes'.
      *
      * @param image      A {@link BufferedImage}: The image to be flipped
      * @param horizontal A {@link Boolean}: Whether the image should be flipped horizontally
@@ -140,7 +105,7 @@ public class ColorWheel {
     }
 
     /**
-     * Uses a {@link Ellipse2D} as a mask for the color wheel gradient to create the clean color wheel.
+     * Uses a {@link Ellipse2D} as a mask for the color-wheel gradient to create the clean color wheel.
      *
      * @param img A {@link BufferedImage}: The gradient to be masked to create the clean color wheel
      */
@@ -169,7 +134,7 @@ public class ColorWheel {
     }
 
     /**
-     * Creates the color wheel gradient for the color wheel
+     * Creates the color-wheel gradient for the color wheel
      *
      * @return A {@link BufferedImage}: The gradient for the clean color wheel
      */
@@ -241,45 +206,6 @@ public class ColorWheel {
                         (int) yPos - circleRadius,
                         null);
             }
-            /*BufferedImage wheel = ImageIO.read(
-                    Objects.requireNonNull(
-                            ClassLoader.getSystemClassLoader().getResource("wheel.png")));
-            BufferedImage circle = ImageIO.read(
-                    Objects.requireNonNull(
-                            ClassLoader.getSystemClassLoader().getResource("circle.png")));
-            int wheelRadius = wheel.getHeight() / 2;
-            int circleRadius = 50;
-            circle = resize(circle, circleRadius * 2, circleRadius * 2);
-            Graphics2D g = wheel.createGraphics();
-            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0F));
-
-            java.awt.Color awtColor = new java.awt.Color((float) color.getRed(), (float) color.getGreen(), (float) color.getBlue());
-            float[] hsbValues = java.awt.Color.RGBtoHSB(awtColor.getRed(), awtColor.getGreen(), awtColor.getBlue(), null);
-            float radius = (WHEEL_SIZE / 2F) * hsbValues[1];
-            double angle = Math.toRadians(360 * hsbValues[0] + 90);
-            double xPos = radius * Math.cos(angle) + wheelRadius;
-            double yPos = radius * Math.sin(angle) + wheelRadius;
-            List<ComplementaryColor> complementaryColors = new LinkedList<>();
-
-            HARMONIC_COLORS.clear();
-            for (ColorHarmony colorHarmony : harmonyList) {
-                complementaryColors = switch (colorHarmony) {
-                    case COMPLEMENTARY -> getComplementary(hsbValues, radius, wheelRadius);
-                    case SPLIT_COMPLEMENTARY -> getSplitComplementary(hsbValues, radius, wheelRadius);
-                    case ANALOGOUS -> getAnalogous(hsbValues, radius, wheelRadius);
-                    case TRIADIC -> getTriadic(hsbValues, radius, wheelRadius);
-                    case TETRADIC -> getTetradic(hsbValues, radius, wheelRadius);
-                    case MONOCHROMATIC -> getMonochromatic(hsbValues, radius, wheelRadius);
-                };
-                for (ComplementaryColor complementaryColor : complementaryColors) {
-                    HARMONIC_COLORS.add(complementaryColor.color);
-                }
-            }
-
-            drawCircle(circle, circleRadius, g, (float)  xPos, (float) yPos, color);
-            for (ComplementaryColor col : complementaryColors) {
-                drawCircle(circle, circleRadius, g, col.xPos, col.yPos, col.color);
-            }*/
             g.dispose();
             return wheel;
         } catch (IOException e) {
@@ -288,22 +214,12 @@ public class ColorWheel {
         return null;
     }
 
-    private static void drawCircle(BufferedImage circle, int circleRadius, Graphics2D g, float xPos, float yPos, javafx.scene.paint.Color color) {
-        java.awt.Color c = new java.awt.Color((float) color.getRed(), (float) color.getGreen(), (float) color.getBlue());
-        g.setColor(c);
-        g.fill(new Ellipse2D.Float(
-                xPos - circleRadius,
-                yPos - circleRadius,
-                (float) circleRadius * 2 - 4,
-                (float) circleRadius * 2 - 4));
-        g.drawImage(
-                circle,
-                (int) xPos - circleRadius,
-                (int) yPos - circleRadius,
-                null);
-    }
-
-    private static List<ComplementaryColor> getComplementary(float[] hsbValues, float radius, int wheelRadius) {
+    /**
+     * Returns the list of complementary colors for displaying them on a color wheel.
+     *
+     * @return A {@link List} of {@link HarmonicColour}s: The list of harmonic colors
+     */
+    private static List<HarmonicColour> getComplementary(float[] hsbValues, float radius, int wheelRadius) {
         double imageAngle = 360 * hsbValues[0] + 180 + 90;
         double colourAngle = 360 * hsbValues[0] + 180;
 
@@ -317,10 +233,15 @@ public class ColorWheel {
 
         javafx.scene.paint.Color c = javafx.scene.paint.Color.hsb(colourAngle, hsbValues[1], hsbValues[2]);
         return List.of(
-                new ComplementaryColor(imageAngle, colourAngle, (float) xPos, (float) yPos, c)
+                new HarmonicColour(imageAngle, colourAngle, (float) xPos, (float) yPos, c)
         );
     }
 
+    /**
+     * Returns the list of complementary colors.
+     * @param hsbValues The HSB values of the color
+     * @return A {@link List} of {@link javafx.scene.paint.Color}s: The list of complementary colors
+     */
     protected static List<javafx.scene.paint.Color> getComplementaryColourList(float[] hsbValues) {
         double colourAngle = 360 * hsbValues[0] + 180;
         colourAngle = getAngle(colourAngle);
@@ -328,7 +249,12 @@ public class ColorWheel {
         return List.of(javafx.scene.paint.Color.hsb(colourAngle, hsbValues[1], hsbValues[2]));
     }
 
-    private static List<ComplementaryColor> getSplitComplementary(float[] hsbValues, float radius, int wheelRadius) {
+    /**
+     * Returns the list of split-complementary colors for displaying them on a color wheel.
+     *
+     * @return A {@link List} of {@link HarmonicColour}s: The list of harmonic colors
+     */
+    private static List<HarmonicColour> getSplitComplementary(float[] hsbValues, float radius, int wheelRadius) {
         double imageAngle1 = 360 * hsbValues[0] + 180 + 90 + 30;
         double colourAngle1 = 360 * hsbValues[0] + 180 + 30;
         double imageAngle2 = 360 * hsbValues[0] + 180 + 90 - 30;
@@ -349,11 +275,16 @@ public class ColorWheel {
         javafx.scene.paint.Color c1 = javafx.scene.paint.Color.hsb(colourAngle1, hsbValues[1], hsbValues[2]);
         javafx.scene.paint.Color c2 = javafx.scene.paint.Color.hsb(colourAngle2, hsbValues[1], hsbValues[2]);
         return List.of(
-                new ComplementaryColor(imageAngle1, colourAngle1, (float) xPos1, (float) yPos1, c1),
-                new ComplementaryColor(imageAngle2, colourAngle2, (float) xPos2, (float) yPos2, c2)
+                new HarmonicColour(imageAngle1, colourAngle1, (float) xPos1, (float) yPos1, c1),
+                new HarmonicColour(imageAngle2, colourAngle2, (float) xPos2, (float) yPos2, c2)
         );
     }
 
+    /**
+     * Returns the list of split-complementary colors.
+     * @param hsbValues The HSB values of the color
+     * @return A {@link List} of {@link javafx.scene.paint.Color}s: The list of split-complementary colors
+     */
     protected static List<javafx.scene.paint.Color> getSplitComplementaryColour(float[] hsbValues) {
         double colourAngle1 = 360 * hsbValues[0] + 180 + 30;
         double colourAngle2 = 360 * hsbValues[0] + 180 - 30;
@@ -368,7 +299,12 @@ public class ColorWheel {
         );
     }
 
-    private static List<ComplementaryColor> getAnalogous(float[] hsbValues, float radius, int wheelRadius) {
+    /**
+     * Returns the list of analogous colors for displaying them on a color wheel.
+     *
+     * @return A {@link List} of {@link HarmonicColour}s: The list of harmonic colors
+     */
+    private static List<HarmonicColour> getAnalogous(float[] hsbValues, float radius, int wheelRadius) {
         double imageAngle1 = 360 * hsbValues[0] + 90 + 30;
         double colourAngle1 = 360 * hsbValues[0] + 30;
         double imageAngle2 = 360 * hsbValues[0] + 90 - 30;
@@ -389,11 +325,16 @@ public class ColorWheel {
         javafx.scene.paint.Color c1 = javafx.scene.paint.Color.hsb(colourAngle1, hsbValues[1], hsbValues[2]);
         javafx.scene.paint.Color c2 = javafx.scene.paint.Color.hsb(colourAngle2, hsbValues[1], hsbValues[2]);
         return List.of(
-                new ComplementaryColor(imageAngle1, colourAngle1, (float) xPos1, (float) yPos1, c1),
-                new ComplementaryColor(imageAngle2, colourAngle2, (float) xPos2, (float) yPos2, c2)
+                new HarmonicColour(imageAngle1, colourAngle1, (float) xPos1, (float) yPos1, c1),
+                new HarmonicColour(imageAngle2, colourAngle2, (float) xPos2, (float) yPos2, c2)
         );
     }
 
+    /**
+     * Returns the list of analogous colors.
+     * @param hsbValues The HSB values of the color
+     * @return A {@link List} of {@link javafx.scene.paint.Color}s: The list of analogous colors
+     */
     protected static List<javafx.scene.paint.Color> getAnalogousColour(float[] hsbValues) {
         double colourAngle1 = 360 * hsbValues[0] + 30;
         double colourAngle2 = 360 * hsbValues[0] - 30;
@@ -410,7 +351,12 @@ public class ColorWheel {
         );
     }
 
-    private static List<ComplementaryColor> getTriadic(float[] hsbValues, float radius, int wheelRadius) {
+    /**
+     * Returns the list of triadic colors for displaying them on a color wheel.
+     *
+     * @return A {@link List} of {@link HarmonicColour}s: The list of harmonic colors
+     */
+    private static List<HarmonicColour> getTriadic(float[] hsbValues, float radius, int wheelRadius) {
         double imageAngle1 = 360 * hsbValues[0] + 120 + 90;
         double colourAngle1 = 360 * hsbValues[0] + 120;
         double imageAngle2 = 360 * hsbValues[0] + 240 + 90;
@@ -432,11 +378,16 @@ public class ColorWheel {
         javafx.scene.paint.Color c1 = javafx.scene.paint.Color.hsb(colourAngle1, hsbValues[1], hsbValues[2]);
         javafx.scene.paint.Color c2 = javafx.scene.paint.Color.hsb(colourAngle2, hsbValues[1], hsbValues[2]);
         return List.of(
-                new ComplementaryColor(imageAngle1, colourAngle1, (float) xPos1, (float) yPos1, c1),
-                new ComplementaryColor(imageAngle2, colourAngle2, (float) xPos2, (float) yPos2, c2)
+                new HarmonicColour(imageAngle1, colourAngle1, (float) xPos1, (float) yPos1, c1),
+                new HarmonicColour(imageAngle2, colourAngle2, (float) xPos2, (float) yPos2, c2)
         );
     }
 
+    /**
+     * Returns the list of triadic colors.
+     * @param hsbValues The HSB values of the color
+     * @return A {@link List} of {@link javafx.scene.paint.Color}s: The list of triadic colors
+     */
     protected static List<javafx.scene.paint.Color> getTriadicColour(float[] hsbValues) {
         double colourAngle1 = 360 * hsbValues[0] + 120;
         double colourAngle2 = 360 * hsbValues[0] + 240;
@@ -451,7 +402,12 @@ public class ColorWheel {
         );
     }
 
-    private static List<ComplementaryColor> getTetradic(float[] hsbValues, float radius, int wheelRadius) {
+    /**
+     * Returns the list of tetradic colors for displaying them on a color wheel.
+     *
+     * @return A {@link List} of {@link HarmonicColour}s: The list of harmonic colors
+     */
+    private static List<HarmonicColour> getTetradic(float[] hsbValues, float radius, int wheelRadius) {
         double imageAngle1 = 360 * hsbValues[0] + 90 + 90;
         double colourAngle1 = 360 * hsbValues[0] + 90;
         double imageAngle2 = 360 * hsbValues[0] + 180 + 90;
@@ -481,12 +437,17 @@ public class ColorWheel {
         javafx.scene.paint.Color c2 = javafx.scene.paint.Color.hsb(colourAngle2, hsbValues[1], hsbValues[2]);
         javafx.scene.paint.Color c3 = javafx.scene.paint.Color.hsb(colourAngle3, hsbValues[1], hsbValues[2]);
         return List.of(
-                new ComplementaryColor(imageAngle1, colourAngle1, (float) xPos1, (float) yPos1, c1),
-                new ComplementaryColor(imageAngle2, colourAngle2, (float) xPos2, (float) yPos2, c2),
-                new ComplementaryColor(imageAngle3, colourAngle3, (float) xPos3, (float) yPos3, c3)
+                new HarmonicColour(imageAngle1, colourAngle1, (float) xPos1, (float) yPos1, c1),
+                new HarmonicColour(imageAngle2, colourAngle2, (float) xPos2, (float) yPos2, c2),
+                new HarmonicColour(imageAngle3, colourAngle3, (float) xPos3, (float) yPos3, c3)
         );
     }
 
+    /**
+     * Returns the list of tetradic colors.
+     * @param hsbValues The HSB values of the color
+     * @return A {@link List} of {@link javafx.scene.paint.Color}s: The list of tetradic colors
+     */
     protected static List<javafx.scene.paint.Color> getTetradicColour(float[] hsbValues) {
         double colourAngle1 = 360 * hsbValues[0] + 90;
         double colourAngle2 = 360 * hsbValues[0] + 180;
@@ -506,7 +467,12 @@ public class ColorWheel {
         );
     }
 
-    private static List<ComplementaryColor> getMonochromatic(float[] hsbValues, float radius, int wheelRadius) {
+    /**
+     * Returns the list of monochromatic colors for displaying them on a color wheel.
+     *
+     * @return A {@link List} of {@link HarmonicColour}s: The list of harmonic colors
+     */
+    private static List<HarmonicColour> getMonochromatic(float[] hsbValues, float radius, int wheelRadius) {
         double imageAngle = 360 * hsbValues[0] + 90;
         double colourAngle = 360 * hsbValues[0];
 
@@ -517,15 +483,19 @@ public class ColorWheel {
         double yPos1 = radius * Math.sin(imageAngle) + wheelRadius;
 
         return List.of(
-                new ComplementaryColor(imageAngle, colourAngle, (float) xPos1, (float) yPos1, javafx.scene.paint.Color.hsb(hsbValues[0] * 360, 0.22, 1)),
-                new ComplementaryColor(imageAngle, colourAngle, (float) xPos1, (float) yPos1, javafx.scene.paint.Color.hsb(hsbValues[0] * 360, 0.46, 1)),
-                new ComplementaryColor(imageAngle, colourAngle, (float) xPos1, (float) yPos1, javafx.scene.paint.Color.hsb(hsbValues[0] * 360, 0.75, 0.8)),
-                new ComplementaryColor(imageAngle, colourAngle, (float) xPos1, (float) yPos1, javafx.scene.paint.Color.hsb(hsbValues[0] * 360, 0.75, 0.26))
+                new HarmonicColour(imageAngle, colourAngle, (float) xPos1, (float) yPos1, javafx.scene.paint.Color.hsb(hsbValues[0] * 360, 0.22, 1)),
+                new HarmonicColour(imageAngle, colourAngle, (float) xPos1, (float) yPos1, javafx.scene.paint.Color.hsb(hsbValues[0] * 360, 0.46, 1)),
+                new HarmonicColour(imageAngle, colourAngle, (float) xPos1, (float) yPos1, javafx.scene.paint.Color.hsb(hsbValues[0] * 360, 0.75, 0.8)),
+                new HarmonicColour(imageAngle, colourAngle, (float) xPos1, (float) yPos1, javafx.scene.paint.Color.hsb(hsbValues[0] * 360, 0.75, 0.26))
         );
     }
 
+    /**
+     * Returns the list of monochromatic colors.
+     * @param hsbValues The HSB values of the color
+     * @return A {@link List} of {@link javafx.scene.paint.Color}s: The list of monochromatic colors
+     */
     protected static List<javafx.scene.paint.Color> getMonochromaticColour(float[] hsbValues) {
-
         return List.of(
                 javafx.scene.paint.Color.hsb(hsbValues[0] * 360, 0.22, 1),
                 javafx.scene.paint.Color.hsb(hsbValues[0] * 360, 0.46, 1),
@@ -534,6 +504,11 @@ public class ColorWheel {
         );
     }
 
+    /**
+     * Calculates the hue for the harmonious colors.
+     * @param angle The angle of the color
+     * @return A {@link Double}: The hue for the harmonious colors
+     */
     private static double getAngle(double angle) {
         if (angle < 0) {
             angle = 360 + angle;
@@ -563,7 +538,15 @@ public class ColorWheel {
         return resizedImage;
     }
 
-    record ComplementaryColor(
+    /**
+     * A simple record for the harmonic colors.
+     * @param imageAngle The angle of the color on the color wheel
+     * @param colorAngle The hue of the color
+     * @param xPos The x position of the color on the color wheel
+     * @param yPos The y position of the color on the color wheel
+     * @param color The color
+     */
+    record HarmonicColour(
             double imageAngle,
             double colorAngle,
             float xPos,
