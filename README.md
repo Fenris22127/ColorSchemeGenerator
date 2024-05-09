@@ -202,21 +202,21 @@ This program requires Java 18+ to run properly. How to install Java will be expl
          
       10. Press the Windows key and type in `Control Panel`, open the `Programs` page and click on `Java`
          
-         <p>
-            <img src="src/res/images/Programs.png" alt="The ´Programs´ page" height="60">
-            <img src="src/res/images/Java.png" alt="The ´Java´ page" height="60">
-         </p>
+           <p>
+              <img src="src/res/images/Programs.png" alt="The ´Programs´ page" height="60">
+              <img src="src/res/images/Java.png" alt="The ´Java´ page" height="60">
+           </p>
 
       11. Switch to the `Java` tab in the window that should have opened and click on `View`
          
-         <img src="src/res/images/java_control_panel.png" alt="The ´Java´ Tab in the Java Control Panel" width="330">
+           <img src="src/res/images/java_control_panel.png" alt="The ´Java´ Tab in the Java Control Panel" width="330">
        
       12. A new window with a table should now open. Click on `Find` and then on `Next` in the JRE Finder
       
-         <p>
-            <img src="src/res/images/jre_settings.png" alt="The Java Runtime Environments Settings" width="270">
-            <img src="src/res/images/jre_finder.png" alt="The Java Runtime Environments Finder" width="270">
-         </p>
+           <p>
+              <img src="src/res/images/jre_settings.png" alt="The Java Runtime Environments Settings" width="270">
+              <img src="src/res/images/jre_finder.png" alt="The Java Runtime Environments Finder" width="270">
+           </p>
       
       13. Enter the file path to the Java installation as determined in Step 4 and click on `Finish`
       14. Should there be more than your downloaded version of Java in the table, disable the old one by unselecting the checkbox in the column titled `Enabled`
