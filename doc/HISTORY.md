@@ -101,3 +101,35 @@ estimates based on timestamps on files and documents.</sub>
 > #### Version 2.0.11
 > * `ColorLogger-v2.jar`: Added the .jar for the improved ColorLogger
 > * `build.gradle`: Changed dependencies accordingly
+
+### 01.11.2023 18:32
+> #### Version 3.0.0
+> * Merged JavaFX branch with master
+> * Rebased UI from Swing onto JavaFX
+
+### 15.04.2024 14:28
+> #### Version 3.1.0
+> * Started major UI rework
+> * Started major output file rework
+
+### 07.05.2024 16:00
+> #### Version 3.2.0
+> * Finished major UI rework
+
+### 08.05.2024 23:06
+> #### Version 3.3.0
+> * Added option to add colour harmonies to output
+
+### 09.05.2024 02:51
+> #### Version 3.3.0
+> * Finalized output rework
+> * Testing & cleanup
+
+### 27.05.2024 21:17
+> #### Version 4.0.0
+> * Final cleanup
+> * Published latest release jar
+
+### 27.05.2024 21:46
+> #### Version 4.0.1
+> * Removed old directories containing unused elements
