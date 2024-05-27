@@ -17,14 +17,14 @@ public interface MetaData extends Comparable<MetaData> {
 
     /**
      * Creates a {@link Set} of {@link MetaData} with the given {@link Function} to assign the values to a
-     * {@link Type metadata type}
+     * {@link MetaType metadata type}
      *
      * @param metaDataCreator A {@link Function}: The function used to assign the values to a metadata type
      * @return A {@link Set} of {@link MetaData}: The metadata with the assigned values
      */
-    static Set<MetaData> createMetaData(Function<Type, String> metaDataCreator) {
+    static Set<MetaData> createMetaData(Function<MetaType, String> metaDataCreator) {
         Set<MetaData> metaData = new TreeSet<>();
-        for (Type type : Type.values()) {
+        for (MetaType type : MetaType.values()) {
             metaData.add(type.create(metaDataCreator.apply(type)));
         }
         return metaData;
@@ -38,32 +38,30 @@ public interface MetaData extends Comparable<MetaData> {
      */
     static Set<MetaData> createNoAccessMetaData() {
         Set<MetaData> metaData = new TreeSet<>();
-        for (Type type : Type.values()) {
+        for (MetaType type : MetaType.values()) {
             metaData.add(type.create(getResBundle().getString("noAccess")));
         }
         return metaData;
     }
 
     /**
-     * Gets the data of a {@link Type metadata type}
+     * Gets the data of a {@link MetaType metadata type}
      *
      * @return A {@link String}: The value of the metadata type
      */
     String getData();
 
     /**
-     * Gets the {@link Type metadata type} as a {@link String}
+     * Gets the {@link MetaType metadata type} as a {@link String}
      *
      * @return A {@link String}: The metadata type
      */
     String getDescriptor();
 
     /**
-     * Gets the {@link Type metadata type}
+     * Gets the {@link MetaType metadata type}
      *
-     * @return A {@link Type}: The metadata type
+     * @return A {@link MetaType}: The metadata type
      */
-    Type getType();
-
-
+    MetaType getType();
 }

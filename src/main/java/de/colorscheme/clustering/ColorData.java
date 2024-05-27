@@ -8,12 +8,12 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static de.colorscheme.app.AppController.getResBundle;
-import static java.util.logging.Level.INFO;
 
 /**
  * Reads an image and stores all pixels rgb-values <br>
@@ -67,13 +67,6 @@ public class ColorData {
     private Point3D maximum = new Point3D(256, 256, 256);
 
     /**
-     * Empty default constructor
-     */
-    @SuppressWarnings("unused")
-    protected ColorData() {
-    }
-
-    /**
      * ✓ <i>Successfully reads data from image as Point3D's to pixel into list</i> <br>
      * <b>Alternate constructor invocation:</b><br>
      * Reads content of provided file via {@link ImageIO} into a {@link BufferedImage} and traverses it pixel by pixel,
@@ -92,7 +85,7 @@ public class ColorData {
      *
      * @param image A {@link BufferedImage}: The image to be read
      **/
-    public ColorData(BufferedImage image) {
+    private ColorData(BufferedImage image) {
         try {
             double width = image.getWidth();
             double height = image.getHeight();
@@ -202,6 +195,16 @@ public class ColorData {
     }
 
     /**
+     * Creates a new {@link ColorData} object
+     *
+     * @param img The image to be read
+     * @return A {@link ColorData} object
+     */
+    public static ColorData createColorData(BufferedImage img) {
+        return new ColorData(img);
+    }
+
+    /**
      * ✓ <i>Successfully updates Minimum depending on whether Minimum has already been set or not</i> <br>
      * Updates the {@link Point3D} object {@link #minimum} with new minimums for x, y and/or z.
      * <ul>
@@ -210,7 +213,7 @@ public class ColorData {
      *         the {@link Point3D point} given to the method
      *     </li>
      *     <li>
-     *         If no minimum has been set yet, ({@link #minimum} = <code color="#B5B5B5">(x: -1, y: -1, z: -1)</code>,
+     *         If no minimum has been set yet, ({@link #minimum} = <code>(x: -1, y: -1, z: -1)</code>,
      *         the {@link Point3D point} given to the method will be set as the new {@link #minimum}
      *     </li>
      *     <li>
@@ -235,24 +238,10 @@ public class ColorData {
         if (minimum.equals(new Point3D(-1, -1, -1))) {
             minimum = p;
         } else { //check for smaller coordinates and update the minimum accordingly
-            if (x < minimum.getX() ||
-                    y < minimum.getY() ||
-                    z < minimum.getZ()) {
-                double minX = minimum.getX();
-                double minY = minimum.getY();
-                double minZ = minimum.getZ();
-
-                if (x < minX) {
-                    minX = x;
-                }
-                if (y < minY) {
-                    minY = y;
-                }
-                if (z < minZ) {
-                    minZ = z;
-                }
-                minimum = new Point3D(minX, minY, minZ);
-            }
+            double minX = Math.min(x, minimum.getX());
+            double minY = Math.min(y, minimum.getY());
+            double minZ = Math.min(z, minimum.getZ());
+            minimum = new Point3D(minX, minY, minZ);
         }
     }
 
@@ -266,7 +255,7 @@ public class ColorData {
      *     </li>
      *     <li>
      *         If no maximum has been set yet, meaning {@link #maximum} is
-     *         <code color="#B5B5B5">(x: 256, y: -256, z: -256</code>, the {@link Point3D point} given to the method
+     *         <code>(x: 256, y: -256, z: -256</code>, the {@link Point3D point} given to the method
      *         will be set as the new {@link #maximum}
      *     </li>
      *     <li>
@@ -291,24 +280,10 @@ public class ColorData {
         if (maximum.equals(new Point3D(256, 256, 256))) {
             maximum = p;
         } else { //check for larger coordinates and update the maximum accordingly
-            if (x > maximum.getX() ||
-                    y > maximum.getY() ||
-                    z > maximum.getZ()) {
-                double maxX = maximum.getX();
-                double maxY = maximum.getY();
-                double maxZ = maximum.getZ();
-
-                if (x > maxX) {
-                    maxX = x;
-                }
-                if (y > maxY) {
-                    maxY = y;
-                }
-                if (z > maxZ) {
-                    maxZ = z;
-                }
-                maximum = new Point3D(maxX, maxY, maxZ);
-            }
+            double maxX = Math.max(x, minimum.getX());
+            double maxY = Math.max(y, minimum.getY());
+            double maxZ = Math.max(z, minimum.getZ());
+            maximum = new Point3D(maxX, maxY, maxZ);
         }
     }
 
@@ -317,7 +292,7 @@ public class ColorData {
      * Iterates through the elements in the {@link LinkedList List} given to the method. <br>
      * If the current value describing the index of the {@link Point3D point} in that cluster in the
      * {@link #pixelColor List of all pixels} is within the range of indices possible
-     * (<code color="#B5B5B5">pixelColor.length()</code>), adds the x, y and z values
+     * (<code>pixelColor.length()</code>), adds the x, y and z values
      * to the sum of x, y and z values of the other {@link Point3D points} in the cluster. <br>
      * When the iteration is finished, the average value for x, y and z is calculated by dividing the sum by the
      * total number of pixels in the cluster. <br>
@@ -374,22 +349,8 @@ public class ColorData {
      */
     protected void recomputeCentroids(int totalCentroids) {
         for (int i = 0; i < totalCentroids; i++) {
-            getCentroids().remove(i);
-            getCentroids().add(i, calculateCentroid(i));
+            getCentroids().set(i, calculateCentroid(i));
         }
-    }
-
-    /**
-     * ✓ <i>Successfully gets a random point from the list of all points saved</i> <br>
-     * Gets a random pixel from {@link #pixelColor} by getting a random integer in range of the total number of pixels
-     * saved
-     *
-     * @return A randomly determined {@link Point3D} from the list with all points saved
-     */
-    @SuppressWarnings("unused")
-    protected Point3D randomFromPoint3DList() {
-        int index = random.nextInt(pixelColor.size());
-        return pixelColor.get(index).getPixel();
     }
 
     /**
@@ -426,7 +387,7 @@ public class ColorData {
      * @param centroids The {@link LinkedList} containing the centroids
      * @return A {@link Double} - The squared distance of each pixel in all clusters from its centroid
      */
-    protected Double calculateTotalSumSquaredDistances(LinkedList<Point3D> centroids) {
+    protected Double calculateTotalSumSquaredDistances(List<Point3D> centroids) {
 
         Double sumSquaredError = 0.0;
 
@@ -463,7 +424,7 @@ public class ColorData {
      * </ol>
      *
      * @return A {@link Point3D} - The point selected as a centroid <b>OR</b>
-     * <code color="#B5B5B5">(x: -1, y: -1, z: -1)</code> if an error occurred and no centroid could be calculated
+     * <code >(x: -1, y: -1, z: -1)</code> if an error occurred and no centroid could be calculated
      */
     protected Point3D calculateWeighedCentroid() {
 
@@ -566,26 +527,6 @@ public class ColorData {
     }
 
     /**
-     * Get the minimum value of all pixels
-     *
-     * @return A {@link Point3D} - The minimum
-     */
-    @SuppressWarnings("unused")
-    protected Point3D getMin() {
-        return minimum;
-    }
-
-    /**
-     * Get the maximum value of all pixels
-     *
-     * @return A {@link Point3D} - The maximum
-     */
-    @SuppressWarnings("unused")
-    protected Point3D getMax() {
-        return maximum;
-    }
-
-    /**
      * Gets the {@link LinkedList} {@link #indicesOfCentroids}
      *
      * @return A {@link LinkedList} containing all indices of centroids
@@ -599,28 +540,8 @@ public class ColorData {
      *
      * @return A {@link LinkedList} containing all centroids
      */
-    public LinkedList<Point3D> getCentroids() {
+    public List<Point3D> getCentroids() {
         return centroids;
-    }
-
-    /**
-     * ✓ <i>Successfully reads data from {@link #pixelColor}</i> <br>
-     * Prints a {@link Point3D} as a Pixel with RBG values
-     */
-    @SuppressWarnings("unused")
-    protected void pixelColorToString() {
-        double red;
-        double green;
-        double blue;
-        int pixelNr = 0;
-        for (Pixels px : pixelColor) {
-            Point3D pt = px.pixel;
-            red = pt.getX();
-            green = pt.getY();
-            blue = pt.getZ();
-            pixelNr++;
-            LOGGER.log(INFO, "Pixel #{0}: R:{1}, G:{2}, B:{3}", new Object[]{pixelNr, red, green, blue});
-        }
     }
 
     /**
@@ -646,7 +567,7 @@ public class ColorData {
      *     </li>
      * </ul>
      */
-    static class Pixels {
+    public static class Pixels {
         /**
          * {@link Point3D} storing a pixel's color with {@link Color#getRed() red} as the {@link Point3D#getX() x},
          * {@link Color#getGreen() green} as the {@link Point3D#getY() y}
@@ -679,6 +600,7 @@ public class ColorData {
 
         /**
          * Getter for the {@link Point3D} object {@link #pixel}
+         * @return A {@link Point3D} - The pixel's color
          **/
         protected Point3D getPixel() {
             return pixel;
@@ -693,6 +615,4 @@ public class ColorData {
             super(errorMessage);
         }
     }
-
-
 }

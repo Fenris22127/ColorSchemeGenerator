@@ -10,6 +10,29 @@
     -fx-darker-grey: #A9ABAC;
 }
 
+@font-face {
+    src: url('fonts/QuattrocentoSans-Regular.ttf');
+    font-style: normal;
+}
+
+@font-face {
+    src: url('fonts/Mulish-Regular.ttf');
+    font-style: normal;
+}
+@font-face {
+    src: url('fonts/Mulish-Bold.ttf');
+    font-weight: bold;
+}
+@font-face {
+    src: url('fonts/Mulish-SemiBold.ttf');
+    font-weight: 600;
+}
+
+.root {
+    -fx-font-family: "Mulish";
+    -fx-font-style: normal;
+}
+
 #icon {
     -fx-background-image: url("LogoOutline.png");
     -fx-background-size: 79 auto;
@@ -17,7 +40,8 @@
 }
 
 #title {
-    -fx-font-family: "Quattrocento Sans Regular";
+    -fx-font-family: "Quattrocento Sans";
+    -fx-font-style: normal;
     -fx-font-size: 36px;
     -fx-text-fill: black;
 }
@@ -43,7 +67,6 @@
     -fx-background-color: transparent;
     -fx-border-radius: 3px;
     -fx-content-display: top;
-    -fx-font-family: Mulish Regular;
     -fx-font-size: 18px;
     -fx-text-fill: black;
 }
@@ -57,7 +80,7 @@
 #downloadBtn {
     -fx-background-color: -fx-mid-green;
     -fx-background-radius: 6px;
-    -fx-font-family: "Mulish Bold";
+    -fx-font-weight: bold;
     -fx-font-size: 14px;
     -fx-text-fill: -fx-grey;
     -fx-padding: 10 30;
@@ -86,7 +109,6 @@
 
 .check-box {
     -fx-label-padding: 0 0 0 15;
-    -fx-font-family: "Mulish Regular";
     -fx-font-size: 14px;
 }
 
@@ -132,13 +154,11 @@
 }
 
 #autoDownload {
-    -fx-font-family: "Mulish Regular";
     -fx-font-size: 14px;
     -fx-text-fill: black;
 }
 
 .textlabel {
-    -fx-font-family: "Mulish Regular";
     -fx-font-size: 14px;
     -fx-text-fill: black;
 }
@@ -172,7 +192,7 @@
 }
 
 .spinner {
-    -fx-border-width: 0.12em;
+    -fx-border-width: 2px;
     -fx-border-color: -fx-darker-grey;
     -fx-border-radius: 0.35em;
     -fx-background-color: transparent;
@@ -182,7 +202,6 @@
 
 .spinner > .text-field {
     -fx-background-color: transparent;
-    -fx-font-family: "Mulish Regular";
     -fx-font-size: 14px;
     -fx-text-fill: black;
     -fx-alignment: center;
@@ -197,21 +216,23 @@
 .titled-pane,
 .titled-pane:disabled {
     -fx-background-color: transparent;
-    -fx-background-radius: 0.8em;
+    -fx-background-radius: 0.25em;
     -fx-border-width: 0.12em;
     -fx-border-color: -fx-darker-grey;
-    -fx-border-radius: 0.8em;
+    -fx-border-radius: 0.25em;
     -fx-padding: 0;
 }
 
+.titled-pane:disabled {
+    -fx-border-color: -fx-grey;
+}
+.titled-pane .title,
 .titled-pane > .title,
 .titled-pane:collapsed > .title,
 .titled-pane:focused > .title
 {
     -fx-background-color: transparent;
-    -fx-font-family: "Mulish SemiBold";
     -fx-font-size: 16px;
-    -fx-text-fill: black;
     -fx-padding: 0.5em 0.7em 0.5em 0.7em;
 }
 
@@ -220,7 +241,6 @@
 .titled-pane:focused:disabled > .title
 {
     -fx-background-color: transparent;
-    -fx-font-family: "Mulish SemiBold";
     -fx-font-size: 16px;
     -fx-text-fill: -fx-darker-grey;
     -fx-padding: 0.5em 0.7em 0.5em 0.7em;
@@ -246,7 +266,6 @@
 {
     -fx-background-color: -fx-darker-grey;
     -fx-padding: 0.4em;
-    /*-fx-padding: 0.25em 0.3125em 0.25em 0.3125em; !* 3 3.75 3 3.75 *!*/
     -fx-shape: "M.536 1044.409v-1.997h9v-9h2v11z";
 }
 .titled-pane:collapsed > .title > .arrow-button .arrow
@@ -289,10 +308,11 @@
 .colourbutton {
     -fx-background-color: transparent;
     -fx-background-radius: 0.35em;
-    -fx-border-width: 0.12em;
+    -fx-border-width: 2px;
     -fx-border-color: -fx-darker-grey;
     -fx-border-radius: 0.35em;
-    -fx-font-family: "Mulish Bold";
+    -fx-font-family: "Mulish";
+    -fx-font-weight: bold;
     -fx-font-size: 14px;
     -fx-text-fill: -fx-grey;
     -fx-padding: 0 0 0 0;
@@ -308,7 +328,7 @@
 }
 
 #downloadBtn:disabled {
-    -fx-border-width: 0.12em;
+    -fx-border-width: 2px;
     -fx-border-color: -fx-darker-grey;
     -fx-border-radius: 0.35em;
     -fx-text-fill: -fx-darker-grey;
@@ -317,10 +337,6 @@
 
 .progress-bar {
     -fx-background-color: -fx-grey;
-    /*-fx-indeterminate-bar-length: 60;
-    -fx-indeterminate-bar-escape: true;
-    -fx-indeterminate-bar-flip: true;
-    -fx-indeterminate-bar-animation-time: 2;*/
 
     -fx-border-radius: 0.5em;
     -fx-background-radius: 0.5em;
@@ -345,24 +361,23 @@
 }
 
 .progressTitleLabel {
-    -fx-font-family: "Mulish Regular";
     -fx-font-size: 12px;
     -fx-text-fill: black;
 }
 
 #progressLabel {
-    -fx-font-family: "Mulish SemiBold";
+    -fx-font-family: "Mulish";
+    -fx-font-weight: bold;
     -fx-font-size: 12px;
     -fx-text-fill: black;
 }
 
 .choice-box {
-    -fx-border-width: 0.12em;
+    -fx-border-width: 2px;
     -fx-border-color: -fx-darker-grey;
     -fx-border-radius: 0.35em;
     -fx-mark-color: -fx-darker-grey;
     -fx-background-color: transparent;
-    -fx-font-family: "Mulish Regular";
     -fx-font-size: 12px;
 }
 

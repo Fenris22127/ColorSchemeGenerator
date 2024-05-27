@@ -10,7 +10,7 @@
          <padding>
             <Insets left="6.0" top="5.0" />
          </padding>
-         <Pane fx:id="icon" maxHeight="-Infinity" prefHeight="100.0" prefWidth="80.0" />
+         <Pane id="icon" maxHeight="-Infinity" prefHeight="100.0" prefWidth="80.0" />
          <Label fx:id="title" styleClass="title" text="COLOR SCHEME GENERATOR">
             <padding>
                <Insets top="6.0" />
@@ -22,17 +22,17 @@
          <HBox fx:id="startBox" alignment="CENTER" minHeight="-Infinity" prefHeight="182.0" prefWidth="300.0" spacing="5.0">
             <VBox fx:id="progressBox" maxHeight="-Infinity" HBox.hgrow="NEVER">
                <HBox alignment="CENTER">
-                  <Label styleClass="progressTitleLabel" text="Progress"/>
-                  <Region HBox.hgrow="ALWAYS"/>
-                  <Label fx:id="progressLabel" text="50%" textAlignment="RIGHT"/>
+                  <Label styleClass="progressTitleLabel" text="Progress" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Label fx:id="progressLabel" text="50%" textAlignment="RIGHT" />
                </HBox>
-               <ProgressBar fx:id="progressBar" prefHeight="15.0" prefWidth="537.0" progress="0.5"/>
+               <ProgressBar fx:id="progressBar" prefHeight="15.0" prefWidth="537.0" progress="0.5" />
             </VBox>
             <VBox alignment="TOP_CENTER" maxHeight="-Infinity" spacing="10.0">
-               <Label fx:id="fileNameLabel" text="Label"/>
+               <Label fx:id="fileNameLabel" text="Label" />
                <HBox spacing="5.0" VBox.vgrow="NEVER">
-                  <Button fx:id="startBtn" mnemonicParsing="false" onAction="#startProcess" text="Start"/>
-                  <Button fx:id="reuploadButton" mnemonicParsing="false" onAction="#upload"/>
+                  <Button fx:id="startBtn" mnemonicParsing="false" onAction="#startProcess" text="Start" />
+                  <Button fx:id="reuploadButton" mnemonicParsing="false" onAction="#upload" />
                </HBox>
             </VBox>
             <padding>
@@ -80,10 +80,9 @@
             </AnchorPane>
          </TitledPane>
          <HBox alignment="BOTTOM_LEFT" prefWidth="200.0">
-            <Button fx:id="downloadBtn" disable="true" mnemonicParsing="false" onAction="#downloadFile"
-                    text="Download"/>
-            <Region prefWidth="200.0" HBox.hgrow="ALWAYS"/>
-            <ChoiceBox fx:id="languageChoice" prefWidth="100.0"/>
+            <Button fx:id="downloadBtn" disable="true" mnemonicParsing="false" onAction="#downloadFile" text="Download" />
+            <Region prefWidth="200.0" HBox.hgrow="ALWAYS" />
+            <ChoiceBox fx:id="languageChoice" prefWidth="100.0" />
          </HBox>
       </VBox>
    </VBox>

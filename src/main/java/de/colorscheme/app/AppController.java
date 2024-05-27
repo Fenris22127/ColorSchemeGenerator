@@ -237,30 +237,6 @@ public class AppController implements Initializable {
     }
 
     /**
-     * Adds or removes the harmonies from the list of harmonies to be included in the color scheme
-     *
-     * @param actionEvent The {@link ActionEvent} that triggered the method
-     */
-    private void setHarmony(ActionEvent actionEvent) {
-        ToggleButton tBtn = (ToggleButton) actionEvent.getSource();
-        ToggleButton button = (ToggleButton) actionEvent.getSource();
-        if (!button.isSelected()) {
-            styleButtons(tBtn, tBtn.getId().concat("_light"));
-            harmony.remove(ColorHarmony.valueOf(button.getId().toUpperCase()));
-        } else {
-            switch (button.getId()) {
-                case "complementary" -> harmony.add(ColorHarmony.COMPLEMENTARY);
-                case "splitcomplementary" -> harmony.add(ColorHarmony.SPLITCOMPLEMENTARY);
-                case "analogous" -> harmony.add(ColorHarmony.ANALOGOUS);
-                case "triadic" -> harmony.add(ColorHarmony.TRIADIC);
-                case "tetradic" -> harmony.add(ColorHarmony.TETRADIC);
-                case "monochromatic" -> harmony.add(ColorHarmony.MONOCHROMATIC);
-                default -> throw new IllegalStateException("Unexpected value: " + button.getId());
-            }
-        }
-    }
-
-    /**
      * Returns the {@link ResourceBundle} containing the {@link String}s for the program in the language
      * chosen by the user
      *
@@ -272,7 +248,17 @@ public class AppController implements Initializable {
     }
 
     /**
-     * Adds a {@link String} to the {@link TextArea} displaying the progress of the process
+     * Adds a {@link String} to the {@link TextArea} displaying the progress of the process <br>
+     * If the passed text is an error message:
+     * <ul>
+     *     <li>Set the text color to red</li>
+     *     <li>Add the message to the text field where status messages are displayed</li>
+     *     <li>Set the text colour back to black (Amy Winehouse was here)</li>
+     * </ul>
+     * If the passed text isn't an error message:
+     * <ul>
+     *     <li>Add the message to the text field where status messages are displayed</li>
+     * </ul>
      *
      * @param text    A {@link String}: The text to be added to the {@link TextArea}
      * @param isError A {@link Boolean}: Whether the text is an error message or not
@@ -371,11 +357,7 @@ public class AppController implements Initializable {
 
         // Sets the language of the program according to the choice of the user
         languageChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-            bundle = switch (newValue.intValue()) {
-                case 0 -> ResourceBundle.getBundle("messages_EN");
-                case 1 -> ResourceBundle.getBundle("messages_DE");
-                default -> throw new IllegalStateException("Unexpected value: " + newValue.intValue());
-            };
+            setBundle(newValue);
             title.setText(bundle.getString("appTitle"));
             autoDownload.setText(bundle.getString("appAutoDownload"));
             numberOfColors.setText(bundle.getString("appColorAmount"));
@@ -387,9 +369,29 @@ public class AppController implements Initializable {
 
         // Binds the progress bar to the progress label
         IntegerProperty progressProp = new SimpleIntegerProperty((int) progressBar.getProgress());
-        textProp = progressLabel.textProperty();
+        bind(progressLabel);
         Bindings.bindBidirectional(textProp, progressProp, new NumberStringConverter("#'%'"));
 
+    }
+
+    /**
+     * Binds the progress bar to the progress label
+     * @param progressLabel The {@link Label} displaying the progress of the process
+     */
+    private static synchronized void bind(Label progressLabel) {
+        textProp = progressLabel.textProperty();
+    }
+
+    /**
+     * Sets the language of the program according to the choice of the user
+     * @param newValue A {@link Number}: The index of the chosen language
+     */
+    private static synchronized void setBundle(Number newValue) {
+        bundle = switch (newValue.intValue()) {
+            case 0 -> ResourceBundle.getBundle("messages_EN");
+            case 1 -> ResourceBundle.getBundle("messages_DE");
+            default -> throw new IllegalStateException("Unexpected value: " + newValue.intValue());
+        };
     }
 
     /**
@@ -432,13 +434,22 @@ public class AppController implements Initializable {
      */
     @FXML
     private void toggleBtn(ActionEvent event) {
-        ToggleButton o = (ToggleButton) event.getSource();
-        if (o.isSelected()) {
-            styleButtons(o, o.getId().concat("_selected"));
+        ToggleButton button = (ToggleButton) event.getSource();
+        if (button.isSelected()) {
+            styleButtons(button, button.getId().concat("_selected"));
+            switch (button.getId()) {
+                case "complementary" -> harmony.add(ColorHarmony.COMPLEMENTARY);
+                case "splitcomplementary" -> harmony.add(ColorHarmony.SPLITCOMPLEMENTARY);
+                case "analogous" -> harmony.add(ColorHarmony.ANALOGOUS);
+                case "triadic" -> harmony.add(ColorHarmony.TRIADIC);
+                case "tetradic" -> harmony.add(ColorHarmony.TETRADIC);
+                case "monochromatic" -> harmony.add(ColorHarmony.MONOCHROMATIC);
+                default -> throw new IllegalStateException("Unexpected value: " + button.getId());
+            }
         } else {
-            styleButtons(o, o.getId().concat("_light"));
+            styleButtons(button, button.getId().concat("_light"));
+            harmony.remove(ColorHarmony.valueOf(button.getId().toUpperCase()));
         }
-        setHarmony(event);
     }
 
     /**
@@ -530,7 +541,7 @@ public class AppController implements Initializable {
      *
      * @param scene A {@link Scene}: The scene to be set as the current scene
      */
-    public void setScene(Scene scene) {
+    public static synchronized void setScene(Scene scene) {
         currentScene = scene;
     }
 

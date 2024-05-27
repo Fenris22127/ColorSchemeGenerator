@@ -8,10 +8,28 @@ package de.colorscheme.output;
  * @since 17.0.1
  */
 public enum ColorHarmony {
+    /**
+     * The complementary color harmony
+     */
     COMPLEMENTARY,
+    /**
+     * The split-complementary color harmony
+     */
     SPLITCOMPLEMENTARY,
+    /**
+     * The analogous color harmony
+     */
     ANALOGOUS,
+    /**
+     * The triadic color harmony
+     */
     TRIADIC,
+    /**
+     * The tetradic color harmony
+     */
     TETRADIC,
+    /**
+     * The monochromatic color harmony
+     */
     MONOCHROMATIC
 }

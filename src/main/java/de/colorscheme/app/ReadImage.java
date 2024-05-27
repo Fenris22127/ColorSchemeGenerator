@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static de.colorscheme.app.AppController.*;
+import static de.colorscheme.clustering.ColorData.createColorData;
 import static de.colorscheme.clustering.ColorData.resize;
 import static de.colorscheme.clustering.KMeans.kMeans;
 
@@ -29,8 +30,15 @@ public class ReadImage extends Task<Void> {
      * Creates a {@link ColorLogger} for this class
      */
     private static final Logger LOGGER = ColorLogger.newLogger(ReadImage.class.getName());
+    /**
+     * The {@link AppController} for this class
+     */
     private AppController con = null;
 
+    /**
+     * Sets the {@link AppController} for this class
+     * @param con The {@link AppController} to set
+     */
     public void setController(AppController con) {
         this.con = con;
     }
@@ -69,7 +77,7 @@ public class ReadImage extends Task<Void> {
         addToOutputField(getResBundle().getString("startReadingColours") + System.lineSeparator(), false);
         TimeUnit.MILLISECONDS.sleep(1000);
 
-        setColorData(new ColorData(img));
+        setColorData(createColorData(img));
         if (!isCancelled()) {
             updateProgress(68, 100);
             addToOutputField(getResBundle().getString("startDeterminingColours") + System.lineSeparator(), false);

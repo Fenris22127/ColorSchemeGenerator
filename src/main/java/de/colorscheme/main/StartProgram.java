@@ -27,7 +27,7 @@ public class StartProgram extends Application {
      * Gets the stage of the application.
      * @return A {@link Stage}: The stage of the application
      */
-    public static Stage getStage() {
+    public static synchronized Stage getStage() {
         return stage;
     }
 
@@ -51,7 +51,7 @@ public class StartProgram extends Application {
                 "Mulish-Medium.TTF",
                 "Mulish-SemiBold.TTF");
 
-        stage = primaryStage;
+        setStage(primaryStage);
         final FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("app.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 628, 712);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("newstyle.css")).toExternalForm());
@@ -60,5 +60,13 @@ public class StartProgram extends Application {
         stage.getIcons().add(new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResourceAsStream("logoFX.png"))));
 
         stage.show();
+    }
+
+    /**
+     * Sets the stage of the application.
+     * @param stage The stage to set
+     */
+    private static synchronized void setStage(Stage stage) {
+        StartProgram.stage = stage;
     }
 }

@@ -55,11 +55,26 @@ public class OutputColors {
      * The {@link Font} used for the {@link Document}s regular content
      */
     private static Font regular = FontFactory.getFont("../fonts/Mulish-Regular.ttf", 8, Font.NORMAL);
+    /**
+     * The {@link Path} to the color wheel image
+     */
     private static final Path schemeWheelPath = Path.of("src/main/resources/img/SchemeWheel.png");
+    /**
+     * The {@link Path} to the resource base
+     */
     private static final Path RESOURCE_BASE = Path.of("src/main/resources/de/colorscheme/");
 
+    /**
+     * The {@link String} containing the color for the table header
+     */
     private static final String TABLE_HEADER_COLOR = "#404040";
+    /**
+     * The {@link String} containing the color for the table border
+     */
     private static final String TABLE_BORDER_COLOR = "#F3F3F4";
+    /**
+     * The {@link String} containing the color for even banded table cells
+     */
     private static final String TABLE_B_CELL_COLOR = "#FAFAFA";
 
 
@@ -67,12 +82,30 @@ public class OutputColors {
      * The {@link String} containing the path where the file will be downloaded to
      */
     private static String downloadPath;
+    /**
+     * The {@link Font} Mulish ExtraBold
+     */
     private static Font mulishExtrabold;
+    /**
+     * The {@link Font} Quattrocento Sans Regular
+     */
     private static Font quattrocentoSansRegular;
+    /**
+     * The {@link Font} Quattrocento Sans Bold
+     */
     private static Font quattrocentoSansBold;
+    /**
+     * The {@link PdfWriter} used to write the {@link Document}
+     */
     private static PdfWriter writer;
 
+    /**
+     * The {@link ColorUtils} instance used for all color related processes
+     */
     private static final ColorUtils colorUtils = new ColorUtils();
+    /**
+     * The {@link FontUtils} instance used for all font related processes
+     */
     private static final FontUtils fontUtils = new FontUtils();
 
     /**
@@ -81,6 +114,10 @@ public class OutputColors {
     private OutputColors() {
     }
 
+    /**
+     * Sets the download path for the file
+     * @param path A {@link String}: The path where the file will be downloaded to
+     */
     public static void setDownloadPath(String path) {
         downloadPath = path;
     }
@@ -105,7 +142,8 @@ public class OutputColors {
      *     </li>
      * </ul>
      *
-     * couldn't be created
+     * @param c        A {@link ColorData} object: The instance used for all processes for the currently inspected image
+     * @param imagePath A {@link Path}: The path to the selected image
      */
     public static void createOutput(ColorData c, Path imagePath) {
         mulishExtrabold = fontUtils.getMulishExtraBold();
@@ -398,24 +436,36 @@ public class OutputColors {
 
             String hex = colorUtils.getHex(color);
             ct.setSimpleColumn(rect);
-            Paragraph colorValues = new Paragraph();
-            Paragraph hexVal = new Paragraph(" HEX: " + hex, regular);
-            Paragraph hslVal = new Paragraph(
-                    String.format(" HSB: %d°, %d%%, %d%%",
-                            Math.round(hsb[0] * 360),
-                            Math.round(hsb[1] * 100),
-                            Math.round(hsb[2] * 100)), regular);
-            Paragraph rgbVal = new Paragraph(
-                    String.format(" RGB: %d, %d, %d",
-                            awtColor.getRed(),
-                            awtColor.getGreen(),
-                            awtColor.getBlue()), regular);
-            colorValues.add(hexVal);
-            colorValues.add(hslVal);
-            colorValues.add(rgbVal);
+            Paragraph colorValues = getColorStrings(hex, hsb, awtColor);
             ct.addElement(colorValues);
             ct.go();
         }
+    }
+
+    /**
+     * Formats the {@link Paragraph} containing the HEX, HSB and RGB values of the color.
+     * @param hex The hexadecimal value of the color
+     * @param hsb The HSB values of the color
+     * @param awtColor The {@link Color} object of the color
+     * @return A {@link Paragraph} containing the HEX, HSB and RGB values of the color
+     */
+    private static Paragraph getColorStrings(String hex, float[] hsb, Color awtColor) {
+        Paragraph colorValues = new Paragraph();
+        Paragraph hexVal = new Paragraph(" HEX: " + hex, regular);
+        Paragraph hslVal = new Paragraph(
+                String.format(" HSB: %d°, %d%%, %d%%",
+                        Math.round(hsb[0] * 360),
+                        Math.round(hsb[1] * 100),
+                        Math.round(hsb[2] * 100)), regular);
+        Paragraph rgbVal = new Paragraph(
+                String.format(" RGB: %d, %d, %d",
+                        awtColor.getRed(),
+                        awtColor.getGreen(),
+                        awtColor.getBlue()), regular);
+        colorValues.add(hexVal);
+        colorValues.add(hslVal);
+        colorValues.add(rgbVal);
+        return colorValues;
     }
 
     /**
@@ -462,22 +512,22 @@ public class OutputColors {
             String hex = colorUtils.getHex(color);
             ct.setSimpleColumn(rect);
             Paragraph colorValues = new Paragraph();
-            Paragraph hexHeader = new Paragraph(" HEX:", fontUtils.getMulish(10, "Bold", checkContrastAWT(color)));
-            Paragraph hexVal = new Paragraph(" " + hex, fontUtils.getMulish(9, "Regular", checkContrastAWT(color)));
+            Paragraph hexHeader = new Paragraph(" HEX:", fontUtils.getMulish(10, FontUtils.FontWeight.BOLD, checkContrastAWT(color)));
+            Paragraph hexVal = new Paragraph(" " + hex, fontUtils.getMulish(9, FontUtils.FontWeight.BOLD, checkContrastAWT(color)));
             hexVal.setSpacingAfter(4);
-            Paragraph hslHeader = new Paragraph(" HSB:", fontUtils.getMulish(10, "Bold", checkContrastAWT(color)));
+            Paragraph hslHeader = new Paragraph(" HSB:", fontUtils.getMulish(10, FontUtils.FontWeight.BOLD, checkContrastAWT(color)));
             Paragraph hslVal = new Paragraph(
                     String.format(" %d°, %d%%, %d%%",
                             Math.round(hsb[0] * 360),
                             Math.round(hsb[1] * 100),
-                            Math.round(hsb[2] * 100)), fontUtils.getMulish(9, "Regular", checkContrastAWT(color)));
+                            Math.round(hsb[2] * 100)), fontUtils.getMulish(9, FontUtils.FontWeight.REGULAR, checkContrastAWT(color)));
             hslVal.setSpacingAfter(4);
-            Paragraph rgbHeader = new Paragraph(" RGB:", fontUtils.getMulish(10, "Bold", checkContrastAWT(color)));
+            Paragraph rgbHeader = new Paragraph(" RGB:", fontUtils.getMulish(10, FontUtils.FontWeight.BOLD, checkContrastAWT(color)));
             Paragraph rgbVal = new Paragraph(
                     String.format(" %d, %d, %d",
                             awtColor.getRed(),
                             awtColor.getGreen(),
-                            awtColor.getBlue()), fontUtils.getMulish(9, "Regular", checkContrastAWT(color)));
+                            awtColor.getBlue()), fontUtils.getMulish(9, FontUtils.FontWeight.REGULAR, checkContrastAWT(color)));
             rgbVal.setSpacingAfter(4);
             colorValues.add(hexHeader);
             colorValues.add(hexVal);
@@ -505,8 +555,8 @@ public class OutputColors {
         table.setSpacingBefore(14);
         table.setSpacingAfter(20);
         table.setWidths(new int[]{1, 2});
-        Paragraph header = new Paragraph("Average", fontUtils.getMulish(9, "Bold", colorUtils.hexToColor(TABLE_HEADER_COLOR)));
-        Paragraph value = new Paragraph("Value", fontUtils.getMulish(9, "Bold", colorUtils.hexToColor(TABLE_HEADER_COLOR)));
+        Paragraph header = new Paragraph("Average", fontUtils.getMulish(9, FontUtils.FontWeight.BOLD, colorUtils.hexToColor(TABLE_HEADER_COLOR)));
+        Paragraph value = new Paragraph("Value", fontUtils.getMulish(9, FontUtils.FontWeight.BOLD, colorUtils.hexToColor(TABLE_HEADER_COLOR)));
         PdfPCell avgHeader = getHeaderCell(header);
         PdfPCell valueHeader = getHeaderCell(value);
 
@@ -514,7 +564,7 @@ public class OutputColors {
         table.addCell(valueHeader);
         String[] averages = getAverage(hsbColors);
 
-        Font mulishSemibold = fontUtils.getMulish(12, "Semibold", Color.BLACK);
+        Font mulishSemibold = fontUtils.getMulish(12, FontUtils.FontWeight.SEMI_BOLD, Color.BLACK);
         Paragraph color = new Paragraph("Colour", mulishSemibold);
         Paragraph colorAvg = new Paragraph(averages[0], fontUtils.getMulish());
         table.addCell(getACell(color, false));
@@ -548,8 +598,8 @@ public class OutputColors {
         table.setSpacingAfter(20);
         table.setWidths(new int[]{1, 2});
         table.setHeaderRows(1);
-        Paragraph header = new Paragraph("Meta Data", fontUtils.getMulish(9, "bold", colorUtils.hexToColor(TABLE_HEADER_COLOR)));
-        Paragraph value = new Paragraph("Value", fontUtils.getMulish(9, "bold", colorUtils.hexToColor(TABLE_HEADER_COLOR)));
+        Paragraph header = new Paragraph("Meta Data", fontUtils.getMulish(9, FontUtils.FontWeight.BOLD, colorUtils.hexToColor(TABLE_HEADER_COLOR)));
+        Paragraph value = new Paragraph("Value", fontUtils.getMulish(9, FontUtils.FontWeight.BOLD, colorUtils.hexToColor(TABLE_HEADER_COLOR)));
         PdfPCell metaHeader = getHeaderCell(header);
         PdfPCell valueHeader = getHeaderCell(value);
 
@@ -558,7 +608,7 @@ public class OutputColors {
 
         boolean isBRow = false;
         for (int i = 0; i < metaList.size(); i++) {
-            Paragraph metaName = new Paragraph(metaList.get(i).getDescriptor(), fontUtils.getMulish(12, "semibold", Color.BLACK));
+            Paragraph metaName = new Paragraph(metaList.get(i).getDescriptor(), fontUtils.getMulish(12, FontUtils.FontWeight.SEMI_BOLD, Color.BLACK));
             Paragraph metaValue = new Paragraph(metaList.get(i).getData(), fontUtils.getMulish());
             if (!isBRow) {
                 if (i == metaList.size() - 1) {
@@ -869,7 +919,7 @@ public class OutputColors {
         innerCell.setPaddingLeft(5);
         innerCell.setFixedHeight(35);
         String hex = colorUtils.getHex(c);
-        innerCell.setPhrase(new Phrase(hex, fontUtils.getMulish(8, "Regular", checkContrastAWT(c))));
+        innerCell.setPhrase(new Phrase(hex, fontUtils.getMulish(8, FontUtils.FontWeight.REGULAR, checkContrastAWT(c))));
 
         return innerCell;
     }
@@ -947,10 +997,10 @@ public class OutputColors {
      */
     private static BaseColor checkContrast(BaseColor color) {
         //check against white
-        double whiteContrast = ContrastChecker.getConstrastRatio(color, BaseColor.WHITE);
+        double whiteContrast = ContrastChecker.getContrastRatio(color, BaseColor.WHITE);
 
         //check against black
-        double blackContrast = ContrastChecker.getConstrastRatio(color, BaseColor.BLACK);
+        double blackContrast = ContrastChecker.getContrastRatio(color, BaseColor.BLACK);
 
         //compare contrast
         if (whiteContrast > blackContrast) {

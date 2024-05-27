@@ -29,6 +29,12 @@ public final class ContrastChecker {
     private ContrastChecker() {
     }
 
+    /**
+     * This method computes the distance between 2 colors.
+     * @param fgColor The foreground color
+     * @param bgColor The background color
+     * @return The distance between the 2 colors
+     */
     public static double distanceColor(final BaseColor fgColor, final BaseColor bgColor) {
         int redFg = fgColor.getRed();
         int redBg = bgColor.getRed();
@@ -36,7 +42,7 @@ public final class ContrastChecker {
         int greenFg = fgColor.getGreen();
         int blueFg = fgColor.getBlue();
         int blueBg = bgColor.getBlue();
-        return (Math.sqrt(Math.pow(redFg - redBg, 2) + Math.pow(greenFg - greenBg, 2) + Math.pow(blueFg - blueBg, 2)));
+        return (Math.sqrt(Math.pow((double) redFg - redBg, 2) + Math.pow((double) greenFg - greenBg, 2) + Math.pow((double) blueFg - blueBg, 2)));
     }
 
     /**
@@ -47,7 +53,7 @@ public final class ContrastChecker {
      * @return {@code true} if the contrast is valid, {@code false} otherwise
      */
     public static boolean isContrastValid(final BaseColor fgColor, final BaseColor bgColor, Float coefficientLevel) {
-        return getConstrastRatio(fgColor, bgColor) > coefficientLevel;
+        return getContrastRatio(fgColor, bgColor) > coefficientLevel;
     }
 
     /**
@@ -58,7 +64,7 @@ public final class ContrastChecker {
      * @param bgColor The background color
      * @return the contrast ratio between the 2 colors
      */
-    public static double getConstrastRatio(final BaseColor fgColor, final BaseColor bgColor) {
+    public static double getContrastRatio(final BaseColor fgColor, final BaseColor bgColor) {
         double fgLuminosity = getLuminosity(fgColor);
         double bgLuminosity = getLuminosity(bgColor);
         if (fgLuminosity > bgLuminosity) {

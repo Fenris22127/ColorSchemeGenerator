@@ -215,29 +215,6 @@ public class ColorWheel {
     }
 
     /**
-     * Returns the list of complementary colors for displaying them on a color wheel.
-     *
-     * @return A {@link List} of {@link HarmonicColour}s: The list of harmonic colors
-     */
-    private static List<HarmonicColour> getComplementary(float[] hsbValues, float radius, int wheelRadius) {
-        double imageAngle = 360 * hsbValues[0] + 180 + 90;
-        double colourAngle = 360 * hsbValues[0] + 180;
-
-        imageAngle = getAngle(imageAngle);
-        colourAngle = getAngle(colourAngle);
-
-        imageAngle = Math.toRadians(imageAngle);
-
-        double xPos = radius * Math.cos(imageAngle) + wheelRadius;
-        double yPos = radius * Math.sin(imageAngle) + wheelRadius;
-
-        javafx.scene.paint.Color c = javafx.scene.paint.Color.hsb(colourAngle, hsbValues[1], hsbValues[2]);
-        return List.of(
-                new HarmonicColour(imageAngle, colourAngle, (float) xPos, (float) yPos, c)
-        );
-    }
-
-    /**
      * Returns the list of complementary colors.
      * @param hsbValues The HSB values of the color
      * @return A {@link List} of {@link javafx.scene.paint.Color}s: The list of complementary colors
@@ -250,37 +227,6 @@ public class ColorWheel {
     }
 
     /**
-     * Returns the list of split-complementary colors for displaying them on a color wheel.
-     *
-     * @return A {@link List} of {@link HarmonicColour}s: The list of harmonic colors
-     */
-    private static List<HarmonicColour> getSplitComplementary(float[] hsbValues, float radius, int wheelRadius) {
-        double imageAngle1 = 360 * hsbValues[0] + 180 + 90 + 30;
-        double colourAngle1 = 360 * hsbValues[0] + 180 + 30;
-        double imageAngle2 = 360 * hsbValues[0] + 180 + 90 - 30;
-        double colourAngle2 = 360 * hsbValues[0] + 180 - 30;
-
-        imageAngle1 = getAngle(imageAngle1);
-        colourAngle1 = getAngle(colourAngle1);
-        imageAngle2 = getAngle(imageAngle2);
-        colourAngle2 = getAngle(colourAngle2);
-        imageAngle1 = Math.toRadians(imageAngle1);
-        imageAngle2 = Math.toRadians(imageAngle2);
-
-        double xPos1 = radius * Math.cos(imageAngle1) + wheelRadius;
-        double yPos1 = radius * Math.sin(imageAngle1) + wheelRadius;
-        double xPos2 = radius * Math.cos(imageAngle2) + wheelRadius;
-        double yPos2 = radius * Math.sin(imageAngle2) + wheelRadius;
-
-        javafx.scene.paint.Color c1 = javafx.scene.paint.Color.hsb(colourAngle1, hsbValues[1], hsbValues[2]);
-        javafx.scene.paint.Color c2 = javafx.scene.paint.Color.hsb(colourAngle2, hsbValues[1], hsbValues[2]);
-        return List.of(
-                new HarmonicColour(imageAngle1, colourAngle1, (float) xPos1, (float) yPos1, c1),
-                new HarmonicColour(imageAngle2, colourAngle2, (float) xPos2, (float) yPos2, c2)
-        );
-    }
-
-    /**
      * Returns the list of split-complementary colors.
      * @param hsbValues The HSB values of the color
      * @return A {@link List} of {@link javafx.scene.paint.Color}s: The list of split-complementary colors
@@ -289,45 +235,15 @@ public class ColorWheel {
         double colourAngle1 = 360 * hsbValues[0] + 180 + 30;
         double colourAngle2 = 360 * hsbValues[0] + 180 - 30;
 
-        colourAngle1 = getAngle(colourAngle1);
-        colourAngle2 = getAngle(colourAngle2);
-
-        javafx.scene.paint.Color c1 = javafx.scene.paint.Color.hsb(colourAngle1, hsbValues[1], hsbValues[2]);
-        javafx.scene.paint.Color c2 = javafx.scene.paint.Color.hsb(colourAngle2, hsbValues[1], hsbValues[2]);
+        javafx.scene.paint.Color c1 = getColorFromAngle(colourAngle1, hsbValues);
+        javafx.scene.paint.Color c2 = getColorFromAngle(colourAngle2, hsbValues);
         return List.of(
                 c1, c2
         );
     }
-
-    /**
-     * Returns the list of analogous colors for displaying them on a color wheel.
-     *
-     * @return A {@link List} of {@link HarmonicColour}s: The list of harmonic colors
-     */
-    private static List<HarmonicColour> getAnalogous(float[] hsbValues, float radius, int wheelRadius) {
-        double imageAngle1 = 360 * hsbValues[0] + 90 + 30;
-        double colourAngle1 = 360 * hsbValues[0] + 30;
-        double imageAngle2 = 360 * hsbValues[0] + 90 - 30;
-        double colourAngle2 = 360 * hsbValues[0] - 30;
-
-        imageAngle1 = getAngle(imageAngle1);
-        colourAngle1 = getAngle(colourAngle1);
-        imageAngle2 = getAngle(imageAngle2);
-        colourAngle2 = getAngle(colourAngle2);
-        imageAngle1 = Math.toRadians(imageAngle1);
-        imageAngle2 = Math.toRadians(imageAngle2);
-
-        double xPos1 = radius * Math.cos(imageAngle1) + wheelRadius;
-        double yPos1 = radius * Math.sin(imageAngle1) + wheelRadius;
-        double xPos2 = radius * Math.cos(imageAngle2) + wheelRadius;
-        double yPos2 = radius * Math.sin(imageAngle2) + wheelRadius;
-
-        javafx.scene.paint.Color c1 = javafx.scene.paint.Color.hsb(colourAngle1, hsbValues[1], hsbValues[2]);
-        javafx.scene.paint.Color c2 = javafx.scene.paint.Color.hsb(colourAngle2, hsbValues[1], hsbValues[2]);
-        return List.of(
-                new HarmonicColour(imageAngle1, colourAngle1, (float) xPos1, (float) yPos1, c1),
-                new HarmonicColour(imageAngle2, colourAngle2, (float) xPos2, (float) yPos2, c2)
-        );
+    private static javafx.scene.paint.Color getColorFromAngle(double angle, float[] hsbValues) {
+        angle = getAngle(angle);
+        return javafx.scene.paint.Color.hsb(angle, hsbValues[1], hsbValues[2]);
     }
 
     /**
@@ -339,47 +255,12 @@ public class ColorWheel {
         double colourAngle1 = 360 * hsbValues[0] + 30;
         double colourAngle2 = 360 * hsbValues[0] - 30;
 
-        colourAngle1 = getAngle(colourAngle1);
-        colourAngle2 = getAngle(colourAngle2);
-
-        javafx.scene.paint.Color c1 = javafx.scene.paint.Color.hsb(colourAngle1, hsbValues[1], hsbValues[2]);
-        javafx.scene.paint.Color c2 = javafx.scene.paint.Color.hsb(colourAngle2, hsbValues[1], hsbValues[2]);
+        javafx.scene.paint.Color c1 = getColorFromAngle(colourAngle1, hsbValues);
+        javafx.scene.paint.Color c2 = getColorFromAngle(colourAngle2, hsbValues);
 
         return List.of(
                 c1,
                 c2
-        );
-    }
-
-    /**
-     * Returns the list of triadic colors for displaying them on a color wheel.
-     *
-     * @return A {@link List} of {@link HarmonicColour}s: The list of harmonic colors
-     */
-    private static List<HarmonicColour> getTriadic(float[] hsbValues, float radius, int wheelRadius) {
-        double imageAngle1 = 360 * hsbValues[0] + 120 + 90;
-        double colourAngle1 = 360 * hsbValues[0] + 120;
-        double imageAngle2 = 360 * hsbValues[0] + 240 + 90;
-        double colourAngle2 = 360 * hsbValues[0] + 240;
-
-        imageAngle1 = getAngle(imageAngle1);
-        colourAngle1 = getAngle(colourAngle1);
-        imageAngle2 = getAngle(imageAngle2);
-        colourAngle2 = getAngle(colourAngle2);
-
-        imageAngle1 = Math.toRadians(imageAngle1);
-        imageAngle2 = Math.toRadians(imageAngle2);
-
-        double xPos1 = radius * Math.cos(imageAngle1) + wheelRadius;
-        double yPos1 = radius * Math.sin(imageAngle1) + wheelRadius;
-        double xPos2 = radius * Math.cos(imageAngle2) + wheelRadius;
-        double yPos2 = radius * Math.sin(imageAngle2) + wheelRadius;
-
-        javafx.scene.paint.Color c1 = javafx.scene.paint.Color.hsb(colourAngle1, hsbValues[1], hsbValues[2]);
-        javafx.scene.paint.Color c2 = javafx.scene.paint.Color.hsb(colourAngle2, hsbValues[1], hsbValues[2]);
-        return List.of(
-                new HarmonicColour(imageAngle1, colourAngle1, (float) xPos1, (float) yPos1, c1),
-                new HarmonicColour(imageAngle2, colourAngle2, (float) xPos2, (float) yPos2, c2)
         );
     }
 
@@ -392,54 +273,10 @@ public class ColorWheel {
         double colourAngle1 = 360 * hsbValues[0] + 120;
         double colourAngle2 = 360 * hsbValues[0] + 240;
 
-        colourAngle1 = getAngle(colourAngle1);
-        colourAngle2 = getAngle(colourAngle2);
-
-        javafx.scene.paint.Color c1 = javafx.scene.paint.Color.hsb(colourAngle1, hsbValues[1], hsbValues[2]);
-        javafx.scene.paint.Color c2 = javafx.scene.paint.Color.hsb(colourAngle2, hsbValues[1], hsbValues[2]);
+        javafx.scene.paint.Color c1 = getColorFromAngle(colourAngle1, hsbValues);
+        javafx.scene.paint.Color c2 = getColorFromAngle(colourAngle2, hsbValues);
         return List.of(
                 c1, c2
-        );
-    }
-
-    /**
-     * Returns the list of tetradic colors for displaying them on a color wheel.
-     *
-     * @return A {@link List} of {@link HarmonicColour}s: The list of harmonic colors
-     */
-    private static List<HarmonicColour> getTetradic(float[] hsbValues, float radius, int wheelRadius) {
-        double imageAngle1 = 360 * hsbValues[0] + 90 + 90;
-        double colourAngle1 = 360 * hsbValues[0] + 90;
-        double imageAngle2 = 360 * hsbValues[0] + 180 + 90;
-        double colourAngle2 = 360 * hsbValues[0] + 180;
-        double imageAngle3 = 360 * hsbValues[0] + 270 + 90;
-        double colourAngle3 = 360 * hsbValues[0] + 270;
-
-        imageAngle1 = getAngle(imageAngle1);
-        colourAngle1 = getAngle(colourAngle1);
-        imageAngle2 = getAngle(imageAngle2);
-        colourAngle2 = getAngle(colourAngle2);
-        imageAngle3 = getAngle(imageAngle3);
-        colourAngle3 = getAngle(colourAngle3);
-
-        imageAngle1 = Math.toRadians(imageAngle1);
-        imageAngle2 = Math.toRadians(imageAngle2);
-        imageAngle3 = Math.toRadians(imageAngle3);
-
-        double xPos1 = radius * Math.cos(imageAngle1) + wheelRadius;
-        double yPos1 = radius * Math.sin(imageAngle1) + wheelRadius;
-        double xPos2 = radius * Math.cos(imageAngle2) + wheelRadius;
-        double yPos2 = radius * Math.sin(imageAngle2) + wheelRadius;
-        double xPos3 = radius * Math.cos(imageAngle3) + wheelRadius;
-        double yPos3 = radius * Math.sin(imageAngle3) + wheelRadius;
-
-        javafx.scene.paint.Color c1 = javafx.scene.paint.Color.hsb(colourAngle1, hsbValues[1], hsbValues[2]);
-        javafx.scene.paint.Color c2 = javafx.scene.paint.Color.hsb(colourAngle2, hsbValues[1], hsbValues[2]);
-        javafx.scene.paint.Color c3 = javafx.scene.paint.Color.hsb(colourAngle3, hsbValues[1], hsbValues[2]);
-        return List.of(
-                new HarmonicColour(imageAngle1, colourAngle1, (float) xPos1, (float) yPos1, c1),
-                new HarmonicColour(imageAngle2, colourAngle2, (float) xPos2, (float) yPos2, c2),
-                new HarmonicColour(imageAngle3, colourAngle3, (float) xPos3, (float) yPos3, c3)
         );
     }
 
@@ -464,29 +301,6 @@ public class ColorWheel {
                 c1,
                 c2,
                 c3
-        );
-    }
-
-    /**
-     * Returns the list of monochromatic colors for displaying them on a color wheel.
-     *
-     * @return A {@link List} of {@link HarmonicColour}s: The list of harmonic colors
-     */
-    private static List<HarmonicColour> getMonochromatic(float[] hsbValues, float radius, int wheelRadius) {
-        double imageAngle = 360 * hsbValues[0] + 90;
-        double colourAngle = 360 * hsbValues[0];
-
-        imageAngle = getAngle(imageAngle);
-        colourAngle = getAngle(colourAngle);
-
-        double xPos1 = radius * Math.cos(imageAngle) + wheelRadius;
-        double yPos1 = radius * Math.sin(imageAngle) + wheelRadius;
-
-        return List.of(
-                new HarmonicColour(imageAngle, colourAngle, (float) xPos1, (float) yPos1, javafx.scene.paint.Color.hsb(hsbValues[0] * 360, 0.22, 1)),
-                new HarmonicColour(imageAngle, colourAngle, (float) xPos1, (float) yPos1, javafx.scene.paint.Color.hsb(hsbValues[0] * 360, 0.46, 1)),
-                new HarmonicColour(imageAngle, colourAngle, (float) xPos1, (float) yPos1, javafx.scene.paint.Color.hsb(hsbValues[0] * 360, 0.75, 0.8)),
-                new HarmonicColour(imageAngle, colourAngle, (float) xPos1, (float) yPos1, javafx.scene.paint.Color.hsb(hsbValues[0] * 360, 0.75, 0.26))
         );
     }
 
@@ -537,20 +351,4 @@ public class ColorWheel {
 
         return resizedImage;
     }
-
-    /**
-     * A simple record for the harmonic colors.
-     * @param imageAngle The angle of the color on the color wheel
-     * @param colorAngle The hue of the color
-     * @param xPos The x position of the color on the color wheel
-     * @param yPos The y position of the color on the color wheel
-     * @param color The color
-     */
-    record HarmonicColour(
-            double imageAngle,
-            double colorAngle,
-            float xPos,
-            float yPos,
-            javafx.scene.paint.Color color
-    ) {}
 }

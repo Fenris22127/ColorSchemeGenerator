@@ -12,7 +12,7 @@ import static de.colorscheme.app.AppController.getResBundle;
  * @version 2.0
  * @since 18.0.1
  */
-public enum Type {
+public enum MetaType {
     /**
      * The name of the file
      */
@@ -76,11 +76,11 @@ public enum Type {
     private final String typeDescriptor;
 
     /**
-     * Creates a new {@link Type metadata type} with the given {@link String} representation
+     * Creates a new {@link MetaType metadata type} with the given {@link String} representation
      *
      * @param type A {@link String}: The metadata type
      */
-    Type(String type) {
+    MetaType(String type) {
         typeDescriptor = type;
     }
 
@@ -104,8 +104,8 @@ public enum Type {
             }
 
             @Override
-            public Type getType() {
-                return Type.this;
+            public MetaType getType() {
+                return MetaType.this;
             }
 
             @Override
