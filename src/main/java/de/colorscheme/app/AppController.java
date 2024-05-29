@@ -220,11 +220,16 @@ public class AppController implements Initializable {
      */
     public static TextArea getTextField() {
         Node node = currentScene.lookup("#progressTextField");
-        if (node instanceof TextArea textarea) {
-            return textarea;
+        if (node.getClass() == TextArea.class) {
+            return (TextArea) node;
         } else {
             return null;
         }
+        /*if (node instanceof TextArea textarea) {
+            return textarea;
+        } else {
+            return null;
+        }*/
     }
 
     /**
@@ -387,11 +392,18 @@ public class AppController implements Initializable {
      * @param newValue A {@link Number}: The index of the chosen language
      */
     private static synchronized void setBundle(Number newValue) {
-        bundle = switch (newValue.intValue()) {
+        if (newValue.intValue() == 0) {
+            bundle = ResourceBundle.getBundle("messages_EN");
+        } else if (newValue.intValue() == 1) {
+            bundle = ResourceBundle.getBundle("messages_DE");
+        } else {
+            throw new IllegalStateException("Unexpected value: " + newValue.intValue());
+        }
+        /*bundle = switch (newValue.intValue()) {
             case 0 -> ResourceBundle.getBundle("messages_EN");
             case 1 -> ResourceBundle.getBundle("messages_DE");
             default -> throw new IllegalStateException("Unexpected value: " + newValue.intValue());
-        };
+        };*/
     }
 
     /**
@@ -437,7 +449,28 @@ public class AppController implements Initializable {
         ToggleButton button = (ToggleButton) event.getSource();
         if (button.isSelected()) {
             styleButtons(button, button.getId().concat("_selected"));
-            switch (button.getId()) {
+            if (Objects.equals(button.getId(), "complementary")) {
+                harmony.add(ColorHarmony.COMPLEMENTARY);
+            }
+            if (Objects.equals(button.getId(), "splitcomplementary")) {
+                harmony.add(ColorHarmony.SPLITCOMPLEMENTARY);
+            }
+            if (Objects.equals(button.getId(), "analogous")) {
+                harmony.add(ColorHarmony.ANALOGOUS);
+            }
+            if (Objects.equals(button.getId(), "triadic")) {
+                harmony.add(ColorHarmony.TRIADIC);
+            }
+            if (Objects.equals(button.getId(), "tetradic")) {
+                harmony.add(ColorHarmony.TETRADIC);
+            }
+            if (Objects.equals(button.getId(), "monochromatic")) {
+                harmony.add(ColorHarmony.MONOCHROMATIC);
+            }
+            else {
+                throw new IllegalStateException("Unexpected value: " + button.getId());
+            }
+            /*switch (button.getId()) {
                 case "complementary" -> harmony.add(ColorHarmony.COMPLEMENTARY);
                 case "splitcomplementary" -> harmony.add(ColorHarmony.SPLITCOMPLEMENTARY);
                 case "analogous" -> harmony.add(ColorHarmony.ANALOGOUS);
@@ -445,7 +478,7 @@ public class AppController implements Initializable {
                 case "tetradic" -> harmony.add(ColorHarmony.TETRADIC);
                 case "monochromatic" -> harmony.add(ColorHarmony.MONOCHROMATIC);
                 default -> throw new IllegalStateException("Unexpected value: " + button.getId());
-            }
+            }*/
         } else {
             styleButtons(button, button.getId().concat("_light"));
             harmony.remove(ColorHarmony.valueOf(button.getId().toUpperCase()));

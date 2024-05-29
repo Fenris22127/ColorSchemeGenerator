@@ -42,14 +42,14 @@ public class StartProgram extends Application {
      */
     @Override
     public void start(Stage primaryStage) throws IOException {
-        FontUtils fontUtils = new FontUtils();
+        /*FontUtils fontUtils = new FontUtils();
         fontUtils.loadFont(
                 "QuattrocentoSans-Bold.TTF",
                 "QuattrocentoSans-Regular.TTF",
                 "Mulish-Regular.TTF",
                 "Mulish-Bold.TTF",
                 "Mulish-Medium.TTF",
-                "Mulish-SemiBold.TTF");
+                "Mulish-SemiBold.TTF");*/
 
         setStage(primaryStage);
         final FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("app.fxml"));
@@ -68,5 +68,9 @@ public class StartProgram extends Application {
      */
     private static synchronized void setStage(Stage stage) {
         StartProgram.stage = stage;
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 }

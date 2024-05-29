@@ -1,0 +1,15 @@
+
+
+java:S1192³"GDefine a constant instead of duplicating this literal "avgRed" 3 times.(ÇŞ³ùÿÿÿÿ8¦Œ²§ü1J$e307e981-5133-4dda-907b-abb253021283
+	java:S125Ä"<This block of commented-out lines of code should be removed.(‰«8è¡²§ü1J$a5da455d-9616-4036-ac4b-fdcec8de8803
+m
+java:S1481Ø"*Remove this unused "model" local variable.(–«Å28è¡²§ü1J$ecb0aa60-0254-4563-b640-ed1e84fe788e
+Œ
+java:S1107€	"HMove this "else" on the same line that the previous closing curly brace.(á¢–¬8è¡²§ü1J$b59ecf26-4f71-4199-bbe7-628aa386b78c
+	java:S125ƒ	"<This block of commented-out lines of code should be removed.(íò¯¶8è¡²§ü1J$2bf4ea90-0b7d-4245-a9e3-40f11716955b
+–
+java:S3776	"RRefactor this method to reduce its Cognitive Complexity from 36 to the 15 allowed.(ñ¿Ã8è¡²§ü1J$f4217d62-9439-4037-8575-39c1192293cb
+Œ
+java:S1107Ú	"HMove this "else" on the same line that the previous closing curly brace.(á¢–¬8ê¡²§ü1J$3f7ba8d7-cdad-405b-87ed-cb1cefe8e249
+„	java:S125Ş	"<This block of commented-out lines of code should be removed.(ŞÄç»ıÿÿÿÿ8ê¡²§ü1J$3f1ca1e2-0ba2-4519-b571-3999a13a33d0
+„	java:S125ş	"<This block of commented-out lines of code should be removed.(ŞµÀ²úÿÿÿÿ8ë¡²§ü1J$b5baf9c5-5e75-453c-b9ae-67ea8b89a042

@@ -159,9 +159,12 @@ public class ColorData {
      */
     protected static BufferedImage convertToBufferedImage(Image img) {
 
-        if (img instanceof BufferedImage bImg) {
-            return bImg;
+        if (img.getClass() == BufferedImage.class) {
+            return (BufferedImage) img;
         }
+        /*if (img instanceof BufferedImage bImg) {
+            return bImg;
+        }*/
         // Create a buffered image with transparency
         BufferedImage bi = new BufferedImage(
                 img.getWidth(null), img.getHeight(null),
@@ -439,7 +442,7 @@ public class ColorData {
         }
 
         //Set threshold: If crossed, the element crossing it will be selected
-        double threshold = random.nextDouble(0, totalSum);
+        double threshold = randomInRange(0, totalSum);
 
         //The sum of all elements together until the threshold is reached
         double currentSum = 0.0;
@@ -460,6 +463,13 @@ public class ColorData {
             }
         }
         return new Point3D(-1, -1, -1);
+    }
+
+    private double randomInRange(double min, double max) {
+        double range = max - min;
+        double scaled = random.nextDouble() * range;
+        double shifted = scaled + min;
+        return shifted; // == (rand.nextDouble() * (max-min)) + min;
     }
 
     /**

@@ -34,6 +34,7 @@ import static de.colorscheme.app.AppController.getHarmony;
 import static de.colorscheme.app.AppController.getResBundle;
 import static de.colorscheme.clustering.KMeans.getCentroids;
 import static de.colorscheme.output.ColorWheel.*;
+import static de.colorscheme.output.MetaType.*;
 import static java.util.logging.Level.*;
 
 /**
@@ -58,11 +59,11 @@ public class OutputColors {
     /**
      * The {@link Path} to the color wheel image
      */
-    private static final Path schemeWheelPath = Path.of("src/main/resources/img/SchemeWheel.png");
+    private static final Path schemeWheelPath = Paths.get("src/main/resources/img/SchemeWheel.png");
     /**
      * The {@link Path} to the resource base
      */
-    private static final Path RESOURCE_BASE = Path.of("src/main/resources/de/colorscheme/");
+    private static final Path RESOURCE_BASE = Paths.get("src/main/resources/de/colorscheme/");
 
     /**
      * The {@link String} containing the color for the table header
@@ -1073,7 +1074,22 @@ public class OutputColors {
         if (newHue < 30) {
             color = AppController.getResBundle().getString("avgRed");
         } else {
-            switch (h) {
+            if (h == 0) {
+                color = AppController.getResBundle().getString("avgRed");
+            } else if (h == 1) {
+                color = AppController.getResBundle().getString("avgYellow");
+            } else if (h == 2) {
+                color = AppController.getResBundle().getString("avgGreen");
+            } else if (h == 3) {
+                color = AppController.getResBundle().getString("avgCyan");
+            } else if (h == 4) {
+                color = AppController.getResBundle().getString("avgBlue");
+            } else if (h == 5) {
+                color = AppController.getResBundle().getString("avgPurple");
+            } else {
+                color = AppController.getResBundle().getString("avgRed");
+            }
+            /*switch (h) {
                 case 0 -> color = AppController.getResBundle().getString("avgYellow");
                 case 1 -> color = AppController.getResBundle().getString("avgGreen");
                 case 2 -> color = AppController.getResBundle().getString("avgCyan");
@@ -1081,7 +1097,7 @@ public class OutputColors {
                 case 4 -> color = AppController.getResBundle().getString("avgPurple");
                 case 5 -> color = AppController.getResBundle().getString("avgRed");
                 default -> color = AppController.getResBundle().getString("avgIndeterminate");
-            }
+            }*/
         }
         return color;
     }
@@ -1094,7 +1110,49 @@ public class OutputColors {
      */
     private static String getColorSpace(int index) {
         String model;
-        switch (index) {
+        if (index == 1) {
+            return AppController.getResBundle().getString("metaColorModel1");
+        }
+        if (index == 2) {
+            return AppController.getResBundle().getString("metaColorModel2");
+        }
+        if (index == 3) {
+            return AppController.getResBundle().getString("metaColorModel3");
+        }
+        if (index == 4) {
+            return AppController.getResBundle().getString("metaColorModel4");
+        }
+        if (index == 5) {
+            return AppController.getResBundle().getString("metaColorModel5");
+        }
+        if (index == 6) {
+            return AppController.getResBundle().getString("metaColorModel6");
+        }
+        if (index == 7) {
+            return AppController.getResBundle().getString("metaColorModel7");
+        }
+        if (index == 8) {
+            return AppController.getResBundle().getString("metaColorModel8");
+        }
+        if (index == 9) {
+            return AppController.getResBundle().getString("metaColorModel9");
+        }
+        if (index == 10) {
+            return AppController.getResBundle().getString("metaColorModel10");
+        }
+        if (index == 11) {
+            return AppController.getResBundle().getString("metaColorModel11");
+        }
+        if (index == 12) {
+            return AppController.getResBundle().getString("metaColorModel12");
+        }
+        if (index == 13) {
+            return AppController.getResBundle().getString("metaColorModel13");
+        }
+        else {
+            return AppController.getResBundle().getString("metaColorModelDefault");
+        }
+        /*switch (index) {
             case 1 -> model = AppController.getResBundle().getString("metaColorModel1");
             case 2 -> model = AppController.getResBundle().getString("metaColorModel2");
             case 3 -> model = AppController.getResBundle().getString("metaColorModel3");
@@ -1110,7 +1168,7 @@ public class OutputColors {
             case 13 -> model = AppController.getResBundle().getString("metaColorModel13");
             default -> model = AppController.getResBundle().getString("metaColorModelDefault");
         }
-        return model;
+        return model;*/
     }
 
     /**
@@ -1134,8 +1192,58 @@ public class OutputColors {
             return MetaData.createNoAccessMetaData();
         }
 
-        return MetaData.createMetaData(type ->
-                switch (type) {
+        return MetaData.createMetaData(type -> {
+                if(type == FILE_NAME) {
+                    return imgPath.getFileName().toString().split("\\.")[0];
+                }
+                if(type == FILE_TYPE) {
+                    return imgPath.getFileName().toString().split("\\.")[1].toUpperCase();
+                }
+                if(type == FILE_SIZE) {
+                    return formatSize(attr.size());
+                }
+                if(type == FILE_CREATION_DATE) {
+                    return formatTime(attr.creationTime(), dateTimeFormatter);
+                }
+                if(type == FILE_LAST_MODIFIED_DATE) {
+                    return formatTime(attr.lastModifiedTime(), dateTimeFormatter);
+                }
+                if(type == FILE_LAST_ACCESSED_DATE) {
+                    return formatTime(attr.lastAccessTime(), dateTimeFormatter);
+                }
+                if(type == FILE_HEIGHT) {
+                    return img.getHeight() + " px";
+                }
+                if(type == FILE_WIDTH) {
+                    return img.getWidth() + " px";
+                }
+                if(type == FILE_IMAGE_TYPE) {
+                    return getColorSpace(img.getType());
+                }
+                if(type == FILE_COLOR_COMPONENTS) {
+                    return String.valueOf(img.getColorModel().getNumComponents());
+                }
+                if(type == FILE_BIT_DEPTH) {
+                    return String.valueOf(img.getColorModel().getPixelSize());
+                }
+                if(type == FILE_TRANSPARENCY) {
+                    return getTransparency(img);
+                }
+                if(type == FILE_ALPHA) {
+                    return (img.getColorModel().hasAlpha() ?
+                            AppController.getResBundle().getString("metaAlphaYes") :
+                            AppController.getResBundle().getString("metaAlphaNo"));
+                }
+                if(type == FILE_ALPHA_TYPE) {
+                    return (img.getColorModel().isAlphaPremultiplied() ?
+                            AppController.getResBundle().getString("metaAlphaPremultiplied") :
+                            AppController.getResBundle().getString("metaAlphaNotPremultiplied"));
+                }
+                else {
+                    return null;
+                }
+        });
+                /*switch (type) {
                     case FILE_NAME -> imgPath.getFileName().toString().split("\\.")[0];
                     case FILE_TYPE -> imgPath.getFileName().toString().split("\\.")[1].toUpperCase();
                     case FILE_SIZE -> formatSize(attr.size());
@@ -1147,21 +1255,33 @@ public class OutputColors {
                     case FILE_IMAGE_TYPE -> getColorSpace(img.getType());
                     case FILE_COLOR_COMPONENTS -> String.valueOf(img.getColorModel().getNumComponents());
                     case FILE_BIT_DEPTH -> String.valueOf(img.getColorModel().getPixelSize());
-                    case FILE_TRANSPARENCY -> switch (img.getColorModel().getTransparency()) {
-                        case 1 -> AppController.getResBundle().getString("metaTransparency1");
-                        case 2 -> AppController.getResBundle().getString("metaTransparency2");
-                        case 3 -> AppController.getResBundle().getString("metaTransparency3");
-                        default -> AppController.getResBundle().getString("metaTransparencyDefault");
-                    };
+                    case FILE_TRANSPARENCY -> "";
                     case FILE_ALPHA -> (img.getColorModel().hasAlpha() ?
                             AppController.getResBundle().getString("metaAlphaYes") :
                             AppController.getResBundle().getString("metaAlphaNo"));
                     case FILE_ALPHA_TYPE -> (img.getColorModel().isAlphaPremultiplied() ?
                             AppController.getResBundle().getString("metaAlphaPremultiplied") :
                             AppController.getResBundle().getString("metaAlphaNotPremultiplied"));
-                });
+                });*/
     }
-
+    private static String getTransparency(BufferedImage img) {
+        int transparency = img.getColorModel().getTransparency();
+        if (transparency == 1) {
+            return AppController.getResBundle().getString("metaTransparency1");
+        } else if (transparency == 2) {
+            return AppController.getResBundle().getString("metaTransparency2");
+        } else if (transparency == 3) {
+            return AppController.getResBundle().getString("metaTransparency3");
+        } else {
+            return AppController.getResBundle().getString("metaTransparencyDefault");
+        }
+        /*switch (img.getColorModel().getTransparency()) {
+            case 1 -> AppController.getResBundle().getString("metaTransparency1");
+            case 2 -> AppController.getResBundle().getString("metaTransparency2");
+            case 3 -> AppController.getResBundle().getString("metaTransparency3");
+            default -> AppController.getResBundle().getString("metaTransparencyDefault");
+        };*/
+    }
     /**
      * Formats the passed {@link FileTime} to a {@link String} using the passed {@link DateTimeFormatter}.
      *
