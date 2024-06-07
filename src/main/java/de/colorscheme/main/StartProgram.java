@@ -1,6 +1,5 @@
 package de.colorscheme.main;
 
-import de.colorscheme.utils.FontUtils;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -42,19 +41,12 @@ public class StartProgram extends Application {
      */
     @Override
     public void start(Stage primaryStage) throws IOException {
-        FontUtils fontUtils = new FontUtils();
-        fontUtils.loadFont(
-                "QuattrocentoSans-Bold.TTF",
-                "QuattrocentoSans-Regular.TTF",
-                "Mulish-Regular.TTF",
-                "Mulish-Bold.TTF",
-                "Mulish-Medium.TTF",
-                "Mulish-SemiBold.TTF");
-
         setStage(primaryStage);
         final FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("app.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 628, 712);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("newstyle.css")).toExternalForm());
+        scene.getStylesheets().add("http://fonts.googleapis.com/css?family=Quattrocento+Sans");
+        scene.getStylesheets().add("http://fonts.googleapis.com/css?family=Mulish");
         stage.setTitle("Color Scheme Generator");
         stage.setScene(scene);
         stage.getIcons().add(new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResourceAsStream("logoFX.png"))));
@@ -68,5 +60,9 @@ public class StartProgram extends Application {
      */
     private static synchronized void setStage(Stage stage) {
         StartProgram.stage = stage;
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 }

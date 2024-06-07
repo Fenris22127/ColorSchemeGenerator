@@ -1,0 +1,20 @@
+<component name="ArtifactManager">
+  <artifact type="javafx" name="ColorSchemeGenerator_FX">
+    <output-path>$PROJECT_DIR$/out/artifacts/ColorSchemeGenerator_FX</output-path>
+    <properties id="javafx-properties">
+      <options>
+        <option name="appClass" value="de.colorscheme.main.StartProgram" />
+        <option name="description" value="" />
+        <option name="htmlPlaceholderId" value="" />
+        <option name="title" value="" />
+        <option name="vendor" value="" />
+        <option name="version" value="" />
+      </options>
+    </properties>
+    <root id="root">
+      <element id="archive" name="ColorSchemeGenerator.jar">
+        <element id="module-output" name="ColorSchemeGenerator" />
+      </element>
+    </root>
+  </artifact>
+</component>

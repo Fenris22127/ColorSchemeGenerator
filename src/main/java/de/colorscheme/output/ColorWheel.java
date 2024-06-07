@@ -1,6 +1,7 @@
 package de.colorscheme.output;
 
 import com.itextpdf.text.BaseColor;
+import de.colorscheme.app.AppController;
 import de.fenris.logger.ColorLogger;
 
 import javax.imageio.ImageIO;
@@ -9,10 +10,12 @@ import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
 
+import static de.colorscheme.utils.PathUtils.*;
 import static java.util.logging.Level.SEVERE;
 
 /**
@@ -34,9 +37,19 @@ public class ColorWheel {
     private static final int IMG_SIZE = 1124;
 
     /**
-     * Creates a {@link ColorLogger} for this class
+     * Creates a {@link ColorLogger Logger} for this class
      */
     private static final Logger LOGGER = ColorLogger.newLogger(ColorWheel.class.getName());
+    /*private static final String WHEEL_PATH_STANDARD = "src/main/resources/img/SchemeWheel.png";
+    private static final String WHEEL_PATH_JAR = "/img/SchemeWheel.png";
+    private static final String WHEEL_PATH;
+    static {
+        if(runningFromJAR()) {
+            WHEEL_PATH = WHEEL_PATH_JAR;
+        } else {
+            WHEEL_PATH = WHEEL_PATH_STANDARD;
+        }
+    }*/
 
     /**
      * Private constructor to hide the public one
@@ -53,18 +66,23 @@ public class ColorWheel {
      * @return A {@link Boolean}: Returns true, if the file has been created successfully. Returns false, if the file
      * cannot be found at the location it should be saved in.
      */
-    public static boolean createColorWheel(List<BaseColor> colours) {
+    public static File createColorWheel(List<BaseColor> colours) {
         BufferedImage colWheel = makeColorWheelImage();
         drawColorWheel(colWheel);
 
         colWheel = addCircle(colours);
-        File f = new File("src/main/resources/img/SchemeWheel.png");
+        File f = new File(getColorWheelPath());
         try {
+            if (runningFromJAR()) {
+                f = File.createTempFile("SchemeWheel", ".png");
+                f.deleteOnExit();
+            }
             ImageIO.write(Objects.requireNonNull(colWheel), "png", f);
         } catch (IOException e) {
+            AppController.addToOutputField("Image could not be written!" + System.lineSeparator(), true);
             LOGGER.log(SEVERE, String.format("%s: Image could not be written!", e.getClass().getSimpleName()));
         }
-        return f.exists();
+        return f;
     }
 
 
@@ -174,12 +192,23 @@ public class ColorWheel {
      */
     private static BufferedImage addCircle(List<BaseColor> colors) {
         try {
-            BufferedImage wheel = ImageIO.read(
-                    Objects.requireNonNull(
-                            ClassLoader.getSystemClassLoader().getResource("img/wheel.png")));
-            BufferedImage circle = ImageIO.read(
-                    Objects.requireNonNull(
-                            ClassLoader.getSystemClassLoader().getResource("img/circle.png")));
+            BufferedImage wheel;
+            BufferedImage circle;
+            if (runningFromJAR()) {
+                wheel = ImageIO.read(
+                        Objects.requireNonNull(
+                                ClassLoader.getSystemClassLoader().getResource("img/wheel.png")));
+                circle = ImageIO.read(
+                        Objects.requireNonNull(
+                                ClassLoader.getSystemClassLoader().getResource("img/circle.png")));
+            } else {
+                wheel = ImageIO.read(
+                        Objects.requireNonNull(
+                                ClassLoader.getSystemClassLoader().getResource("img/wheel.png")));
+                circle = ImageIO.read(
+                        Objects.requireNonNull(
+                                ClassLoader.getSystemClassLoader().getResource("img/circle.png")));
+            }
             int wheelRadius = wheel.getHeight() / 2;
             int circleRadius = 50;
             circle = resize(circle, circleRadius * 2, circleRadius * 2);
@@ -209,6 +238,7 @@ public class ColorWheel {
             g.dispose();
             return wheel;
         } catch (IOException e) {
+            AppController.addToOutputField("BufferedImage could not be read!" + System.lineSeparator(), true);
             LOGGER.log(SEVERE, "{0}: BufferedImage could not be read!", e.getClass().getSimpleName());
         }
         return null;
@@ -223,7 +253,7 @@ public class ColorWheel {
         double colourAngle = 360 * hsbValues[0] + 180;
         colourAngle = getAngle(colourAngle);
 
-        return List.of(javafx.scene.paint.Color.hsb(colourAngle, hsbValues[1], hsbValues[2]));
+        return Arrays.asList(javafx.scene.paint.Color.hsb(colourAngle, hsbValues[1], hsbValues[2]));
     }
 
     /**
@@ -237,7 +267,7 @@ public class ColorWheel {
 
         javafx.scene.paint.Color c1 = getColorFromAngle(colourAngle1, hsbValues);
         javafx.scene.paint.Color c2 = getColorFromAngle(colourAngle2, hsbValues);
-        return List.of(
+        return Arrays.asList(
                 c1, c2
         );
     }
@@ -258,7 +288,7 @@ public class ColorWheel {
         javafx.scene.paint.Color c1 = getColorFromAngle(colourAngle1, hsbValues);
         javafx.scene.paint.Color c2 = getColorFromAngle(colourAngle2, hsbValues);
 
-        return List.of(
+        return Arrays.asList(
                 c1,
                 c2
         );
@@ -275,7 +305,7 @@ public class ColorWheel {
 
         javafx.scene.paint.Color c1 = getColorFromAngle(colourAngle1, hsbValues);
         javafx.scene.paint.Color c2 = getColorFromAngle(colourAngle2, hsbValues);
-        return List.of(
+        return Arrays.asList(
                 c1, c2
         );
     }
@@ -297,7 +327,7 @@ public class ColorWheel {
         javafx.scene.paint.Color c1 = javafx.scene.paint.Color.hsb(colourAngle1, hsbValues[1], hsbValues[2]);
         javafx.scene.paint.Color c2 = javafx.scene.paint.Color.hsb(colourAngle2, hsbValues[1], hsbValues[2]);
         javafx.scene.paint.Color c3 = javafx.scene.paint.Color.hsb(colourAngle3, hsbValues[1], hsbValues[2]);
-        return List.of(
+        return Arrays.asList(
                 c1,
                 c2,
                 c3
@@ -310,7 +340,7 @@ public class ColorWheel {
      * @return A {@link List} of {@link javafx.scene.paint.Color}s: The list of monochromatic colors
      */
     protected static List<javafx.scene.paint.Color> getMonochromaticColour(float[] hsbValues) {
-        return List.of(
+        return Arrays.asList(
                 javafx.scene.paint.Color.hsb(hsbValues[0] * 360, 0.22, 1),
                 javafx.scene.paint.Color.hsb(hsbValues[0] * 360, 0.46, 1),
                 javafx.scene.paint.Color.hsb(hsbValues[0] * 360, 0.75, 0.8),

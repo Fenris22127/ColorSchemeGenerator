@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Quattrocento+Sans:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap');
 * {
     -fx-dark-green: #303533;
     -fx-mid-green: #515B48;
@@ -379,6 +381,7 @@
     -fx-mark-color: -fx-darker-grey;
     -fx-background-color: transparent;
     -fx-font-size: 12px;
+    -fx-text-fill: black;
 }
 
 

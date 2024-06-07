@@ -18,6 +18,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,6 +35,7 @@ import static de.colorscheme.app.AppController.getHarmony;
 import static de.colorscheme.app.AppController.getResBundle;
 import static de.colorscheme.clustering.KMeans.getCentroids;
 import static de.colorscheme.output.ColorWheel.*;
+import static de.colorscheme.utils.PathUtils.*;
 import static java.util.logging.Level.*;
 
 /**
@@ -47,7 +49,7 @@ import static java.util.logging.Level.*;
 public class OutputColors {
 
     /**
-     * Creates a {@link ColorLogger Logger} for this class
+     * Creates a {@link Logger Logger} for this class
      */
     private static final Logger LOGGER = ColorLogger.newLogger(OutputColors.class.getName());
 
@@ -55,14 +57,15 @@ public class OutputColors {
      * The {@link Font} used for the {@link Document}s regular content
      */
     private static Font regular = FontFactory.getFont("../fonts/Mulish-Regular.ttf", 8, Font.NORMAL);
+
     /**
      * The {@link Path} to the color wheel image
      */
-    private static final Path schemeWheelPath = Path.of("src/main/resources/img/SchemeWheel.png");
+    private static final Path schemeWheelPath = Paths.get("src/main/resources/img/SchemeWheel.png");
     /**
      * The {@link Path} to the resource base
      */
-    private static final Path RESOURCE_BASE = Path.of("src/main/resources/de/colorscheme/");
+    private static final Path RESOURCE_BASE = Paths.get("src/main/resources/de/colorscheme/");
 
     /**
      * The {@link String} containing the color for the table header
@@ -214,7 +217,7 @@ public class OutputColors {
     private static void outputWrite(ColorData c, Path path, Path imagePath) {
         try {
             Document doc = new Document(PageSize.A4, 0, 0, 0, 0);
-            writer = PdfWriter.getInstance(doc, new FileOutputStream(path.toString()));
+            writer = PdfWriter.getInstance(doc, Files.newOutputStream(Paths.get(path.toString())));
             doc.open();
             addContent(c, doc, imagePath);
             doc.close();
@@ -351,9 +354,9 @@ public class OutputColors {
             float height = pageSize.getHeight();
             float width40 = width / 10 * 4;
             float height40 = height / 10 * 4;
-
-            if (ColorWheel.createColorWheel(getColors(c))) {
-                Image colorWheel = Image.getInstance(schemeWheelPath.toString());
+            File f = ColorWheel.createColorWheel(getColors(c));
+            if (f.exists()) {
+                Image colorWheel = Image.getInstance(f.getPath());
                 colorWheel.setAlignment(Element.ALIGN_CENTER);
                 colorWheel.scaleToFit(width40, height40);
                 Paragraph imgParagraph = new Paragraph();
@@ -817,13 +820,21 @@ public class OutputColors {
         Image im = null;
         String file = header.toLowerCase().replace(" ", "");
         try {
-            Path complementaryBubble = Paths.get(
-                    String.format("%s/app/icons/%s_bubble.png", RESOURCE_BASE, file));
-            im = Image.getInstance(complementaryBubble.toString());
+            if (runningFromJAR()) {
+                URL bi = Objects.requireNonNull(
+                        ClassLoader.getSystemClassLoader().getResource(String.format(getHarmonyBubble(), getResourceBase(), file)));
+                im = Image.getInstance(bi);
+            } else {
+                Path complementaryBubble = Paths.get(
+                        String.format(getHarmonyBubble(), getResourceBase(), file));
+                im = Image.getInstance(complementaryBubble.toString());
+            }
             im.scaleAbsolute(22, 22);
         } catch (MalformedURLException e) {
+            AppController.addToOutputField("Malformed URL for image!", true);
             LOGGER.log(SEVERE, "Malformed URL for image!", e);
         } catch (IOException e) {
+            AppController.addToOutputField("Could not read image!", true);
             LOGGER.log(SEVERE,  "Could not read image!", e);
         }
         PdfPTable tab = getTable(header, im);
@@ -1074,13 +1085,34 @@ public class OutputColors {
             color = AppController.getResBundle().getString("avgRed");
         } else {
             switch (h) {
-                case 0 -> color = AppController.getResBundle().getString("avgYellow");
-                case 1 -> color = AppController.getResBundle().getString("avgGreen");
-                case 2 -> color = AppController.getResBundle().getString("avgCyan");
-                case 3 -> color = AppController.getResBundle().getString("avgBlue");
-                case 4 -> color = AppController.getResBundle().getString("avgPurple");
-                case 5 -> color = AppController.getResBundle().getString("avgRed");
-                default -> color = AppController.getResBundle().getString("avgIndeterminate");
+                case 0: {
+                    color = AppController.getResBundle().getString("avgYellow");
+                    break;
+                }
+                case 1: {
+                    color = AppController.getResBundle().getString("avgGreen");
+                    break;
+                }
+                case 2: {
+                    color = AppController.getResBundle().getString("avgCyan");
+                    break;
+                }
+                case 3: {
+                    color = AppController.getResBundle().getString("avgBlue");
+                    break;
+                }
+                case 4: {
+                    color = AppController.getResBundle().getString("avgPurple");
+                    break;
+                }
+                case 5: {
+                    color = AppController.getResBundle().getString("avgRed");
+                    break;
+                }
+                default: {
+                    color = AppController.getResBundle().getString("avgIndeterminate");
+                    break;
+                }
             }
         }
         return color;
@@ -1095,20 +1127,62 @@ public class OutputColors {
     private static String getColorSpace(int index) {
         String model;
         switch (index) {
-            case 1 -> model = AppController.getResBundle().getString("metaColorModel1");
-            case 2 -> model = AppController.getResBundle().getString("metaColorModel2");
-            case 3 -> model = AppController.getResBundle().getString("metaColorModel3");
-            case 4 -> model = AppController.getResBundle().getString("metaColorModel4");
-            case 5 -> model = AppController.getResBundle().getString("metaColorModel5");
-            case 6 -> model = AppController.getResBundle().getString("metaColorModel6");
-            case 7 -> model = AppController.getResBundle().getString("metaColorModel7");
-            case 8 -> model = AppController.getResBundle().getString("metaColorModel8");
-            case 9 -> model = AppController.getResBundle().getString("metaColorModel9");
-            case 10 -> model = AppController.getResBundle().getString("metaColorModel10");
-            case 11 -> model = AppController.getResBundle().getString("metaColorModel11");
-            case 12 -> model = AppController.getResBundle().getString("metaColorModel12");
-            case 13 -> model = AppController.getResBundle().getString("metaColorModel13");
-            default -> model = AppController.getResBundle().getString("metaColorModelDefault");
+            case 1: {
+                model = AppController.getResBundle().getString("metaColorModel1");
+                break;
+            }
+            case 2: {
+                model = AppController.getResBundle().getString("metaColorModel2");
+                break;
+            }
+            case 3: {
+                model = AppController.getResBundle().getString("metaColorModel3");
+                break;
+            }
+            case 4: {
+                model = AppController.getResBundle().getString("metaColorModel4");
+                break;
+            }
+            case 5: {
+                model = AppController.getResBundle().getString("metaColorModel5");
+                break;
+            }
+            case 6: {
+                model = AppController.getResBundle().getString("metaColorModel6");
+                break;
+            }
+            case 7: {
+                model = AppController.getResBundle().getString("metaColorModel7");
+                break;
+            }
+            case 8: {
+                model = AppController.getResBundle().getString("metaColorModel8");
+                break;
+            }
+            case 9: {
+                model = AppController.getResBundle().getString("metaColorModel9");
+                break;
+            }
+            case 10: {
+                model = AppController.getResBundle().getString("metaColorModel10");
+                break;
+            }
+            case 11: {
+                model = AppController.getResBundle().getString("metaColorModel11");
+                break;
+            }
+            case 12: {
+                model = AppController.getResBundle().getString("metaColorModel12");
+                break;
+            }
+            case 13: {
+                model = AppController.getResBundle().getString("metaColorModel13");
+                break;
+            }
+            default: {
+                model = AppController.getResBundle().getString("metaColorModelDefault");
+                break;
+            }
         }
         return model;
     }
@@ -1134,32 +1208,75 @@ public class OutputColors {
             return MetaData.createNoAccessMetaData();
         }
 
-        return MetaData.createMetaData(type ->
-                switch (type) {
-                    case FILE_NAME -> imgPath.getFileName().toString().split("\\.")[0];
-                    case FILE_TYPE -> imgPath.getFileName().toString().split("\\.")[1].toUpperCase();
-                    case FILE_SIZE -> formatSize(attr.size());
-                    case FILE_CREATION_DATE -> formatTime(attr.creationTime(), dateTimeFormatter);
-                    case FILE_LAST_MODIFIED_DATE -> formatTime(attr.lastModifiedTime(), dateTimeFormatter);
-                    case FILE_LAST_ACCESSED_DATE -> formatTime(attr.lastAccessTime(), dateTimeFormatter);
-                    case FILE_HEIGHT -> img.getHeight() + " px";
-                    case FILE_WIDTH -> img.getWidth() + " px";
-                    case FILE_IMAGE_TYPE -> getColorSpace(img.getType());
-                    case FILE_COLOR_COMPONENTS -> String.valueOf(img.getColorModel().getNumComponents());
-                    case FILE_BIT_DEPTH -> String.valueOf(img.getColorModel().getPixelSize());
-                    case FILE_TRANSPARENCY -> switch (img.getColorModel().getTransparency()) {
-                        case 1 -> AppController.getResBundle().getString("metaTransparency1");
-                        case 2 -> AppController.getResBundle().getString("metaTransparency2");
-                        case 3 -> AppController.getResBundle().getString("metaTransparency3");
-                        default -> AppController.getResBundle().getString("metaTransparencyDefault");
-                    };
-                    case FILE_ALPHA -> (img.getColorModel().hasAlpha() ?
+        return MetaData.createMetaData(type -> {
+            switch (type) {
+                case FILE_NAME: {
+                    return imgPath.getFileName().toString().split("\\.")[0];
+                }
+                case FILE_TYPE: {
+                    return imgPath.getFileName().toString().split("\\.")[1].toUpperCase();
+                }
+                case FILE_SIZE: {
+                    return formatSize(attr.size());
+                }
+                case FILE_CREATION_DATE: {
+                    return formatTime(attr.creationTime(), dateTimeFormatter);
+                }
+                case FILE_LAST_MODIFIED_DATE: {
+                    return formatTime(attr.lastModifiedTime(), dateTimeFormatter);
+                }
+                case FILE_LAST_ACCESSED_DATE: {
+                    return formatTime(attr.lastAccessTime(), dateTimeFormatter);
+                }
+                case FILE_HEIGHT: {
+                    return img.getHeight() + " px";
+                }
+                case FILE_WIDTH: {
+                    return img.getWidth() + " px";
+                }
+                case FILE_IMAGE_TYPE: {
+                    return getColorSpace(img.getType());
+                }
+                case FILE_COLOR_COMPONENTS: {
+                    return String.valueOf(img.getColorModel().getNumComponents());
+                }
+                case FILE_BIT_DEPTH: {
+                    return String.valueOf(img.getColorModel().getPixelSize());
+                }
+                case FILE_TRANSPARENCY: {
+                    return getTransparency(img);
+                }
+                case FILE_ALPHA: {
+                    return (img.getColorModel().hasAlpha() ?
                             AppController.getResBundle().getString("metaAlphaYes") :
                             AppController.getResBundle().getString("metaAlphaNo"));
-                    case FILE_ALPHA_TYPE -> (img.getColorModel().isAlphaPremultiplied() ?
+                }
+                case FILE_ALPHA_TYPE: {
+                    return (img.getColorModel().isAlphaPremultiplied() ?
                             AppController.getResBundle().getString("metaAlphaPremultiplied") :
                             AppController.getResBundle().getString("metaAlphaNotPremultiplied"));
-                });
+                }
+                default: {
+                    return null;
+                }
+            }
+        });
+    }
+    private static String getTransparency(BufferedImage img) {
+        switch (img.getColorModel().getTransparency()) {
+            case 1: {
+                return AppController.getResBundle().getString("metaTransparency1");
+            }
+            case 2: {
+                return AppController.getResBundle().getString("metaTransparency2");
+            }
+            case 3: {
+                return AppController.getResBundle().getString("metaTransparency3");
+            }
+            default: {
+                return AppController.getResBundle().getString("metaTransparencyDefault");
+            }
+        }
     }
 
     /**

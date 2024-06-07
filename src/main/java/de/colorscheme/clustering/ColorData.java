@@ -26,7 +26,7 @@ import static de.colorscheme.app.AppController.getResBundle;
 public class ColorData {
 
     /**
-     * Creates a {@link ColorLogger} for this class
+     * Creates a {@link ColorLogger Logger} for this class
      */
     private static final Logger LOGGER = ColorLogger.newLogger(ColorData.class.getName());
 
@@ -159,8 +159,8 @@ public class ColorData {
      */
     protected static BufferedImage convertToBufferedImage(Image img) {
 
-        if (img instanceof BufferedImage bImg) {
-            return bImg;
+        if (img.getClass() == BufferedImage.class) {
+            return (BufferedImage) img;
         }
         // Create a buffered image with transparency
         BufferedImage bi = new BufferedImage(
@@ -439,7 +439,7 @@ public class ColorData {
         }
 
         //Set threshold: If crossed, the element crossing it will be selected
-        double threshold = random.nextDouble(0, totalSum);
+        double threshold = randomInRange(0, totalSum);
 
         //The sum of all elements together until the threshold is reached
         double currentSum = 0.0;
@@ -460,6 +460,12 @@ public class ColorData {
             }
         }
         return new Point3D(-1, -1, -1);
+    }
+
+    private double randomInRange(double min, double max) {
+        double range = max - min;
+        double scaled = random.nextDouble() * range;
+        return scaled + min;
     }
 
     /**

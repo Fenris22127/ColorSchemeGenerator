@@ -15,7 +15,7 @@ class OutputColorsTest {
 
     @Test
     void testReadMetaData() {
-        Path imgPath = Path.of("C:\\Users\\Elisa\\Documents\\Iceland (by Jonny Auh).jpg");
+        Path imgPath = Paths.get("C:\\Users\\Elisa\\Documents\\Iceland (by Jonny Auh).jpg");
         Set<MetaData> metaData = OutputColors.readMetaData(imgPath);
         List<MetaData> metaList = new LinkedList<>(metaData);
         Collections.reverse(metaList);
@@ -43,7 +43,7 @@ class OutputColorsTest {
     void testHsb() {
         float[] hsb = new float[3];
         System.out.println(Arrays.toString(hsb));
-        List<Color> colList = List.of(
+        List<Color> colList = Arrays.asList(
                 new Color(255, 0, 0),
                 new Color(255, 128, 0),
                 new Color(255, 255, 0),
@@ -67,14 +67,32 @@ class OutputColorsTest {
                 System.out.println("red");
             }
             else {
-                switch (h) {
+                if (h == 0) {
+                    System.out.println("yellow");
+                }
+                else if (h == 1) {
+                    System.out.println("green");
+                }
+                else if (h == 2) {
+                    System.out.println("cyan");
+                }
+                else if (h == 3) {
+                    System.out.println("blue");
+                }
+                else if (h == 4) {
+                    System.out.println("purple");
+                }
+                else if (h == 5) {
+                    System.out.println("red");
+                }
+                /*switch (h) {
                     case 0 -> System.out.println("yellow");
                     case 1 -> System.out.println("green");
                     case 2 -> System.out.println("cyan");
                     case 3 -> System.out.println("blue");
                     case 4 -> System.out.println("purple");
                     case 5 -> System.out.println("red");
-                }
+                }*/
             }
         }
     }
