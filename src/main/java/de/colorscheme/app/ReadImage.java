@@ -27,7 +27,7 @@ import static de.colorscheme.clustering.KMeans.kMeans;
 public class ReadImage extends Task<Void> {
 
     /**
-     * Creates a {@link ColorLogger} for this class
+     * Creates a {@link ColorLogger Logger} for this class
      */
     private static final Logger LOGGER = ColorLogger.newLogger(ReadImage.class.getName());
     /**

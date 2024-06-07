@@ -8,6 +8,8 @@ import com.itextpdf.text.pdf.BaseFont;
 import java.awt.*;
 import java.util.Objects;
 
+import static de.colorscheme.utils.PathUtils.getFontBase;
+
 /**
  * A utility class for font operations.
  *
@@ -16,14 +18,12 @@ import java.util.Objects;
  * @since 18.0.1
  */
 public class FontUtils {
-    private static final String FONT_BASE = "../main/fonts/";
-
     /**
      * Returns the base {@link Font}.
      * @return A {@link Font}: The base font
      */
     public Font getMulish() {
-        return FontFactory.getFont(Objects.requireNonNull(getClass().getResource(FONT_BASE + "Mulish-Regular.ttf")).toExternalForm(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 12, Font.NORMAL, BaseColor.BLACK);
+        return FontFactory.getFont(Objects.requireNonNull(getClass().getResource(getFontBase() + "Mulish-Regular.ttf")).toExternalForm(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 12, Font.NORMAL, BaseColor.BLACK);
     }
 
     /**
@@ -31,7 +31,7 @@ public class FontUtils {
      * @return A {@link Font}: The font 'Mulish ExtraBold'
      */
     public Font getMulishExtraBold() {
-        return FontFactory.getFont(Objects.requireNonNull(getClass().getResource(FONT_BASE + "Mulish-ExtraBold.ttf")).toExternalForm(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 32, Font.NORMAL, BaseColor.BLACK);
+        return FontFactory.getFont(Objects.requireNonNull(getClass().getResource(getFontBase() + "Mulish-ExtraBold.ttf")).toExternalForm(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 32, Font.NORMAL, BaseColor.BLACK);
     }
 
     /**
@@ -39,7 +39,7 @@ public class FontUtils {
      * @return A {@link Font}: The font 'Quattrocento Sans Regular'
      */
     public Font getQuattrocentoSansRegular() {
-        return FontFactory.getFont(Objects.requireNonNull(getClass().getResource(FONT_BASE + "QuattrocentoSans-Regular.ttf")).toExternalForm(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 16, Font.NORMAL, BaseColor.BLACK);
+        return FontFactory.getFont(Objects.requireNonNull(getClass().getResource(getFontBase() + "QuattrocentoSans-Regular.ttf")).toExternalForm(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 16, Font.NORMAL, BaseColor.BLACK);
     }
 
     /**
@@ -47,7 +47,7 @@ public class FontUtils {
      * @return A {@link Font}: The font 'Quattrocento Sans Bold'
      */
     public Font getQuattrocentoSansBold() {
-        return FontFactory.getFont(Objects.requireNonNull(getClass().getResource(FONT_BASE + "QuattrocentoSans-Bold.ttf")).toExternalForm(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 16, Font.NORMAL, BaseColor.BLACK);
+        return FontFactory.getFont(Objects.requireNonNull(getClass().getResource(getFontBase() + "QuattrocentoSans-Bold.ttf")).toExternalForm(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 16, Font.NORMAL, BaseColor.BLACK);
     }
 
     /**
@@ -58,7 +58,7 @@ public class FontUtils {
      * @return A {@link Font}: The font with the passed parameters
      */
     public Font getMulish(float fontSize, FontWeight fontWeight, Color color) {
-        return FontFactory.getFont(Objects.requireNonNull(getClass().getResource(FONT_BASE + "Mulish-" + fontWeight.getWeight() + ".ttf")).toExternalForm(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED, fontSize, Font.NORMAL, new BaseColor(color.getRGB()));
+        return FontFactory.getFont(Objects.requireNonNull(getClass().getResource(getFontBase() + "Mulish-" + fontWeight.getWeight() + ".ttf")).toExternalForm(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED, fontSize, Font.NORMAL, new BaseColor(color.getRGB()));
     }
 
     /**
@@ -67,7 +67,7 @@ public class FontUtils {
      * @return A {@link Font}: The font with the passed parameters
      */
     public Font getMulishRegular(float fontSize) {
-        return FontFactory.getFont(Objects.requireNonNull(getClass().getResource(FONT_BASE + "Mulish-Regular.ttf")).toExternalForm(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED, fontSize, Font.NORMAL, BaseColor.BLACK);
+        return FontFactory.getFont(Objects.requireNonNull(getClass().getResource(getFontBase() + "Mulish-Regular.ttf")).toExternalForm(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED, fontSize, Font.NORMAL, BaseColor.BLACK);
     }
 
     /**
@@ -76,7 +76,7 @@ public class FontUtils {
      */
     public void loadFont(String... fontName) {
         for (String font : fontName) {
-            javafx.scene.text.Font.loadFont(Objects.requireNonNull(getClass().getResource(FONT_BASE + font)).toExternalForm(), 10);
+            javafx.scene.text.Font.loadFont(Objects.requireNonNull(getClass().getResource(getFontBase() + font)).toExternalForm(), 10);
         }
     }
 

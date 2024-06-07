@@ -26,7 +26,7 @@ import static de.colorscheme.app.AppController.getResBundle;
 public class ColorData {
 
     /**
-     * Creates a {@link ColorLogger} for this class
+     * Creates a {@link ColorLogger Logger} for this class
      */
     private static final Logger LOGGER = ColorLogger.newLogger(ColorData.class.getName());
 
@@ -162,9 +162,6 @@ public class ColorData {
         if (img.getClass() == BufferedImage.class) {
             return (BufferedImage) img;
         }
-        /*if (img instanceof BufferedImage bImg) {
-            return bImg;
-        }*/
         // Create a buffered image with transparency
         BufferedImage bi = new BufferedImage(
                 img.getWidth(null), img.getHeight(null),
@@ -468,8 +465,7 @@ public class ColorData {
     private double randomInRange(double min, double max) {
         double range = max - min;
         double scaled = random.nextDouble() * range;
-        double shifted = scaled + min;
-        return shifted; // == (rand.nextDouble() * (max-min)) + min;
+        return scaled + min;
     }
 
     /**

@@ -27,10 +27,8 @@ import javafx.util.converter.NumberStringConverter;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,7 +48,7 @@ public class AppController implements Initializable {
      */
     protected static final boolean IS_DEBUG = false;
     /**
-     * Creates a {@link ColorLogger} for this class
+     * Creates a {@link ColorLogger Logger} for this class
      */
     private static final Logger LOGGER = ColorLogger.newLogger(AppController.class.getName());
     /**
@@ -225,11 +223,6 @@ public class AppController implements Initializable {
         } else {
             return null;
         }
-        /*if (node instanceof TextArea textarea) {
-            return textarea;
-        } else {
-            return null;
-        }*/
     }
 
     /**
@@ -288,7 +281,7 @@ public class AppController implements Initializable {
         fileChooser.setTitle(bundle.getString("selectImgUpload"));
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.bmp", "*.gif"));
-        fileChooser.setInitialDirectory(Path.of(USER_HOME).toFile());
+        fileChooser.setInitialDirectory(Paths.get(USER_HOME).toFile());
         File chosen = fileChooser.showOpenDialog(getStage());
 
         return chosen == null ? null : chosen.toPath();
@@ -357,8 +350,8 @@ public class AppController implements Initializable {
         spinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 6, 4));
 
         // Sets the available languages in the choice box
-        languageChoice.setItems(FXCollections.observableList(List.of("English", "Deutsch")));
-        languageChoice.setValue("Language");
+        languageChoice.setItems(FXCollections.observableList(Arrays.asList("English", "Deutsch")));
+        languageChoice.setValue("English");
 
         // Sets the language of the program according to the choice of the user
         languageChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
@@ -392,18 +385,14 @@ public class AppController implements Initializable {
      * @param newValue A {@link Number}: The index of the chosen language
      */
     private static synchronized void setBundle(Number newValue) {
+        ClassLoader classLoader = AppController.class.getClassLoader();
         if (newValue.intValue() == 0) {
-            bundle = ResourceBundle.getBundle("messages_EN");
+            bundle = ResourceBundle.getBundle("messages_EN", Locale.getDefault(), classLoader);
         } else if (newValue.intValue() == 1) {
-            bundle = ResourceBundle.getBundle("messages_DE");
+            bundle = ResourceBundle.getBundle("messages_DE", Locale.getDefault(), classLoader);
         } else {
             throw new IllegalStateException("Unexpected value: " + newValue.intValue());
         }
-        /*bundle = switch (newValue.intValue()) {
-            case 0 -> ResourceBundle.getBundle("messages_EN");
-            case 1 -> ResourceBundle.getBundle("messages_DE");
-            default -> throw new IllegalStateException("Unexpected value: " + newValue.intValue());
-        };*/
     }
 
     /**
@@ -449,36 +438,35 @@ public class AppController implements Initializable {
         ToggleButton button = (ToggleButton) event.getSource();
         if (button.isSelected()) {
             styleButtons(button, button.getId().concat("_selected"));
-            if (Objects.equals(button.getId(), "complementary")) {
-                harmony.add(ColorHarmony.COMPLEMENTARY);
+            switch(button.getId()) {
+                case "complementary": {
+                    harmony.add(ColorHarmony.COMPLEMENTARY);
+                    break;
+                }
+                case "splitcomplementary": {
+                    harmony.add(ColorHarmony.SPLITCOMPLEMENTARY);
+                    break;
+                }
+                case "analogous": {
+                    harmony.add(ColorHarmony.ANALOGOUS);
+                    break;
+                }
+                case "triadic": {
+                    harmony.add(ColorHarmony.TRIADIC);
+                    break;
+                }
+                case "tetradic": {
+                    harmony.add(ColorHarmony.TETRADIC);
+                    break;
+                }
+                case "monochromatic": {
+                    harmony.add(ColorHarmony.MONOCHROMATIC);
+                    break;
+                }
+                default: {
+                    throw new IllegalStateException("Unexpected value: " + button.getId());
+                }
             }
-            if (Objects.equals(button.getId(), "splitcomplementary")) {
-                harmony.add(ColorHarmony.SPLITCOMPLEMENTARY);
-            }
-            if (Objects.equals(button.getId(), "analogous")) {
-                harmony.add(ColorHarmony.ANALOGOUS);
-            }
-            if (Objects.equals(button.getId(), "triadic")) {
-                harmony.add(ColorHarmony.TRIADIC);
-            }
-            if (Objects.equals(button.getId(), "tetradic")) {
-                harmony.add(ColorHarmony.TETRADIC);
-            }
-            if (Objects.equals(button.getId(), "monochromatic")) {
-                harmony.add(ColorHarmony.MONOCHROMATIC);
-            }
-            else {
-                throw new IllegalStateException("Unexpected value: " + button.getId());
-            }
-            /*switch (button.getId()) {
-                case "complementary" -> harmony.add(ColorHarmony.COMPLEMENTARY);
-                case "splitcomplementary" -> harmony.add(ColorHarmony.SPLITCOMPLEMENTARY);
-                case "analogous" -> harmony.add(ColorHarmony.ANALOGOUS);
-                case "triadic" -> harmony.add(ColorHarmony.TRIADIC);
-                case "tetradic" -> harmony.add(ColorHarmony.TETRADIC);
-                case "monochromatic" -> harmony.add(ColorHarmony.MONOCHROMATIC);
-                default -> throw new IllegalStateException("Unexpected value: " + button.getId());
-            }*/
         } else {
             styleButtons(button, button.getId().concat("_light"));
             harmony.remove(ColorHarmony.valueOf(button.getId().toUpperCase()));
@@ -631,7 +619,7 @@ public class AppController implements Initializable {
         if (!autoDownload.isSelected()) {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setTitle(bundle.getString("chooseDirSaveIn"));
-            directoryChooser.setInitialDirectory(Path.of(USER_HOME).toFile());
+            directoryChooser.setInitialDirectory(Paths.get(USER_HOME).toFile());
             File chosen = directoryChooser.showDialog(getStage());
             if (chosen != null) {
                 OutputColors.setDownloadPath(String.valueOf(chosen.toPath()));
