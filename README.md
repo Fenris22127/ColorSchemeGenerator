@@ -10,9 +10,6 @@
 
 <h1 id="center">Color Scheme Generator</h1>
 
-> [!WARNING]
-> The provided .jar file currently doesn't work as JavaFX requires a different workflow that I cannot figure out for the life of me.
-
   <p id="center">
     This program generates a colour scheme from an image using K-Means clustering and allows the user to save it as a PDF file.
     <br />
