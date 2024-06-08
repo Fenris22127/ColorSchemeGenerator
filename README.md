@@ -1,6 +1,5 @@
 <a name="readme-top"></a>
-> [!WARNING]
-> The provided .jar file currently doesn't work as JavaFX requires a different workflow that I cannot figure out for the life of me.
+
 <!-- PROJECT LOGO -->
 <br />
 <div id="center">
@@ -45,7 +44,6 @@
         <li>
           <a href="#installation">Installation</a>
           <ol>
-            <li><a href="#installing-java">Installing Java</a></li>
             <li><a href="#using-the-color-scheme-generator">Using the Color Scheme Generator</a></li>
           </ol>
         </li>
@@ -117,162 +115,10 @@ To get a local copy up and running, follow these steps.
 <h2> Prerequisites </h2>
 <a id="prerequisites"></a>
 
-This program requires Java 18+ to run properly. How to install Java will be explained in the following steps. If your device is not running on a 64-bit operating system, you cannot use this program. You will also need administrator privileges to install Java.
+This program requires Java 8+ to run properly. How to install Java will be explained in the following steps. If your device is not running on a 64-bit operating system, you cannot use this program. You will also need administrator privileges to install Java.
 
 <h2> Installation </h2>
 <a id="installation"></a>
-
-<h3> Installing Java</h3>
-<a id="installing-java"></a>
-
-1. Find out which bit-version your operating system is running on:
-
-    * #### Windows 11:
-      1. Open your settings
-      2. Open the `About` page in the `System` tab
-      3. You will see your bit version in the `Device Specifications` tab under `System type`
-      
-         <img src="src/res/images/DeviceSpecifications.svg" alt="Device Specifications Tab" width="400">
-    * #### Windows 10:
-      1. Open your settings
-      2. Open the `System` page, then click on `About`
-      3. You will see your bit version in the `Device Specifications` tab under `System type`, below the Windows Defender details
-      
-         <img src="src/res/images/Win11CheckBit.svg" alt="Device Specifications Tab" width="400">
-    * #### Mac (until Version 10.11):
-      1. Click on the Apple Logo in the upper-left corner
-      2. Open the `About This Mac` page
-      3. You will see your processor below the operating system and computer model name. If your processor appears on the following list, your device is running on a <b>64-bit</b> operating system. If you have a processor not listed here, your device is running on a <b>32-bit</b> operating system.
-          * Core 2 Duo
-          * Dual-core Xeon
-          * Quad-core Xeon
-          * Core i3
-          * Core i5
-          * Core i7
-    * #### Mac (Version 10.11+):
-      1. Open your Spotlight, search `Terminal` and open it
-      2. You should now see two lines of text: your last login and in line 2 `[device name]:~ [username]$`
-      3. Place your cursor at the end of line 2 (make sure to leave a whitespace between the cursor and the `$`)
-      4. Type `getconf LONG_BIT` and hit Enter
-      5. The number being displayed in the following line is the bit-version of your device
-      
-         <img src="src/res/images/MacCheckBit.svg" alt="Bit-version on Mac" width="400">
-      
-    * #### Linux:
-      1. Press `Ctrl + Alt + T` to open the terminal
-      2. Type `getconf LONG_BIT` and hit Enter
-      3. The number being displayed in the following line is the bit-version of your device
-
-2. Install Java from the [Oracle Archive](https://www.oracle.com/java/technologies/javase/jdk18-archive-downloads.html) by downloading the following
-   * Windows: `Windows x64 Installer`
-   * Mac: `macOS x64 DMG Installer`
-   * Linux: `Linux x64 Compressed Archive`
-
-3. Execute the JDK Installer by double-clicking it, and clicking `yes` if it requests system permission
-
-4. Now, the Installer Welcome Screen should open. Click on `Next` to change the installation location if required. Click `Next` again to start the installation. After successfully installing Java, you can click `Close`.
-
-<b>The following steps might not be necessary but should be followed if the program does not work.</b>
-
-5. To verify the installation, open the Terminal (on Windows, press the Windows key and search for `Terminal`)
-
-6. Type `java -version` and hit enter. You should see this:
-   
-   <img src="src/res/images/Win_Check_Java_Version.svg" alt="Terminal displaying the current java version" width="400">
-
-7. If the version number matches the version you installed, you can skip the following steps. If not, here is how to proceed:<br>
-    * Windows: 
-      1. Windows 11: Press the Windows key and enter `environment variables`, then open `Edit the system environment variables` <i>(left image)</i> <br>
-         Windows 10: Press `Windows key + R` and enter `sysdm.cpl` into the dialogue, then hit enter <i>(right image)</i>
-         <p>
-           <img src="src/res/images/Win11_Open_Environment_Variables.svg" alt="Edit environment variables setting on Windows 11" width="250" >
-           <img src="src/res/images/Win10_Open_Environment_Variables.svg" alt="Dialogue with ´sysdm.cpl´ entered on Windows 10" height="122">
-         </p>
-         
-      2. A window `System Properties` should have opened. Switch to the `Advanced` Tab
-      
-         <img src="src/res/images/System_Properties.svg" alt="The ´Advanced´ tab in the System Properties" width="320" >
-         
-      3. Click on `Environment Variables`
-      4. Under `System Variables` look for `JAVA_HOME`
-         
-         <img src="src/res/images/Environment_Variables_Java_Home.svg" alt="The ´Java Home´ variable highlighted in the System Variables" width="320" >
-      
-          * If it is there, double-click it and verify that the variable value is the path to the installed Java version. This is usually `C:\Program Files\Java\[jdk-##]` with the `##` representing the version number (e.g., Java 18 would be jdk-18)
-          * If it is not there, click `New`, enter `JAVA_HOME` as the variable name and the path to the installed Java version (usually `C:\Program Files\Java\[jdk-##]` with the `##` representing the version number) as the variable value
-            
-            <img src="src/res/images/New_System_Variable.svg" alt="The dialogue displaying the name and path of the new variable" width="400" >
-         
-      5. Then look for `PATH` and double-click it
-
-         <img src="src/res/images/Environment_Variables_Path.svg" alt="The ´Path´ variable highlighted in the System Variables" width="320" >
-
-      6. If not already there, click `New` and add `%JAVA_HOME%\bin`
-         
-         <img src="src/res/images/Edit_Environment_Variable.svg" alt="The path that should be added as the ´Path´ variable" width="320" >
-         
-      7. Close the windows with the `OK` buttons
-      8. Press the Windows key and type in `Terminal`, but run it as an administrator by right-clicking it and then clicking `Run as administrator`
-         
-         <img src="src/res/images/Run_As_Administrator.svg" alt="The option to click when right clicking the Terminal-App" width="230" >
-   
-      9. Then enter `javac --version` and hit enter again. The Java version should now be displayed.
-
-         <img src="src/res/images/Check_New_Java_Version.svg" alt="The PowerShell window with the command and output" width="330">
-         
-      10. Press the Windows key and type in `Control Panel`, open the `Programs` page and click on `Java`
-         
-           <p>
-              <img src="src/res/images/Control_Panel.svg" alt="The Control panel" height="100">
-              <img src="src/res/images/Programs_Java.svg" alt="The ´Programs´ and ´Java´ page" height="60">
-           </p>
-
-      11. Switch to the `Java` tab in the window that should have opened and click on `View`
-         
-           <img src="src/res/images/Java_Control_Panel.svg" alt="The ´Java´ Tab in the Java Control Panel" width="330">
-       
-      12. A new window with a table should now open. Click on `Find` and then on `Next` in the JRE Finder
-      
-           <p>
-              <img src="src/res/images/Java_Runtime_Environment_Settings.svg" alt="The Java Runtime Environments Settings" width="270">
-              <img src="src/res/images/JRE_Finder.svg" alt="The Java Runtime Environments Finder" width="270">
-           </p>
-      
-      13. Enter the file path to the Java installation as determined in Step 4 and click on `Finish`
-      14. Should there be more than your downloaded version of Java in the table, disable the old one by unselecting the checkbox in the column titled `Enabled`
-      
-          <img src="src/res/images/Java_Runtime_Environment_Settings_New.svg" alt="The Java Runtime Environments Settings with the new version" width="350">
-
-      15. Click `Okay`, then `Apply` and pat yourself on the shoulder because Good job! You did it! (Maybe restart your PC though)
-    * MacOS:
-      1. Open your Spotlight, search `Terminal` and open it
-      
-         <img src="src/res/images/Terminal.svg" alt="The Terminal on Mac" width="120">
-         
-      2. If you don’t know where the JDK was installed, enter `/usr/libexec/java_home` and press enter <br> It’s usually under `/Library/Java/JavaVirtualMachines`
-
-         <img src="src/res/images/Java_Location.svg" alt="The terminal with the command and the output for the JDK path" width="350">      
-
-      3. Find the path to the target file by typing `~/.bash-profile` and hitting enter
-      
-         <img src="src/res/images/bash_profile.svg" alt="The terminal with the command for the bash file" width="350">
-      
-      4. The file will be opened automatically
-      5. The current Java Home variable will usually be in the first line and looks like this (`[jdk-##]` is the Java version, e.g., Java 18 would be jdk-18)
-      
-         <img src="src/res/images/Bash.svg" alt="Bash file containing the line ´export JAVA_HOME=/Library/Java/JavaVirtualMachines/[jdk-##].jdk/Contents/Home´" width="550">
-      
-      6. Add the following to the file (the file path may vary but usually is at this location)
-          `export %JAVA_HOME%=C:\Program Files\Java\[jdk-##]`
-      
-         <img src="src/res/images/BashNew.svg" alt="Bash file containing the new line ´export %JAVA_HOME%=C:\Program Files\Java\[jdk-##].jdk/Contents/Home´" width="550">
-         
-      7. Save the file with `CMD + S` (the original file should now be modified) and close it
-      8. Execute the new file by reopening the Terminal
-      9. Verify that the new Java version was set by entering java -version and hitting enter. The Java version that will be displayed should match the version you set
-      
-         <img src="src/res/images/NewJava.svg" alt="The terminal with the command and the output for the Java version" width="400">
-      
 
 <h3> Using the Color Scheme Generator </h3>
 <a id="using-the-color-scheme-generator"></a>
@@ -281,14 +127,10 @@ This program requires Java 18+ to run properly. How to install Java will be expl
 
 See the [documentation](https://github.com/Fenris22127/ColorSchemeGenerator/blob/master/doc/CSG%20-%20Documentation.pdf) for specifics.
 
-
-<!-- ![Warning](https://img.shields.io/badge/⚠%20▬▬▬▬▬%20!%20WARNING%20!%20▬▬▬▬▬%20⚠-e10000?style=for-the-badge) -->
-
 > [!WARNING]
 > **NEVER** download or open unknown .exe, .jar or other executable files! <br>
 > If you open this without knowing what it is, that is on you.
 
-<!--![Warning End](https://img.shields.io/badge/|▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬|-e10000?style=for-the-badge) -->
 
 <!-- USAGE EXAMPLES -->
 <h2> Usage </h2>

@@ -40,16 +40,6 @@ public class ColorWheel {
      * Creates a {@link ColorLogger Logger} for this class
      */
     private static final Logger LOGGER = ColorLogger.newLogger(ColorWheel.class.getName());
-    /*private static final String WHEEL_PATH_STANDARD = "src/main/resources/img/SchemeWheel.png";
-    private static final String WHEEL_PATH_JAR = "/img/SchemeWheel.png";
-    private static final String WHEEL_PATH;
-    static {
-        if(runningFromJAR()) {
-            WHEEL_PATH = WHEEL_PATH_JAR;
-        } else {
-            WHEEL_PATH = WHEEL_PATH_STANDARD;
-        }
-    }*/
 
     /**
      * Private constructor to hide the public one
@@ -194,21 +184,12 @@ public class ColorWheel {
         try {
             BufferedImage wheel;
             BufferedImage circle;
-            if (runningFromJAR()) {
-                wheel = ImageIO.read(
-                        Objects.requireNonNull(
-                                ClassLoader.getSystemClassLoader().getResource("img/wheel.png")));
-                circle = ImageIO.read(
-                        Objects.requireNonNull(
-                                ClassLoader.getSystemClassLoader().getResource("img/circle.png")));
-            } else {
-                wheel = ImageIO.read(
-                        Objects.requireNonNull(
-                                ClassLoader.getSystemClassLoader().getResource("img/wheel.png")));
-                circle = ImageIO.read(
-                        Objects.requireNonNull(
-                                ClassLoader.getSystemClassLoader().getResource("img/circle.png")));
-            }
+            wheel = ImageIO.read(
+                    Objects.requireNonNull(
+                            ClassLoader.getSystemClassLoader().getResource("img/wheel.png")));
+            circle = ImageIO.read(
+                    Objects.requireNonNull(
+                            ClassLoader.getSystemClassLoader().getResource("img/circle.png")));
             int wheelRadius = wheel.getHeight() / 2;
             int circleRadius = 50;
             circle = resize(circle, circleRadius * 2, circleRadius * 2);

@@ -114,18 +114,12 @@ w
 G.idea/sonarlint/issuestore/f/1/f19df6fa4200e1140e2f1328c44272894cf7aa05,3\e\3e056f8f96bdce88786299c086b48737e4647327
 w
 G.idea/sonarlint/issuestore/6/e/6e8c2ec6f4bdebc0a28a40f756b188f0df0897c0,9\e\9ede71af76b114016ccce8b611e9bb2583fe0238
-Å
-Q.idea/sonarlint/securityhotspotstore/b/e/be7c2d8968c39fe023f85dbffb128489c8ec3db2,c\c\cceb2e0fbe0c1722a58d6c8033833fe36c413e01
-Å
-Q.idea/sonarlint/securityhotspotstore/1/c/1c89a5491fbfda3fb050196d6a239f20200296e7,1\d\1d6f137ed1f3d2f0a99dd6a0a153e6f9abc39407
 [
 +.idea/artifacts/ColorSchemeGenerator_FX.xml,5\7\57e7c1d49dc6c1f636f5cd2600311c42c9dcf4e5
 i
 9src/test/java/de/colorscheme/output/OutputColorsTest.java,4\d\4d15609bea4d0c445131118674b15c0dbc53fd01
 b
 2src/main/java/de/colorscheme/utils/ColorUtils.java,8\a\8a212ed3afec4b0b7d742511b9945fd4dc339e12
-a
-1src/main/java/de/colorscheme/utils/FilePaths.java,b\6\b6c9377eb626d24c6c9c593f021cd3be2126cce2
 a
 1src/main/java/de/colorscheme/utils/PathUtils.java,c\4\c41bbe719b263be2f56ade29a0cd1e1eddcdbb6e
 Å
@@ -214,3 +208,55 @@ Q.idea/sonarlint/securityhotspotstore/9/b/9bd710c37369fe175d1b5ece411945f237d897
 Q.idea/sonarlint/securityhotspotstore/0/1/01844967bedd84ec5f7709ec932578bd6757f705,c\c\cc6eaa9a42e89b665b548e2614aee32be7d655c3
 \
 ,.idea/artifacts/ColorSchemeGenerator_jar.xml,7\4\74af47ad109ac96c265f1d1c75866c225ab6ee60
+G
+src/res/images/Bash.svg,7\e\7ebd3fd4b043c630d1c6e27ee25a4774b2247cee
+O
+src/res/images/bash_profile.svg,a\b\abf8d32c2f2f2e82b69747ef88b50f7a1534c88b
+J
+src/res/images/BashNew.svg,b\a\baa573445573dcdc4dd3cea3bf4beae3709687be
+Y
+)src/res/images/Check_New_Java_Version.svg,e\5\e5576e10c38dbf50cd1eea8dd5209605f1ebeb6f
+P
+ src/res/images/Control_Panel.svg,9\6\96713d85a97b9d427277dfc5f5b524eca2841662
+W
+'src/res/images/DeviceSpecifications.svg,9\f\9f0063fdaee00c59ab3e75e11bf095112424a699
+K
+src/res/images/Download.svg,f\2\f29d70139e5f539b92cc0efa513ab72459f56512
+\
+,src/res/images/Edit_Environment_Variable.svg,e\6\e6c18b1dd10270e13bf98bc57937994f668d9967
+b
+2src/res/images/Environment_Variables_Java_Home.svg,d\d\dd0dbb87235bd7564a6574db38446a768af068f6
+]
+-src/res/images/Environment_Variables_Path.svg,7\9\79b35ab0903913362ef69cc8f7ecf536178cc810
+P
+ src/res/images/Java_Location.svg,7\7\77abcc25e1dc6c9b48178cb2a87523aa7b2018c5
+N
+src/res/images/MacCheckBit.svg,e\f\efd18efba1de5848e11741a124220020455023f3
+V
+&src/res/images/New_System_Variable.svg,e\b\eb303acf8783c30f213499548fc7a6855d67d991
+J
+src/res/images/NewJava.svg,4\a\4a954a61b4fa789c70b3bf1bc4ed8ac9780e3075
+P
+ src/res/images/Programs_Java.svg,8\e\8e34f8f0159390fd30e386ae996935bc675cd3e9
+W
+'src/res/images/Run_As_Administrator.svg,2\5\25e2c05099a194e606b52e5dfc50acde837a371e
+O
+src/res/images/startProcess.svg,1\0\10176e2d94a1efb24f86c6cade5fb040a2fb509a
+K
+src/res/images/Terminal.svg,f\b\fb2e11837bea303b5ee45907e9f347ed1b5850cf
+T
+$src/res/images/System_Properties.svg,b\1\b1a612da13e76eaa51f681430f3766a2146be385
+c
+3src/res/images/Win10_Open_Environment_Variables.svg,9\4\94d13771b0b6d29d803c9c6b31d8ceb8dfa75ca5
+c
+3src/res/images/Win11_Open_Environment_Variables.svg,0\6\06a2632ea48bde7588f8c810fd06573b893e11f5
+P
+ src/res/images/Win11CheckBit.svg,8\a\8ad649b213f9b1ee5f22e80dda1efb7b40fc62ba
+Y
+)src/res/images/Win_Check_Java_Version.svg,9\e\9e456b7f714abb29cf0478747075897a465c318b
+V
+&src/res/images/WinCheckJavaVersion.svg,f\d\fdbcd7efe431b4f8e0a9908342c10b995061c1dc
+P
+ src/res/images/Addition_dark.svg,0\6\0656b74fe1082351b64ac7758078ccc3864b3a7a
+U
+%src/res/images/AddColourHarmonics.svg,b\2\b22843c9b8f611db27b7fc262d18504cfe356ee7
