@@ -223,8 +223,8 @@ To report an issue, please use the [issue template](https://github.com/Fenris221
 <!-- LICENSE -->
 <h2> License </h2>
 <a id="license"></a>
-By using the software, the user agrees to the 
-[End User License Agreement](https://github.com/Fenris22127/ColorSchemeGenerator/blob/master/doc/LICENSE.md) and accepts 
+
+By using the software, the user agrees to the [End User License Agreement](https://github.com/Fenris22127/ColorSchemeGenerator/blob/master/doc/LICENSE.md) and accepts 
 the risks of use.
 
 <!-- CONTACT -->
