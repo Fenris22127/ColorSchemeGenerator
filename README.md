@@ -138,7 +138,7 @@ In addition, several more details about the image will be shown in the output fi
 These details include the average colour, saturation,
 and brightness of the resulting colour scheme as well as some metadata of the image.
 
-<img src="src/res/images/UI.png" alt="The UI explained" width="900">
+<img src="src/res/images/UI.png" alt="The UI explained" width="600">
 
 <h3> General use </h3>
 <a id="general-use"></a>
@@ -162,7 +162,7 @@ and brightness of the resulting colour scheme as well as some metadata of the im
 <img src="src/res/images/AddColourHarmonics.svg" alt="Choose if you want colour harmonics" width="300"> <br>
 If you decided to add harmonic colours,
 the dropdown will open where you will be able to select one or more types of colour harmonies.
-See here for an explanation of the different types.
+See here for an explanation of the different types.<br>
 <img src="src/res/images/SelectHarmonics.svg" alt="Select desired colour harmonics" width="300">
 
 #### 6. Click on “Start” or click the button with the upload symbol to choose a different image.
@@ -214,7 +214,7 @@ For further information about the metadata provided on page 2, please refer to t
 - [x] Write a file explaining the mathematical structures used (see: Documentation)
 - [x] Write a file explaining the mathematical structures used in simple terms (see: Documentation)
 - [x] Explain code (maybe, JavaDocs exist) (see: Documentation)
-- [ ] Create a wiki
+- [ ] 🚧Create a wiki🚧
 
 See the [open issues](https://github.com/Fenris22127/ColorSchemeGenerator/issues) for a full list of proposed features (and known issues).<br>
 To report an issue, please use the [issue template](https://github.com/Fenris22127/ColorSchemeGenerator/blob/master/doc/ISSUE_TEMPLATE.md).
