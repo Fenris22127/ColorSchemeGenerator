@@ -187,155 +187,13 @@ listing the average colour (more precisely, the average hue), the average satura
 Note, that this table might be on page 2 if the image is in landscape format. <br><br>
 
 <img src="src/res/images/Page2.svg" alt="Overview over page 2" width="500"> <br>
-Page 2 shows the extracted main colours on a colour wheel. Additionally, the selected images meta-data is listed.
+Page 2 shows the extracted main colours on a colour wheel. Additionally, the selected image's meta-data is listed.
 Pages 3 and 4 list the selected colour harmonics for the main colours.<br><br>
 <img src="src/res/images/Page3.svg" alt="Overview over page 3" width="350">
 <img src="src/res/images/Page4.svg" alt="Overview over page 4" width="350">
+<br>
 
-#### 1 — File name
-The file name and extension of the chosen image as displayed in the file explorer.
-
-#### 2 — Image
-The image chosen by the user that is used to generate the colour scheme.
-
-#### 3 — Colour Scheme
-The color scheme generated from the image along with the colour codes in HEX, RGB and HSB.
-
-#### 4 — Colour Wheel
-Shows the main colors of the colour scheme in a colour wheel.
-
-#### 5 — Averages of colour scheme
-Shows the average colour, whether the colours are saturated or unsaturated on average along the average saturation and 
-whether the colours are bright or dark on average along the average brightness.
-
-#### 6 — Metadata of image
-Shows the metadata of the image, if available.
-
-##### 6.1 — File name
-The display name of the file, which is also displayed in the file explorer. The file title set in the details tab of 
-the file properties may differ.
-
-##### 6.2 — File type
-Shows you the file type of your file. This is either a "JPG"/"JPEG" (no difference) or a "PNG" since the program only 
-accepts files of that type.
-
-##### 6.3 — File size
-Shows the file size in the appropriate unit, meaning it is within the 1 - 999.99 range of the unit, except for MB, 
-which is in the 0–999.99 range.
-
-##### 6.4 — Creation date
-Shows the date and time of the creation of the file according to the time zone of the user.
-
-##### 6.5 — Last modified
-Shows the date and time of the last modification of the file according to the time zone of the user. This includes 
-modifications that change the files' metadata, such as editing the name, owner or permissions.
-
-##### 6.6 — Last accessed
-Shows the date and time of the last time the file has been accessed, meaning it has been opened. This can mean the file 
-was opened by the user or a program.
-
-##### 6.7 — Height
-Shows the height of the image in pixels. This value might change according to the rotation of the image.
-
-##### 6.8 — Width
-Shows the width of the image in pixels. This value might change according to the rotation of the image.
-
-##### 6.9 — Colour Space
-A colour space is a range of colours on a spectrum that can be displayed visually.
-
-<picture>
-    <source srcset="src/res/images/RGB_light.svg"  media="(prefers-color-scheme: dark)">
-    <img src="src/res/images/RGB_dark.svg" alt="The RGB color space visualised" width="300">
-</picture><br>
-<i>Example of the visualization of the RGB color space</i> <br>
-
-R stands for red, G stands for green and B stands for blue. When the image supports transparency, the A stands for 
-alpha (transparency value). <br>
-These colours have to be stored in a format readable to a computer. Usually, color spaces are 8-bit large, which can be imagined as 8 boxes holding a single colour value. <br>
-
-<img src="src/res/images/EmptyBoxes.svg" alt="An image of 8 boxes" width="600"> <br>
-
-3 bits store red, 3 bits store green and 2 bits store blue, since the human eye is less sensitive to blue light. <br>
-
-<img src="src/res/images/RGBBoxes.svg" alt="An image of 8 boxes, 3 are red, 3 are green and 2 are blue" width="600"> <br>
-
-If the image supports transparency, each colour only gets two bits and the alpha value is stored in the 7th and 8th boxes. 
-Usually, the colour space name will contain an A somewhere, like in RGBA. <br>
-
-<img src="src/res/images/RGBABoxes.svg" alt="An image of 8 boxes, 2 are red, 2 are green, 2 are blue and 2 are white" width="600"> <br>
-
-The boxes holding the colors can be moved around to create different colour spaces like the BGR colour space. This only means that the order of the boxes holding the colours is reversed. <br>
-
-#### 6.10 — Colour components
-Shows the number of colour components of the image. This includes red, green and blue, making for three colour components. If the image supports transparency, the alpha channel is counted as the fourth colour component.
-
-#### 6.11 — Bit depth
-This shows the number of bits used to indicate the colour of a pixel. The higher the bit depth, the more bits (boxes) are used to store the colour. With more bits, gradual changes in colour can be displayed more accurately. 
-Bit depth is most notable when working with gradients as gradients will start showing clear steps in colour as the bit depth goes down. <br>
-
-<picture>
-    <source srcset="src/res/images/BitDepth_light.png"  media="(prefers-color-scheme: dark)">
-    <img src="src/res/images/BitDepth_dark.png" alt="A visualisation of bit depth with gradients" width="600">
-</picture><br>
-
-#### 6.12 — Transparency
-Shows, how the image supports transparency. If the image does not support transparency, this will be displayed 
-as "completely opaque". If transparency is supported, the image is either completely transparent or allows gradual 
-steps in transparency (value between 0 and 1). <br>
-
-#### 6.13 — Alpha
-Shows, whether the image supports transparency. If the image does not support transparency, this will be displayed as "Transparency not supported by colour model". If transparency is supported, this will be displayed as "Transparency supported by colour model". <br>
-
-#### 6.14 — Alpha type
-Shows whether the alpha is premultiplied.
-This can easily be explained by this quick example,
-where we want to add a tree (image 1) to an image of a landscape (image 2).
-
- <img src="src/res/images/Image1.svg" alt="A picture of a tree in front of a grey background" width="200">
- <img src="src/res/images/Image2.svg" alt="A picture of a landscape" width="200">
-
-Now, the background of the image with the tree is not transparent,
-so if we were to add that image onto image 2, it would cover image 2 completely.
-To fix this, we need to create an alpha mask.
-The alpha value controls the transparency of an area,
-so an alpha mask specifies which areas should remain opaque and which ones should be transparent.
-Transparent areas are usually shown as black in the mask, while opaque areas are white.
-These masks are applied to the image by multiplying the mask with the image.
-
-<picture>
-    <source srcset="src/res/images/Masking1_light.svg"  media="(prefers-color-scheme: dark)">
-    <img src="src/res/images/Masking1_dark.svg" alt="A visualisation of how to create an alpha mask for image 1" width="600">
-</picture><br>
-
-Then, we need to cut out space for the tree on the new background by using the same, but inverted mask. Now everything but the area of the tree is white, meaning only the space, where the tree will be added is transparent.
-
-<picture>
-    <source srcset="src/res/images/Masking2_light.svg"  media="(prefers-color-scheme: dark)">
-    <img src="src/res/images/Masking2_dark.svg" alt="A visualisation of using the created alpha mask on image 2" width="600">
-</picture><br>
-Finally, we can add the masked first image into the masked second image, where it will fill the transparent area.
-
-<picture>
-    <source srcset="src/res/images/Masking3_light.svg"  media="(prefers-color-scheme: dark)">
-    <img src="src/res/images/Masking3_dark.svg" alt="A visualisation of adding image 1 to the masked image 2" width="600">
-</picture><br>
-
-For the first two steps, I used a multiplication symbol to show the mask being applied.
-This is because masking means multiplied.
-Therefore, premultiplied is pre-masked.
-An image with premultiplied alpha already has information about the individual image components.
-This could look like this:
-
-<picture>
-    <source srcset="src/res/images/Addition_light.svg"  media="(prefers-color-scheme: dark)">
-    <img src="src/res/images/Addition_dark.svg" alt="A visualisation of adding each layer of the combined images" width="600">
-</picture><br>
-
-Left: Not masked/not premultiplied, Right: Masked/premultiplied
-
- <img src="src/res/images/NotPremultiplied.svg" alt="Image 1 and the alpha mask for image 1" width="200">
- <img src="src/res/images/Premultiplied.svg" alt="Isolated Image 1 and the alpha mask for image 1" width="200">
-
+For further information about the metadata provided on page 2, please refer to the [documentation](https://github.com/Fenris22127/ColorSchemeGenerator/blob/master/doc/CSG%20-%20Documentation.pdf).
 
 <!-- ROADMAP -->
 <h2> Roadmap </h2>
@@ -356,6 +214,7 @@ Left: Not masked/not premultiplied, Right: Masked/premultiplied
 - [x] Write a file explaining the mathematical structures used (see: Documentation)
 - [x] Write a file explaining the mathematical structures used in simple terms (see: Documentation)
 - [x] Explain code (maybe, JavaDocs exist) (see: Documentation)
+- [ ] Create a wiki
 
 See the [open issues](https://github.com/Fenris22127/ColorSchemeGenerator/issues) for a full list of proposed features (and known issues).<br>
 To report an issue, please use the [issue template](https://github.com/Fenris22127/ColorSchemeGenerator/blob/master/doc/ISSUE_TEMPLATE.md).
@@ -375,7 +234,7 @@ the risks of use.
 Elisa Johanna Woelk<br><br>
 
 ![Email][email-shield]<br>
-[![Twitter][twitter-shield]][twitter-url]<br>
+<!-- [![Twitter][twitter-shield]][twitter-url]<br> -->
 [![Instagram][instagram-shield]][instagram-url]<br>
 [![GitHub][github-shield]][github-url]
 
