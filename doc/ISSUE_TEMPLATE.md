@@ -4,7 +4,7 @@
 > <b>Date:</b> [dd.MM.yyyy] <br>
 > <b>Contact:</b> [...]
 
-## Describe the bug
+## Description
 A short and precise description of the bug.
 
 ### Steps to reproduce
