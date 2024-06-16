@@ -351,18 +351,19 @@ public class AppController implements Initializable {
 
         // Sets the available languages in the choice box
         languageChoice.setItems(FXCollections.observableList(Arrays.asList("English", "Deutsch")));
-        languageChoice.setValue("English");
+        if (System.getProperty("user.language").equals("de")) {
+            languageChoice.setValue("Deutsch");
+            setBundle(1);
+        } else {
+            languageChoice.setValue("English");
+            setBundle(0);
+        }
+        setUiLanguage();
 
         // Sets the language of the program according to the choice of the user
         languageChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             setBundle(newValue);
-            title.setText(bundle.getString("appTitle"));
-            autoDownload.setText(bundle.getString("appAutoDownload"));
-            numberOfColors.setText(bundle.getString("appColorAmount"));
-            addHarmonics.setText(bundle.getString("appIncludeHarmonics"));
-            downloadBtn.setText(bundle.getString("appDownload"));
-            uploadButton.setText(bundle.getString("appUpload"));
-            harmonicsDropdown.setText(bundle.getString("appHarmonics"));
+            setUiLanguage();
         });
 
         // Binds the progress bar to the progress label
@@ -370,6 +371,19 @@ public class AppController implements Initializable {
         bind(progressLabel);
         Bindings.bindBidirectional(textProp, progressProp, new NumberStringConverter("#'%'"));
 
+    }
+
+    /**
+     * Sets the language of the program according to the choice of the user
+     */
+    private void setUiLanguage() {
+        title.setText(bundle.getString("appTitle"));
+        autoDownload.setText(bundle.getString("appAutoDownload"));
+        numberOfColors.setText(bundle.getString("appColorAmount"));
+        addHarmonics.setText(bundle.getString("appIncludeHarmonics"));
+        downloadBtn.setText(bundle.getString("appDownload"));
+        uploadButton.setText(bundle.getString("appUpload"));
+        harmonicsDropdown.setText(bundle.getString("appHarmonics"));
     }
 
     /**

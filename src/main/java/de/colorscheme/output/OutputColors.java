@@ -39,7 +39,7 @@ import static de.colorscheme.utils.PathUtils.*;
 import static java.util.logging.Level.*;
 
 /**
- * Writes the color scheme of the selected image into a pdf containing the image, image name, colors
+ * Writes the colour scheme of the selected image into a pdf containing the image, image name, colours
  * and their rgb- and hex-code
  *
  * @author &copy; 2023 Elisa Johanna Woelk | elisa-johanna.woelk@outlook.de | @fenris_22127
@@ -59,24 +59,20 @@ public class OutputColors {
     private static Font regular = FontFactory.getFont("../fonts/Mulish-Regular.ttf", 8, Font.NORMAL);
 
     /**
-     * The {@link Path} to the color wheel image
+     * The {@link Path} to the colour-wheel image
      */
     private static final Path schemeWheelPath = Paths.get("src/main/resources/img/SchemeWheel.png");
-    /**
-     * The {@link Path} to the resource base
-     */
-    private static final Path RESOURCE_BASE = Paths.get("src/main/resources/de/colorscheme/");
 
     /**
-     * The {@link String} containing the color for the table header
+     * The {@link String} containing the colour for the table header
      */
     private static final String TABLE_HEADER_COLOR = "#404040";
     /**
-     * The {@link String} containing the color for the table border
+     * The {@link String} containing the colour for the table border
      */
     private static final String TABLE_BORDER_COLOR = "#F3F3F4";
     /**
-     * The {@link String} containing the color for even banded table cells
+     * The {@link String} containing the colour for even banded table cells
      */
     private static final String TABLE_B_CELL_COLOR = "#FAFAFA";
 
@@ -103,7 +99,7 @@ public class OutputColors {
     private static PdfWriter writer;
 
     /**
-     * The {@link ColorUtils} instance used for all color related processes
+     * The {@link ColorUtils} instance used for all colour related processes
      */
     private static final ColorUtils colorUtils = new ColorUtils();
     /**
@@ -126,7 +122,7 @@ public class OutputColors {
     }
 
     /**
-     * Create a PDF with the resulting color scheme using the methods of the class {@link OutputColors OutputColors}.
+     * Create a PDF with the resulting colour scheme using the methods of the class {@link OutputColors OutputColors}.
      *
      * <ul>
      *     <li>
@@ -211,7 +207,7 @@ public class OutputColors {
      * </ol>
      *
      * @param c         A {@link ColorData} object: The instance used for all processes for the currently inspected image
-     * @param path      A {@link String}: The path to the location, where the color scheme file will be saved
+     * @param path      A {@link String}: The path to the location, where the colour scheme file will be saved
      * @param imagePath A {@link String}: The path to the selected image
      */
     private static void outputWrite(ColorData c, Path path, Path imagePath) {
@@ -234,7 +230,7 @@ public class OutputColors {
     }
 
     /**
-     * Adds the resulting color scheme and the selected image to the {@link Document}. <br>
+     * Adds the resulting colour scheme and the selected image to the {@link Document}. <br>
      * <ol>
      *     <li>
      *         Adds a {@link Document#newPage() new page} without margins to the {@link Document} and gets the main
@@ -307,7 +303,7 @@ public class OutputColors {
             doc.newPage();
 
             //Add header
-            Chunk titleChunk = new Chunk("COLOR SCHEME", mulishExtrabold);
+            Chunk titleChunk = new Chunk(getResBundle().getString("colourSchemeTitle").toUpperCase(Locale.ROOT), mulishExtrabold);
             titleChunk.setCharacterSpacing(1.2F);
             Paragraph title = new Paragraph(titleChunk);
             title.setAlignment(Element.ALIGN_CENTER);
@@ -341,7 +337,7 @@ public class OutputColors {
             space.setMultipliedLeading(1.5F);
             doc.add(space);
             checkNewPage(doc);
-            doc.add(new Paragraph("COLOR SCHEME AVERAGES", quattrocentoSansBold));
+            doc.add(new Paragraph(getResBundle().getString("avgTitle").toUpperCase(Locale.ROOT), quattrocentoSansBold));
             addAverageTable(doc, hsbColors);
 
             space = new Paragraph(new Paragraph(" "));
@@ -365,7 +361,7 @@ public class OutputColors {
                 doc.add(imgParagraph);
             }
 
-            doc.add(new Paragraph("IMAGE META DATA", quattrocentoSansBold));
+            doc.add(new Paragraph(getResBundle().getString("metaTitle").toUpperCase(Locale.ROOT), quattrocentoSansBold));
             addMetaTable(doc, imagePath);
 
             space = new Paragraph(new Paragraph(" "));
@@ -374,7 +370,7 @@ public class OutputColors {
             checkNewPage(doc);
 
             if (!getHarmony().isEmpty()){
-                doc.add(new Paragraph("COLOR HARMONICS", quattrocentoSansBold));
+                doc.add(new Paragraph(getResBundle().getString("harmonicsTitle").toUpperCase(Locale.ROOT), quattrocentoSansBold));
                 space = new Paragraph(new Paragraph(" "));
                 space.setMultipliedLeading(1F);
                 doc.add(space);
@@ -395,12 +391,12 @@ public class OutputColors {
 
     /**
      * <b>Image format: Portrait</b><br>
-     * Adds the image and the main colors of the image with their HEX, HSB and RGB values to the {@link Document}.
+     * Adds the image and the main colours of the image with their HEX, HSB and RGB values to the {@link Document}.
      *
      * @param doc       A {@link Document}: The document to be written in
      * @param img       An {@link Image}: The image to be added to the document
      * @param margin    A {@link Float}: The margin of the document
-     * @param hsbColors A {@link Float} array: The average HSB values of the main colors
+     * @param hsbColors A {@link Float} array: The average HSB values of the main colours
      * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
      */
     private static void addForVerticalImage(ColorData c, Document doc, Image img, float margin, float[] hsbColors) throws DocumentException {
@@ -446,11 +442,11 @@ public class OutputColors {
     }
 
     /**
-     * Formats the {@link Paragraph} containing the HEX, HSB and RGB values of the color.
-     * @param hex The hexadecimal value of the color
-     * @param hsb The HSB values of the color
-     * @param awtColor The {@link Color} object of the color
-     * @return A {@link Paragraph} containing the HEX, HSB and RGB values of the color
+     * Formats the {@link Paragraph} containing the HEX, HSB and RGB values of the colour.
+     * @param hex The hexadecimal value of the colour
+     * @param hsb The HSB values of the colour
+     * @param awtColor The {@link Color} object of the colour
+     * @return A {@link Paragraph} containing the HEX, HSB and RGB values of the colour
      */
     private static Paragraph getColorStrings(String hex, float[] hsb, Color awtColor) {
         Paragraph colorValues = new Paragraph();
@@ -473,11 +469,11 @@ public class OutputColors {
 
     /**
      * <b>Image format: Landscape or square</b><br>
-     * Adds the image and the main colors of the image with their HEX, HSB and RGB values to the {@link Document}.
+     * Adds the image and the main colours of the image with their HEX, HSB and RGB values to the {@link Document}.
      *
      * @param doc       A {@link Document}: The document to be written in
      * @param img       An {@link Image}: The image to be added to the document
-     * @param hsbColors A {@link Float} array: The average HSB values of the main colors
+     * @param hsbColors A {@link Float} array: The average HSB values of the main colours
      * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
      */
     private static void addForHorizontalImage(ColorData c, Document doc, Image img, float[] hsbColors) throws DocumentException {
@@ -516,7 +512,7 @@ public class OutputColors {
             ct.setSimpleColumn(rect);
             Paragraph colorValues = new Paragraph();
             Paragraph hexHeader = new Paragraph(" HEX:", fontUtils.getMulish(10, FontUtils.FontWeight.BOLD, checkContrastAWT(color)));
-            Paragraph hexVal = new Paragraph(" " + hex, fontUtils.getMulish(9, FontUtils.FontWeight.BOLD, checkContrastAWT(color)));
+            Paragraph hexVal = new Paragraph(" " + hex, fontUtils.getMulish(9, FontUtils.FontWeight.REGULAR, checkContrastAWT(color)));
             hexVal.setSpacingAfter(4);
             Paragraph hslHeader = new Paragraph(" HSB:", fontUtils.getMulish(10, FontUtils.FontWeight.BOLD, checkContrastAWT(color)));
             Paragraph hslVal = new Paragraph(
@@ -547,9 +543,9 @@ public class OutputColors {
     }
 
     /**
-     * Adds the average color values of the selected image to a {@link PdfPTable} in the {@link Document}.
+     * Adds the average colour values of the selected image to a {@link PdfPTable} in the {@link Document}.
      * @param doc The {@link Document} to be written in
-     * @param hsbColors The average HSB values of the main colors
+     * @param hsbColors The average HSB values of the main colours
      * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
      */
     private static void addAverageTable(Document doc, float[] hsbColors) throws DocumentException {
@@ -558,8 +554,8 @@ public class OutputColors {
         table.setSpacingBefore(14);
         table.setSpacingAfter(20);
         table.setWidths(new int[]{1, 2});
-        Paragraph header = new Paragraph("Average", fontUtils.getMulish(9, FontUtils.FontWeight.BOLD, colorUtils.hexToColor(TABLE_HEADER_COLOR)));
-        Paragraph value = new Paragraph("Value", fontUtils.getMulish(9, FontUtils.FontWeight.BOLD, colorUtils.hexToColor(TABLE_HEADER_COLOR)));
+        Paragraph header = new Paragraph(getResBundle().getString("avgTableHeaderAvg"), fontUtils.getMulish(9, FontUtils.FontWeight.BOLD, colorUtils.hexToColor(TABLE_HEADER_COLOR)));
+        Paragraph value = new Paragraph(getResBundle().getString("avgTableHeaderVal"), fontUtils.getMulish(9, FontUtils.FontWeight.BOLD, colorUtils.hexToColor(TABLE_HEADER_COLOR)));
         PdfPCell avgHeader = getHeaderCell(header);
         PdfPCell valueHeader = getHeaderCell(value);
 
@@ -568,15 +564,15 @@ public class OutputColors {
         String[] averages = getAverage(hsbColors);
 
         Font mulishSemibold = fontUtils.getMulish(12, FontUtils.FontWeight.SEMI_BOLD, Color.BLACK);
-        Paragraph color = new Paragraph("Colour", mulishSemibold);
+        Paragraph color = new Paragraph(getResBundle().getString("avgColour"), mulishSemibold);
         Paragraph colorAvg = new Paragraph(averages[0], fontUtils.getMulish());
         table.addCell(getACell(color, false));
         table.addCell(getACell(colorAvg, false));
-        Paragraph saturation = new Paragraph("Saturation", mulishSemibold);
+        Paragraph saturation = new Paragraph(getResBundle().getString("avgSaturation"), mulishSemibold);
         Paragraph saturationAvg = new Paragraph(averages[1], fontUtils.getMulish());
         table.addCell(getBCell(saturation, false));
         table.addCell(getBCell(saturationAvg, false));
-        Paragraph brightness = new Paragraph("Brightness", mulishSemibold);
+        Paragraph brightness = new Paragraph(getResBundle().getString("avgBrightness"), mulishSemibold);
         Paragraph brightnessAvg = new Paragraph(averages[2], fontUtils.getMulish());
         table.addCell(getACell(brightness, true));
         table.addCell(getACell(brightnessAvg, true));
@@ -601,8 +597,8 @@ public class OutputColors {
         table.setSpacingAfter(20);
         table.setWidths(new int[]{1, 2});
         table.setHeaderRows(1);
-        Paragraph header = new Paragraph("Meta Data", fontUtils.getMulish(9, FontUtils.FontWeight.BOLD, colorUtils.hexToColor(TABLE_HEADER_COLOR)));
-        Paragraph value = new Paragraph("Value", fontUtils.getMulish(9, FontUtils.FontWeight.BOLD, colorUtils.hexToColor(TABLE_HEADER_COLOR)));
+        Paragraph header = new Paragraph(getResBundle().getString("metaTableHeaderMeta"), fontUtils.getMulish(9, FontUtils.FontWeight.BOLD, colorUtils.hexToColor(TABLE_HEADER_COLOR)));
+        Paragraph value = new Paragraph(getResBundle().getString("metaTableHeaderVal"), fontUtils.getMulish(9, FontUtils.FontWeight.BOLD, colorUtils.hexToColor(TABLE_HEADER_COLOR)));
         PdfPCell metaHeader = getHeaderCell(header);
         PdfPCell valueHeader = getHeaderCell(value);
 
@@ -638,7 +634,7 @@ public class OutputColors {
     }
 
     /**
-     * Adds the selected color harmonies to the {@link Document}.
+     * Adds the selected colour harmonies to the {@link Document}.
      * @param c The {@link ColorData} object
      * @param doc The {@link Document} to be written in
      * @param harmonies The {@link List} of {@link ColorHarmony} objects
@@ -676,13 +672,13 @@ public class OutputColors {
     }
 
     /**
-     * Adds the complementary color harmony to the {@link Document}.
+     * Adds the complementary colour harmony to the {@link Document}.
      * @param c The {@link ColorData} object
      * @param doc The {@link Document} to be written in
      * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
      */
     private static void addComplementary(ColorData c, Document doc) throws DocumentException {
-        addHarmonyHeader(doc, "Complementary");
+        addHarmonyHeader(doc, getResBundle().getString("harmonicsComplementary"));
 
         PdfPTable table = new PdfPTable(getCentroids());
         table.setWidthPercentage(100);
@@ -698,13 +694,13 @@ public class OutputColors {
     }
 
     /**
-     * Adds the split complementary color harmony to the {@link Document}.
+     * Adds the split complementary colour harmony to the {@link Document}.
      * @param c The {@link ColorData} object
      * @param doc The {@link Document} to be written in
      * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
      */
     private static void addSplitComplementary(ColorData c, Document doc) throws DocumentException {
-        addHarmonyHeader(doc, "Split Complementary");
+        addHarmonyHeader(doc, getResBundle().getString("harmonicsSplitComplementary"));
 
         PdfPTable table = new PdfPTable(getCentroids());
         table.setWidthPercentage(100);
@@ -720,13 +716,13 @@ public class OutputColors {
     }
 
     /**
-     * Adds the monochromatic color harmony to the {@link Document}.
+     * Adds the monochromatic colour harmony to the {@link Document}.
      * @param c The {@link ColorData} object
      * @param doc The {@link Document} to be written in
      * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
      */
     private static void addMonochromatic(ColorData c, Document doc) throws DocumentException {
-        addHarmonyHeader(doc, "Monochromatic");
+        addHarmonyHeader(doc, getResBundle().getString("harmonicsMonochromatic"));
 
         PdfPTable table = new PdfPTable(getCentroids());
         table.setWidthPercentage(100);
@@ -742,13 +738,13 @@ public class OutputColors {
     }
 
     /**
-     * Adds the analogous color harmony to the {@link Document}.
+     * Adds the analogous colour harmony to the {@link Document}.
      * @param c The {@link ColorData} object
      * @param doc The {@link Document} to be written in
      * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
      */
     private static void addAnalogous(ColorData c, Document doc) throws DocumentException {
-        addHarmonyHeader(doc, "Analogous");
+        addHarmonyHeader(doc, getResBundle().getString("harmonicsAnalogous"));
 
         PdfPTable table = new PdfPTable(getCentroids());
         table.setWidthPercentage(100);
@@ -764,13 +760,13 @@ public class OutputColors {
     }
 
     /**
-     * Adds the triadic color harmony to the {@link Document}.
+     * Adds the triadic colour harmony to the {@link Document}.
      * @param c The {@link ColorData} object
      * @param doc The {@link Document} to be written in
      * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
      */
     private static void addTriadic(ColorData c, Document doc) throws DocumentException {
-        addHarmonyHeader(doc, "Triadic");
+        addHarmonyHeader(doc, getResBundle().getString("harmonicsTriadic"));
 
         PdfPTable table = new PdfPTable(getCentroids());
         table.setWidthPercentage(100);
@@ -786,13 +782,13 @@ public class OutputColors {
     }
 
     /**
-     * Adds the tetradic color harmony to the {@link Document}.
+     * Adds the tetradic colour harmony to the {@link Document}.
      * @param c The {@link ColorData} object
      * @param doc The {@link Document} to be written in
      * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
      */
     private static void addTetradic(ColorData c, Document doc) throws DocumentException {
-        addHarmonyHeader(doc, "Tetradic");
+        addHarmonyHeader(doc, getResBundle().getString("harmonicsTetradic"));
 
         PdfPTable table = new PdfPTable(getCentroids());
         table.setWidthPercentage(100);
@@ -808,7 +804,7 @@ public class OutputColors {
     }
 
     /**
-     * Adds a header for the color harmonies to the {@link Document} with the passed {@link String} as content.
+     * Adds a header for the colour harmonies to the {@link Document} with the passed {@link String} as content.
      * @param doc A {@link Document}: The document to be written in
      * @param header A {@link String}: The content of the header
      * @throws DocumentException If the {@link PdfPTable table} could not be added to the document
@@ -870,11 +866,11 @@ public class OutputColors {
     }
 
     /**
-     * Adds a {@link PdfPTable} to the {@link Document} with the passed {@link BaseColor} as the main color and the
-     * contents of the passed {@link List} of {@link javafx.scene.paint.Color}s as harmonic colors.
-     * @param bc A {@link BaseColor}: The main color
-     * @param c A {@link List} of {@link javafx.scene.paint.Color}s: The harmonic colors
-     * @return A {@link PdfPCell}: The cell with the main color and the harmonic colors
+     * Adds a {@link PdfPTable} to the {@link Document} with the passed {@link BaseColor} as the main colour and the
+     * contents of the passed {@link List} of {@link javafx.scene.paint.Color}s as harmonic colours.
+     * @param bc A {@link BaseColor}: The main colour
+     * @param c A {@link List} of {@link javafx.scene.paint.Color}s: The harmonic colours
+     * @return A {@link PdfPCell}: The cell with the main colour and the harmonic colours
      */
     private static PdfPCell getHarmonyCells(BaseColor bc, List<javafx.scene.paint.Color> c) {
         PdfPCell cell = new PdfPCell();
@@ -891,10 +887,10 @@ public class OutputColors {
     }
 
     /**
-     * Returns a {@link PdfPCell} with the passed {@link BaseColor} as background color.
-     * The color is one of the main colors.
-     * @param color A {@link BaseColor}: The color to set as background color
-     * @return A {@link PdfPCell}: The cell with the passed color as the background
+     * Returns a {@link PdfPCell} with the passed {@link BaseColor} as background colour.
+     * The colour is one of the main colours.
+     * @param color A {@link BaseColor}: The colour to set as background colour
+     * @return A {@link PdfPCell}: The cell with the passed colour as the background
      */
     private static PdfPCell getHarmonicMainCell(BaseColor color) {
         PdfPCell innerCell = new PdfPCell();
@@ -907,10 +903,10 @@ public class OutputColors {
     }
 
     /**
-     * Returns a {@link PdfPCell} with the passed {@link BaseColor} as background color.
-     * The color is a harmonic color to one of the main colors.
-     * @param c A {@link BaseColor}: The color to set as background color
-     * @return A {@link PdfPCell}: The cell with the passed color as the background
+     * Returns a {@link PdfPCell} with the passed {@link BaseColor} as background colour.
+     * The colour is a harmonic colour to one of the main colours.
+     * @param c A {@link BaseColor}: The colour to set as background colour
+     * @return A {@link PdfPCell}: The cell with the passed colour as the background
      */
     private static PdfPCell getHarmonicCell(BaseColor c) {
         PdfPCell innerCell = new PdfPCell();
@@ -953,10 +949,10 @@ public class OutputColors {
     }
 
     /**
-     * Returns a {@link PdfPCell} with the passed {@link Paragraph} as content and the color of the cell set to white.
+     * Returns a {@link PdfPCell} with the passed {@link Paragraph} as content and the colour of the cell set to white.
      * @param label A {@link Paragraph}: The content of the cell
      * @param isLast A {@link Boolean}: If the cell is the last in the row
-     * @return A {@link PdfPCell}: The cell with the passed content and color
+     * @return A {@link PdfPCell}: The cell with the passed content and colour
      */
     private static PdfPCell getACell(Paragraph label, boolean isLast) {
         PdfPCell cell = new PdfPCell(label);
@@ -972,10 +968,10 @@ public class OutputColors {
     }
 
     /**
-     * Returns a {@link PdfPCell} with the passed {@link Paragraph} as content and the color of the cell set to gray.
+     * Returns a {@link PdfPCell} with the passed {@link Paragraph} as content and the colour of the cell set to grey.
      * @param label A {@link Paragraph}: The content of the cell
      * @param isLast A {@link Boolean}: If the cell is the last in the row
-     * @return A {@link PdfPCell}: The cell with the passed content and color
+     * @return A {@link PdfPCell}: The cell with the passed content and colour
      */
     private static PdfPCell getBCell(Paragraph label, boolean isLast) {
         PdfPCell cell = new PdfPCell(label);
@@ -992,9 +988,9 @@ public class OutputColors {
     }
 
     /**
-     * Checks the contrast of the passed color against white and black and returns the color with the higher contrast.
-     * @param color A {@link BaseColor}: The color to check the contrast of
-     * @return A {@link Color}: The color with the higher contrast
+     * Checks the contrast of the passed colour against white and black and returns the colour with the higher contrast.
+     * @param color A {@link BaseColor}: The colour to check the contrast of
+     * @return A {@link Color}: The colour with the higher contrast
      */
     private static Color checkContrastAWT(BaseColor color) {
         BaseColor col = checkContrast(color);
@@ -1002,9 +998,9 @@ public class OutputColors {
     }
 
     /**
-     * Checks the contrast of the passed color against white and black and returns the color with the higher contrast.
-     * @param color A {@link BaseColor}: The color to check the contrast of
-     * @return A {@link BaseColor}: The color with the higher contrast
+     * Checks the contrast of the passed colour against white and black and returns the colour with the higher contrast.
+     * @param color A {@link BaseColor}: The colour to check the contrast of
+     * @return A {@link BaseColor}: The colour with the higher contrast
      */
     private static BaseColor checkContrast(BaseColor color) {
         //check against white
@@ -1044,10 +1040,10 @@ public class OutputColors {
     }
 
     /**
-     * Adds the description of the average HSB values for the main colors to the {@link Document}.
+     * Adds the description of the average HSB values for the main colours to the {@link Document}.
      *
-     * @param hsbColors A {@link Float} array: The average HSB values of the main colors
-     * @return A {@link String} array: The description of the average HSB values for the main colors
+     * @param hsbColors A {@link Float} array: The average HSB values of the main colours
+     * @return A {@link String} array: The description of the average HSB values for the main colours
      */
     private static String[] getAverage(float[] hsbColors) {
         hsbColors[0] /= getCentroids();
@@ -1059,23 +1055,23 @@ public class OutputColors {
 
         String saturation = (hsbColors[1] < 0.5 ? getResBundle().getString("avgSaturationUnSat")
                 : getResBundle().getString("avgSaturationSat"))
-                .concat(String.format(" (%s %.2f %%)",
+                .concat(String.format(" (%s: %.2f %%)",
                         getResBundle().getString("avgSaturation"),
                         hsbColors[1] * 100));
 
         String brightness = (hsbColors[2] < 0.5 ? getResBundle().getString("avgBrightnessDark")
                 : getResBundle().getString("avgBrightnessLight"))
-                .concat(String.format(" (%s %.2f %%)",
+                .concat(String.format(" (%s: %.2f %%)",
                         getResBundle().getString("avgBrightness"),
                         hsbColors[2] * 100));
         return new String[]{color, saturation, brightness};
     }
 
     /**
-     * Determines the color for the passed hue value.
+     * Determines the colour for the passed hue value.
      *
-     * @param hue A {@link Float}: The hue value to determine the color of.
-     * @return A {@link String}: The color for the passed hue value.
+     * @param hue A {@link Float}: The hue value to determine the colour of.
+     * @return A {@link String}: The colour for the passed hue value.
      */
     private static String determineHue(float hue) {
         int newHue = (int) (hue * 360);
@@ -1119,10 +1115,10 @@ public class OutputColors {
     }
 
     /**
-     * Returns the description of the color space indicated by the passed integer.
+     * Returns the description of the colour space indicated by the passed integer.
      *
-     * @param index A {@link Integer}: The index of the color space
-     * @return A {@link String}: The description of the color space
+     * @param index A {@link Integer}: The index of the colour space
+     * @return A {@link String}: The description of the colour space
      */
     private static String getColorSpace(int index) {
         String model;
